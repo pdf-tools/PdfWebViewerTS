@@ -1,0 +1,20 @@
+.pwv-rangeslider {
+  .pwv-dropdown-text {
+    width: 50px;
+    text-align: right;
+  }
+  .pwv-dropdown-label {
+    margin-right: auto;
+    .pwv-icon {
+      width: 15px;
+      display: inline-block;
+      padding-top: 4px;
+      svg {
+        height: 15px;
+      }
+    }
+  }
+  button {
+    justify-content: flex-end;
+  }
+}

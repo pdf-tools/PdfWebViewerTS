@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>3-Heights™ PDF Web Viewer</title>
+  <script type="text/javascript">window.PDFTOOLS_WEBVIEWER_BASEURL = "./"</script>
+</head>
+
+<body>
+  <div>
+      <header>
+        <a href="/">
+          <img class="logo" src='https://www.pdf-tools.com/pdf20/fileadmin/cd/Images/logo.png' />
+        </a>
+        <div>
+        </div>
+      </header>
+      <main>
+        <div class="viewer" id="viewer">
+          <div class="dev-panel">
+            <form id="viewerOptionsForm">
+              
+              <div class="form-row form-row-input">
+                <label>License Key</label>
+                <input type="text" name="license" value="1-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" />
+              </div>
+      
+              <div class="form-row form-row-select">
+                <label>Language</label>
+                <select name="language">
+                  <option>en</option>
+                  <option>de</option>
+                </select>
+              </div>
+              
+              <div class="form-row form-row-input">
+                <label>Author</label>
+                <input type="text" name="author" value="Peter Muster" />
+              </div>
+
+              <div class="form-row form-row-select">
+                <label>AnnotationBar Position</label>
+                <select name="annotationBarPosition">
+                  <option>left</option>
+                  <option>right</option>
+                  <option>top</option>
+                  <option>bottom</option>
+                </select>
+              </div>
+      
+              <div class="form-row form-row-checkbox">
+                <label>
+                  <input type="checkbox" name="allowFileDrop" checked /> allowFileDrop
+                </label>
+              </div>
+      
+              <div class="form-row form-row-checkbox">
+                <label>
+                  <input type="checkbox" name="allowSaveFile" checked /> allowSaveFile
+                </label>
+              </div>
+      
+              <div class="form-row form-row-checkbox">
+                <label>
+                  <input type="checkbox" name="allowOpenFile" checked /> allowOpenFile
+                </label>
+              </div>
+      
+              <div class="form-row form-row-checkbox">
+                <label>
+                  <input type="checkbox" name="enableSearch" checked /> enableSearch
+                </label>
+              </div>
+      
+      
+              <div class="form-row form-row-checkbox">
+                <label>
+                  <input type="checkbox" name="enableOutlineNavigation" checked /> enableOutlineNavigation
+                </label>
+              </div>
+      
+              <div class="form-row form-row-checkbox">
+                <label>
+                  <input type="checkbox" name="enableThumbnailNavigation" checked /> enableThumbnailNavigation
+                </label>
+              </div>
+      
+              <div class="form-row form-row-buttons">
+                <button type="submit" class="btn-primary">Create PdfWebViewer</button>
+                <button type="reset">Reset</button>
+              </div>
+      
+            </form>
+          </div>
+        </div>
+      </main>
+  </div>
+  <script>
+    var calcScreenSize = function() { document.body.style.height = window.innerHeight + 'px' }
+    calcScreenSize()
+    window.addEventListener('resize', calcScreenSize, false)
+  </script>
+</body>
+
+</html>

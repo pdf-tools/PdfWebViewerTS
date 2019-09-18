@@ -1,0 +1,87 @@
+.pwv-viewercanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: stretch;
+  background-color: $gray-light;
+  touch-action: none;
+  
+  &.pwv-annotationbar-top {
+    flex-direction: column;
+  }
+  &.pwv-annotationbar-bottom {
+    flex-direction: column-reverse;
+  }
+  &.pwv-annotationbar-left {
+    flex-direction: row;
+  }
+  &.pwv-annotationbar-right {
+    flex-direction: row-reverse;
+  }
+}
+
+.pwv-canvas-toolbar {
+  flex-grow: 0;
+  flex-shrink: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  .pwv-toolbar {
+    height: auto;
+    border-bottom: solid 2px $gray-light;
+    justify-content: left;
+    flex-wrap: wrap;
+    padding-right: 55px;
+    .pwv-commandbar {
+      height: 40px;
+    }
+    .pwv-commandbar:last-child {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    
+  }
+  .pwv-dropdown-panel {
+    top: 38px !important;
+  }
+}
+
+.pwv-canvas-container {
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  > * {
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;
+  }
+}
+
+.pwv-canvas-layers {
+  flex-grow: 1;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+}

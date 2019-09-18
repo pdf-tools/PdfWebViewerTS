@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./build/src",
+		"jsx": "react",
+		"jsxFactory": "h",
+		"target": "es6",
+    "lib": ["es6", "dom"],
+    "strict": true,
+    "declaration": true,
+    "module": "es6",
+    "sourceMap": false,
+		"moduleResolution": "node",
+		"removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "stripInternal": true,
+    "rootDir": "src",
+    "baseUrl": "./src"
+    },
+  "exclude":[
+    "node_modules",
+    "build",
+    "dist",
+    "scripts",
+  ]
+}

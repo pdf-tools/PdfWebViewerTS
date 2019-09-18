@@ -1,0 +1,81 @@
+.pwv-mobile-top {
+  position: absolute;
+  background-color: $gray-light;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 11;
+  padding-bottom: 2px;
+  .pwv-searchbar-input {
+    input {
+      min-width: 120px;
+    }
+  }
+}
+
+.pwv-mobile-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  height: $toolbar-btn-width;
+  background-color: $gray-lighter;
+  justify-content: space-between;
+  .pwv-commandbar-item {
+    min-width: $toolbar-btn-width;
+    .pwv-icon {
+      height: 18px;
+      svg {
+        height: 18px;
+      }
+    }
+  }
+}
+
+.pwv-mobile-hide-annotationbar {
+  position: absolute;
+  display: flex;
+  top: 0;
+  right: 0;
+  .pwv-commandbar-item {
+    height: $toolbar-btn-width;
+    min-width: $toolbar-btn-width;
+    .pwv-icon {
+      height: 18px;
+      svg {
+        height: 18px;
+      }
+    }
+  }
+  .pwv-commandbar-seperator {
+    height: $toolbar-btn-width;
+  }
+}
+
+.pwv-mobile-pagecount {
+  position: absolute;
+  z-index: 2;
+  bottom: 15px;
+  right: 15px; 
+  font-size: 0.8rem;
+  box-sizing: border-box;
+  text-align: center;
+  width: 50px;
+  padding: 2px; 
+  background-color: rgba($gray-darker, .5);
+  color: #ffffff;
+}
+
+.pwv-devicetype-mobile {
+  .pwv-vertical-scrollbar {
+    width: 5px;
+  }
+  .pwv-horizontal-scrollbar {
+    height: 5px;
+  }
+  .pwv-canvas-toolbar {
+    .pwv-toolbar {
+      .pwv-commandbar {
+        //
+      }
+    }
+  }
+}

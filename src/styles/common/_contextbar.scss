@@ -1,0 +1,79 @@
+
+.pwv-contextbar {
+  cursor: default;
+  background-color: $contextbar-bg-color;
+  box-shadow: $contextbar-shadow;
+  z-index: 10;
+  .pwv-contextbar-content {
+    padding: $contextbar-padding;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .pwv-commandbar-item {
+    color: $contextbar-icon-color;
+    min-width: $contextbar-btn-width;
+    svg {
+      fill: $contextbar-icon-color;
+    }
+  }
+  &:after {
+    position: absolute;
+    left: 50%;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    transform: translate(-8px, 0) rotate(45deg);
+    background-color: $contextbar-bg-color;
+    content: '';
+    box-shadow: $contextbar-shadow;
+    z-index: 1;
+    display: none;
+  }
+  .pwv-contextbar-top & {
+    &:after {
+      bottom: -8px;
+      display: block;
+    }
+  }
+  .pwv-contextbar-bottom & {
+    margin-top: 8px;
+    &:after {
+      top: -8px;
+      display: block;
+    }
+  }
+  .pwv-contextbar-float & {
+    margin-top: -8px;
+    &:after {
+      display: none;
+    }
+  }
+}
+
+
+
+.pwv-contextbar-row {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.pwv-contextbar-group {
+  background-color: $contextbar-bg-color;
+  height: $contextbar-height;
+  align-items: stretch;
+  display: flex;
+  &:after {
+    content: '';
+    width: 12px;
+    height: 24px;
+    margin: 8px 12px 0 0;
+    border-right: 1px solid $gray;
+  }
+  &:last-of-type {
+    &:after {
+      display: none;
+    }
+  }
+}

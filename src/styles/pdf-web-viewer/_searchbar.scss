@@ -1,0 +1,70 @@
+
+.pwv-searchbar {
+  margin-top: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  height: $toolbar-btn-width * .8;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  background-color: $gray-lighter;
+  z-index: 5;
+  box-sizing: content-box;
+  
+  .pwv-commandbar-btn {
+    width: $toolbar-btn-width;
+    &.pwv-btn-sm {
+      width: $toolbar-btn-width * .5;
+    }
+  }
+  
+  .pwv-dropdown {
+    .pwv-dropdown-panel {
+      top: $toolbar-btn-width * .75;
+      z-index: 5;
+    }
+  }
+}
+
+.pwv-searchbar-input {
+  padding: 0 10px;
+  input {
+    padding: 0 5px;
+    border: none;
+    min-width: 250px;
+    height: 28px;
+    line-height: 28px;
+  }
+}
+
+
+.pwv-searchoptions {
+  .pwv-checkbox-btn {
+    border: none;
+    background-color: transparent;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    font-size: 1em;
+    padding: 4px;
+    white-space: nowrap;
+    .pwv-icon {
+      display: block;
+      height: 18px;
+      margin-right: 6px;
+      svg {
+        height: 18px;
+        fill: $blue;
+      }
+    }  
+
+  }
+  .pwv-dropdown-panel {
+    min-width: 150px;
+    padding: 8px;
+    z-index: 5;
+    li {
+      padding: 4px;
+    }
+  }
+}

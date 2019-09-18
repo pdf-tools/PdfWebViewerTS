@@ -1,0 +1,99 @@
+.pwv-top {
+  margin-bottom: 2px;
+}
+
+.pwv-commandbar-seperator {
+  width: $toolbar-btn-width / 2;
+  @include screen-md-down {
+    width: 3px;
+  }
+}
+
+.pwv-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  height: $toolbar-btn-width;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  background-color: $toolbar-bg-color;
+  z-index: 5;
+  box-sizing: content-box;
+
+  .pwv-commandbar-item {
+    min-width: $toolbar-btn-width;
+    &.pwv-btn-sm {
+      min-width: $toolbar-btn-width * .75;
+    }
+  }
+  
+
+  .pwv-dropdown {
+    .pwv-dropdown-panel {
+      z-index: 5;
+      top: 48px;
+    }
+  }
+
+  input {
+    border: none;
+    font-size: 1em;
+    height: 28px;
+    box-sizing: border-box;
+    padding: 3px 6px;
+  }
+
+}
+
+.pwv-document-toolbar {
+  margin-right: auto;
+}
+
+.pwv-search-toolbar {
+  margin-right: auto;
+}
+
+.pwv-search-toolbar-result-index {
+  padding: 0 10px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.pwv-navigation-toolbar-pageinput {
+  padding-left: 0;
+  padding-right: 0;
+  justify-content: space-between;
+  input {
+    width: 2.2rem;
+    text-align: right;
+    background-color: transparent;
+    color: $blue;
+    padding-left: 0;
+    padding-right: .2rem;
+    &:hover, &:focus {
+      background-color: #ffffff;
+    }
+  }
+  > span {
+    display: block;
+    padding: 3px;
+  }
+  > label {
+    display: block;
+    min-width: 2.2rem;
+    padding-left: .2rem;
+  }
+  @include screen-md-down {
+    display: none;
+  }
+}
+
+.pwv-dropdown-zoom {
+  width: 75px;
+  > button {
+    justify-content: flex-end;
+  }
+  @include screen-sm-down {
+    display: none;
+  }
+}

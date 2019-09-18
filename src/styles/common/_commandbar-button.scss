@@ -1,0 +1,48 @@
+
+.pwv-commandbar-btn {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  &:focus {
+    outline: none;
+  }
+  &:enabled {
+    &:hover {
+      svg {
+        fill: #006395;
+      }
+      color: #008BD2;
+    }
+    &:active {
+      color: #008BD2;
+      svg {
+        transform: scale(.9);
+        fill: #008BD2;
+      }
+    }
+    &:focus {
+      fill: #008BD2;
+      color: #008BD2;
+    }
+  }
+  &.pwv-active {
+    svg {
+      fill: $blue;
+    }
+  }
+  .pwv-btn-text {
+    display: inline-block;
+    padding: 0 .5rem;
+  }
+  .pwv-icon {
+    display: block;
+    height: 18px;
+    svg {
+      height: 18px;
+    }
+  }
+}

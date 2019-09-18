@@ -1,0 +1,41 @@
+.pwv-opacityslider {
+  .pwv-dropdown-text {
+    width: 50px;
+  }
+}
+.pwv-dropdown-line-width {
+  width: 50px;
+  .pwv-dropdown-panel {
+    width: 75px;
+    min-width: 75px;
+  }
+  ul {
+    li {
+      padding: 0 10px;
+    }
+  }
+  .pwv-line-width {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 25px;
+    padding: 0;
+    > div {
+      width: 100%;
+      background-color: $font-color,
+    }
+    &:hover {
+      > div {
+        background-color: $blue,
+      }
+    }
+  }
+  button {
+    .pwv-line-width {
+      width: 18px;
+      > div {
+        width: 18px;
+      }
+    }
+  }
+}

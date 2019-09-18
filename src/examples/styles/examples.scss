@@ -1,0 +1,121 @@
+/* Colors */
+$white: #ffffff;
+$gray-lighter: #f4f4f4;
+$gray-light: #ebebeb;
+$gray: #b6b6b6;
+$gray-dark: #9b9b9b;
+$gray-darker: #4a4a4a;
+$blue-light: #0066cc;
+$blue: #0066cc;
+$blue-dark: #0066cc;
+
+/* Styling */
+
+html, body {
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-size: 16px;
+  margin: 0 !important;
+  padding: 0;
+  position: relative;
+}
+
+body > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  border-bottom: 1px solid $gray-light;
+  img.logo {
+    height: 40px;
+    margin: 10px 40px 10px 20px;
+  }
+  h1, h2, h3 {
+    font-weight: 200;
+    color: $gray;
+    margin: 0;
+    padding: 0;
+  }
+  h1{
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 767px) {
+  header {
+    display: none;
+  }
+}
+
+main {
+  display: flex;
+  flex-shrink: 1;
+  height: 100%;
+  position: relative;
+  > .content {
+    margin: 0;
+    padding: 20px;
+    a {
+      text-decoration: none;
+    }
+    ul.link-list {
+      li {
+        margin: 0;
+        padding: 4px 2px;
+      }
+    }
+  }
+  .viewer {
+    width: 100%;
+    height: 100%;
+  }
+  .dev-panel {
+    padding: 20px;
+    form {
+      .form-row {
+        margin: 0 0 20px 0;
+        label {
+          display: block;
+          margin: 0 0 8px 0;
+        }
+        input[type="text"], select {
+          box-sizing: border-box;
+          border: 1px solid $gray-dark;
+          width: 100%;
+          max-width: 400px;
+          height: 28px;
+          line-height: 28px;
+          margin: 0;
+          padding: 0 5px;
+          font-size: 16px;
+        }
+      }
+      button {
+        font-size: 16px;
+        padding: 6px 20px;
+        border: 1px solid $gray-dark;
+        background-color: $gray-lighter;
+        color: $blue;
+        &.btn-primary {
+          background-color: $blue;
+          border-color: $blue;
+          color: $white;
+        }
+      }
+    }
+  }
+}

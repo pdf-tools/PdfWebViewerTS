@@ -1,0 +1,53 @@
+.pwv-annotationbar {
+  display: flex;
+  align-content: flex-start;
+  background-color: $gray-lighter;
+  flex-shrink: 0;
+  
+  .pwv-annotationbar-left & {
+    border-right: 2px solid $gray-light;
+    flex-direction: column;
+    width: $toolbar-btn-width;
+    padding-top: 10px;
+    .pwv-commandbar-btn {
+      height: 55px;
+    }
+    .pwv-dropdown-panel{
+      top: 0;
+      left: $toolbar-btn-width;
+      width: 200px;
+    }
+  }
+  
+  .pwv-annotationbar-right & {
+    border-left: 2px solid $gray-light;
+    flex-direction: column;
+    width: $toolbar-btn-width;
+    padding-top: 10px;
+    .pwv-commandbar-btn {
+      height: 55px;
+    }
+  }
+
+  .pwv-annotationbar-top & {
+    border-bottom: 2px solid $gray-light;
+    height: $toolbar-btn-width;
+  }
+  
+  .pwv-annotationbar-bottom & {
+    border-top: 2px solid $gray-light;
+    height: $toolbar-btn-width;
+  }
+  
+  .pwv-commandbar-group {
+    width: $toolbar-btn-width;
+  }
+  .pwv-dropdown, .pwv-commandbar-item {
+    height: $toolbar-btn-width;
+    width: $toolbar-btn-width;
+  }
+
+  .pwv-annotation-border {
+    border: solid 2px $blue
+  }
+}

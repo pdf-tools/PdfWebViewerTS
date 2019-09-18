@@ -1,0 +1,135 @@
+.pwv-loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101;
+}
+
+.pwv-li {
+  width: 4rem;
+  height: 4rem;
+  position: relative;
+}
+
+.pwv-li-c {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.pwv-li-c:before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 15%;
+  height: 15%;
+  background-color: $loader-color;
+  border-radius: 100%;
+  animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+}
+
+.pwv-li-c2 {
+  transform: rotate(30deg);
+  &:before {
+    animation-delay: -1.1s;
+  }
+}
+
+.pwv-li-c3 {
+  transform: rotate(60deg);
+  &:before {
+    animation-delay: -1s;
+  }
+}
+
+.pwv-li-c4 {
+  transform: rotate(90deg);
+  &:before {
+    animation-delay: -.9s;
+  }
+}
+
+.pwv-li-c5 {
+  transform: rotate(120deg);
+  &:before {
+    animation-delay: -.8s;
+  }
+}
+
+.pwv-li-c6 {
+  transform: rotate(150deg);
+  &:before {
+    animation-delay: -.7s;
+  }
+}
+
+.pwv-li-c7 {
+  transform: rotate(180deg);
+  &:before {
+    animation-delay: -.6s;
+  }
+}
+
+.pwv-li-c8 {
+  transform: rotate(210deg);
+  &:before {
+    animation-delay: -.5s;
+  }
+}
+
+.pwv-li-c9 {
+  transform: rotate(240deg);
+  &:before {
+    animation-delay: -.4s;
+  }
+}
+
+.pwv-li-c10 {
+  transform: rotate(270deg);
+  &:before {
+    animation-delay: -.3s;
+  }
+}
+
+.pwv-li-c11 {
+  transform: rotate(300deg);
+  &:before {
+    animation-delay: -.2s;
+  }
+}
+
+.pwv-li-c12 {
+  transform: rotate(330deg);
+  &:before {
+    animation-delay: -.1s;
+  }
+}
+
+@-webkit-keyframes sk-circleFadeDelay {
+  0%,
+  39%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes sk-circleFadeDelay {
+  0%,
+  39%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}

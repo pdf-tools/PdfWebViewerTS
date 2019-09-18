@@ -1,0 +1,22 @@
+.pwv-contextmenu {
+  position: absolute;
+  width: 200px;
+  background-color: $contextbar-bg-color;
+  box-shadow: $contextbar-shadow;
+  z-index: 11;
+}
+.pwv-contextmenu-content {
+  display: flex;
+  flex-direction: column;
+
+  .pwv-commandbar-item {
+    color: $contextbar-icon-color;
+    min-width: $contextbar-btn-width;
+    padding: .5rem 1rem;
+    justify-content: start !important;
+
+    svg {
+      fill: $contextbar-icon-color;
+    }
+  }
+}
