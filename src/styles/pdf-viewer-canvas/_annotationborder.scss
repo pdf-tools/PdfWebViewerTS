@@ -1,0 +1,100 @@
+$border-padding: 0;
+$border-width: 2px;
+$border-color: rgba($selection-color, .75);
+$drag-handle-padding: 3px;
+$resize-handle-size: 16px;
+
+.pwv-annotation-selection {
+  box-sizing: border-box;
+  z-index: 5;
+  .pwv-contextbar {
+    position: absolute;
+    left: $border-padding;
+    transition: opacity .3s;
+  }
+  &.pwv-contextbar-top {
+    .pwv-contextbar {
+      top: -70px;
+    }
+  }
+  &.pwv-contextbar-bottom {
+    .pwv-contextbar {
+      bottom: -70px;
+    }
+  }
+}
+
+.pwv-annotation-moving,
+.pwv-annotation-resizing {
+  .pwv-annotation-border {
+    border-style: dotted;
+    background-color: rgba($selection-color, .33);
+  }
+  .pwv-contextbar {
+    opacity: 0;
+    transition: opacity .1s;
+  }
+}
+
+.pwv-annotation-border {
+  position: absolute;
+  top: $border-padding;
+  left: $border-padding;
+  right: $border-padding;
+  bottom: $border-padding;
+  border: $border-width solid $border-color;
+  box-sizing: border-box;
+}
+
+.pwv-annotation-border-draghandle {
+  position: absolute;
+  top: $drag-handle-padding;
+  left: $drag-handle-padding;
+  bottom: $drag-handle-padding;
+  right: $drag-handle-padding;
+  border: none;
+  cursor: move;
+  z-index: 12;
+}
+
+.pwv-annotation-border-resizehandle-nw,
+.pwv-annotation-border-resizehandle-ne,
+.pwv-annotation-border-resizehandle-sw,
+.pwv-annotation-border-resizehandle-se {
+  position: absolute;
+  border: $border-width solid $border-color;
+  background-color: rgba($selection-color, .75);
+  box-sizing: border-box;
+  width: $resize-handle-size;
+  height: $resize-handle-size;
+  .pwv-annotation-moving & {
+    display: none !important;
+  }
+  .pwv-annotation-resizing & {
+    display: none !important;
+  }
+}
+
+.pwv-annotation-border-resizehandle-nw {
+  top: $border-width - $resize-handle-size;
+  left: $border-width - $resize-handle-size;
+  cursor: nw-resize;
+}
+
+.pwv-annotation-border-resizehandle-ne {
+  top: $border-width - $resize-handle-size;
+  right: $border-width - $resize-handle-size;
+  cursor: ne-resize;
+}
+
+.pwv-annotation-border-resizehandle-sw {
+  bottom: $border-width - $resize-handle-size;
+  left: $border-width - $resize-handle-size;
+  cursor: sw-resize;
+}
+
+.pwv-annotation-border-resizehandle-se {
+  bottom: $border-width - $resize-handle-size;
+  right: $border-width - $resize-handle-size;
+  cursor: se-resize;
+}

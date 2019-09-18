@@ -1,0 +1,108 @@
+
+.pwv-tooltip {
+  position: absolute;
+  visibility: hidden;
+  z-index: 12;
+  
+  &:after {
+    content: '';
+    background-color: $blue;
+    position: absolute;
+    box-sizing: border-box;
+    width: 10px;
+    height: 10px;
+    transform: translate(-5px, -5px) rotate(45deg);
+  }
+
+  &.pwv-tooltip-top {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    .pwv-tooltip-content {
+      bottom: 0;
+      text-align: center;
+    }
+    &:after {
+      left: 50%;
+    }
+  }
+  &.pwv-tooltip-bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    .pwv-tooltip-content {
+      top: 0;
+      text-align: center;
+    }
+    &:after {
+      left: 50%;
+    }
+  }
+  
+  &.pwv-tooltip-left {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    .pwv-tooltip-content {
+      right: 0;
+      top: -50%;
+      text-align: right;
+    }
+    &:after {
+      top: 50%;
+    }
+  }
+  
+  &.pwv-tooltip-right {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    .pwv-tooltip-content {
+      left: 0;
+      top: -50%;
+      text-align: left;
+    }
+    &:after {
+      top: 50%;
+    }
+  }
+  
+}
+.pwv-tooltip-content {
+  z-index: 10;
+  position: absolute;
+  background-color: $blue;
+  font-size: .8rem;
+  width: 100px;
+  box-sizing: border-box;
+  border: solid 1px $blue;
+  box-shadow: 0 3px 8px rgba($blue-dark, .2);
+  color: #ffffff;
+  > span {
+    display: inline-block;
+    box-sizing: border-box;
+    padding: .33rem .25rem;
+  }
+}
+.pwv-commandbar-item, .pwv-dropdown:not(.pwv-dropdown-open) {
+  &:hover {
+    .pwv-tooltip {
+      visibility: visible;
+      animation: tooltipFadeInDelay 1.2s ease-in;
+    }
+  }
+}
+
+@keyframes tooltipFadeInDelay {
+  0%,
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

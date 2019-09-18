@@ -1,0 +1,58 @@
+// colors
+$gray-lighter: #f4f4f4;
+$gray-light: #e9e9e9;
+$gray: #cecece;
+$gray-dark: #9b9b9b;
+$gray-darker: #4a4a4a;
+$blue-light: #3ABCFF;
+$blue: #008bd2;
+$blue-dark: #006395;
+
+$selection-color: #006395;
+
+$icon-color: #111111;
+$font-color: #333333;
+
+// common
+@mixin font-style {
+  font-size: 16px;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+}
+
+// toolbar
+$toolbar-bg-color: $gray-lighter;
+$toolbar-height: 50px;
+$toolbar-btn-width: 50px;
+$toolbar-btn-height: 50px;
+$toolbar-icon-size: 18px;
+$toolbar-icon-color: $icon-color;
+
+// navigation-panel
+$navigation-panel-bg-color: #ffffff;
+
+// document-view
+$document-view-bg-color: $gray-light;
+
+// loader
+$loader-color: $blue-light;
+
+// Contextbar
+$contextbar-bg-color: $gray-lighter;
+$contextbar-icon-color: $gray-darker;
+$contextbar-font-color: $font-color;
+$contextbar-height: 40px;
+$contextbar-btn-width: 50px;
+$contextbar-padding: 0 10px 0 10px;
+$contextbar-shadow: 0 3px 8px rgba(black, .4);
+
+// popup
+$popup-bg: $gray-lighter;
+$popup-color: $font-color;
+$popup-shadow: 0 3px 8px rgba(black, .4);
+$popup-content-bg: #ffffff;
+$popup-content-color: $font-color;
+$popup-content-border: solid 1px $gray;
+
+@import "../common/index";
+@import "../pdf-viewer-canvas/index";
+@import "../pdf-web-viewer/index";

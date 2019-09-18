@@ -1,0 +1,234 @@
+$modal-bg: $blue;
+$modal-text-align: left;
+$modal-header-bg: $blue;
+$modal-header-color: #ffffff;
+$modal-body-bg: $blue;
+$modal-body-color: #ffffff;
+
+.pwv-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background-color: $modal-bg;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pwv-modal-dialog {  
+  display: flex;
+  flex-direction: column;
+  text-align: $modal-text-align;
+
+  border: dashed 2px rgba($modal-body-color, .2);
+  
+  transition: border-color .3s;
+  .pwv-openfile & {
+    .pwv-dropzone-dragover & {
+      transition: border-color .3s;
+      border-color: rgba($modal-body-color, .7);
+    }
+  }
+
+  @include screen-sm-down {
+    width: 100%;
+    margin: 20px;
+  }
+  @include screen-md {
+    width: 600px;
+  }
+  @include screen-lg {
+    width: 760px;
+  }
+  @include screen-xl {
+    width: 760px;
+  }
+}
+
+.pwv-modal-header {
+  padding: .25rem 1rem;
+  background-color: $modal-header-bg;
+  color: $modal-header-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+
+  h2 {
+    display: none;
+    padding: 0;
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 2.2rem;
+    font-weight: 200;
+    opacity: .8;
+  }
+  .pwv-icon {
+    padding-top: 2rem;
+    svg {
+      height: 70px;
+      fill: rgba($modal-body-color, .7);
+    } 
+  }
+}
+
+.pwv-modal-body {
+  background-color: $modal-body-bg;
+  color: $modal-body-color;
+  text-align: center;
+  padding: 2rem;
+  
+  @include screen-sm-down {
+    padding: 1rem;
+  }
+
+  .pwv-modal-message {
+    font-size: 1.25em;
+    margin: 0 0 2rem 0;
+    p {
+      margin: 0 0 .25em 0;
+      padding: 0;
+    }
+    h2 {
+      text-transform: uppercase;
+      font-size: 2em;
+      font-weight: 200;
+      opacity: .5;
+      margin: 0;
+      padding: 0;
+    }
+  }
+  
+  .pwv-form-row {
+    padding: 0 0 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .pwv-form-field {
+    background-color: $modal-body-color;
+    position: relative;
+    width: 60%;
+    
+    @include screen-xs {
+      width: calc(100% - 1rem);
+    }
+
+    .pwv-input {
+      position: relative;
+      background-color: transparent;
+      border: none;
+      box-sizing: border-box;
+      width: 100%;
+      height: 2.2rem;
+      line-height: 2rem;
+      padding: 0 .5rem;
+      text-align: center;
+      z-index: 2;
+      color: $modal-body-bg;
+    }
+
+    .pwv-form-error {
+      display: flex;
+      background-color: $gray-light;
+      height: 2.2rem;
+      justify-content: center;
+      align-items: center;
+      color: red;
+      .pwv-icon {
+        margin-right: .5rem;
+        svg {
+          height: 1rem;
+          fill: red;
+        } 
+      }
+    }
+    
+    &.pwv-form-has-error {
+      .pwv-form-error {
+        display: flex;
+      }
+    }
+  }
+  
+  .pwv-btn-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    
+    @include screen-xs {
+      flex-direction: column;
+    }
+  }
+  
+  .pwv-btn {
+    background-color: transparent;
+    border: 1px solid rgba($modal-body-color, .5);
+    color: $modal-body-color;
+    padding: 6px 30px;
+    margin: .5rem .75rem;
+    
+    @include screen-xs {
+      margin: .5rem;
+    }
+    &:focus {
+      border: 1px solid rgba($modal-body-color, .9);
+    }
+  }
+}
+
+
+$loader-size: 60px;
+$animation-duration: 1.2s;
+.pwv-apploading-indicator {
+  box-sizing: border-box;
+  height: 52px;
+  padding-top: 12px;
+  >div {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: $loader-size;
+    height: $loader-size *.5;
+    transition: all 300ms ease-in-out 0s;
+    z-index: 1;
+    margin: auto;
+    .rect-1,
+    .rect-2,
+    .rect-3,
+    .rect-4,
+    .rect-5 {
+      width: 15%;
+      height: 100%;
+      background-color: rgba($modal-body-color, .7);
+      animation: rectangle-bounce $animation-duration infinite ease-in-out;
+    }
+    .rect-2 {
+      animation-delay: -$animation-duration + .1;
+    }
+    .rect-3 {
+      animation-delay: -$animation-duration + .2;
+    }
+    .rect-4 {
+      animation-delay: -$animation-duration + .3;
+    }
+    .rect-5 {
+      animation-delay: -$animation-duration + .4;
+    }
+  }
+}
+
+@keyframes rectangle-bounce {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  20% {
+    transform: scaleY(1);
+  }
+}

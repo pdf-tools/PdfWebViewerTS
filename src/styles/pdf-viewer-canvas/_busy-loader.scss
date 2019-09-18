@@ -1,0 +1,52 @@
+$loader-size: 42px;
+$animation-duration: 1.2s;
+.pwv-busy-loader {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  right: 20px;
+  z-index: 100;
+  >div {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: $loader-size;
+    height: $loader-size *.5;
+    transition: all 300ms ease-in-out 0s;
+    z-index: 1;
+    margin: auto;
+    .rect-1,
+    .rect-2,
+    .rect-3,
+    .rect-4,
+    .rect-5 {
+      width: 15%;
+      height: 100%;
+      background-color: rgba($blue, .8);
+      animation: rectangle-bounce $animation-duration infinite ease-in-out;
+    }
+    .rect-2 {
+      animation-delay: -$animation-duration + .1;
+    }
+    .rect-3 {
+      animation-delay: -$animation-duration + .2;
+    }
+    .rect-4 {
+      animation-delay: -$animation-duration + .3;
+    }
+    .rect-5 {
+      animation-delay: -$animation-duration + .4;
+    }
+  }
+}
+
+@keyframes rectangle-bounce {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  20% {
+    transform: scaleY(1);
+  }
+}

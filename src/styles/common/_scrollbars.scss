@@ -1,0 +1,99 @@
+$scrollBarSize: 4px;
+$expandedScrollBarSize: 15px;
+
+$scrollBarBg: rgba($gray-dark, .25);
+$scrollHandleBg: rgba($gray-darker, .33);
+$scrollHandleScrollingBg: rgba($blue, 1);
+$scrollHandleDraggingBg: rgba($blue, 1);
+
+.pwv-scroll-container {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+.pwv-scroll-container-sc {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  bottom: -18px;
+  right: -12px;
+  overflow: scroll;
+}
+
+.pwv-scroll-v-expanded {
+  .pwv-scroll-container-sc {
+    right: 0;
+    transition: right .5s;
+  }
+}
+.pwv-scroll-v-collapsed {
+  .pwv-scroll-container-sc {
+    right: -12px;
+    transition: right .5s;
+  }
+}
+
+.pwv-vertical-scrollbar,
+.pwv-horizontal-scrollbar {
+  cursor: default !important;
+  z-index: 7;
+  position: absolute;
+  background-color: $scrollBarBg;
+  & > div {
+    position: absolute;
+  }
+}
+
+.pwv-scrollbar-handle {
+  background-color: $scrollHandleBg;
+  transition: background-color .5s;
+}
+
+.pwv-horizontal-scrollbar {
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: $scrollBarSize;
+  border-left: $expandedScrollBarSize solid transparent;
+  border-right: $expandedScrollBarSize solid transparent;
+  transition: height .5s;
+  .pwv-scrollbar-handle {
+    height: 100%;
+  }
+}
+
+.pwv-vertical-scrollbar {
+  width: $scrollBarSize;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  border-top: $expandedScrollBarSize solid transparent;
+  border-bottom: $expandedScrollBarSize solid transparent;
+  transition: width .5s;
+  .pwv-scrollbar-handle {
+    width: 100%;
+  }
+}
+
+.pwv-scrollbar-hover, .pwv-scrollbar-dragging {
+  &.pwv-vertical-scrollbar {
+    width: $expandedScrollBarSize;
+    transition: width .5s;
+  }
+  &.pwv-horizontal-scrollbar {
+    height: $expandedScrollBarSize;
+    transition: height .5s;
+  }
+  .pwv-scrollbar-handle {
+    background-color: $scrollHandleDraggingBg !important;
+    transition: background-color .5s;
+  }
+}
+
+.pwv-scrollbar-scrolling {
+  .pwv-scrollbar-handle {
+    background-color: $scrollHandleScrollingBg;
+    transition: background-color .5s;
+  }
+}

@@ -1,0 +1,17 @@
+.pwv-textselection-contextbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  .pwv-colorpicker {
+    .pwv-icon {
+      height: 18px;
+      svg {
+        height: 18px;
+      }
+    }
+  }
+
+  .pwv-colorpicker-currentcolor {
+    display: none;
+  }
+}

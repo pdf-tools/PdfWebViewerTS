@@ -1,0 +1,73 @@
+
+.pwv-colorpicker {
+  cursor: default;
+  position: relative;
+  > button {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+    .pwv-icon {
+      display: block;
+      height: 18px;
+      svg {
+        height: 15px;
+      }
+    }
+    .pwv-colorpicker-currentcolor {
+      height: 5px;
+      width: 20px;
+    }
+  }
+  
+  .pwv-dropdown-panel {
+    left: 0;
+    right: auto;
+    width: 120px;
+  }
+}
+.pwv-colorpicker-opacity {
+  margin: 6px;
+  label {
+    font-size: 14px;
+  }
+  input {
+    width: 108px
+  }
+}
+.pwv-colorpicker-buttons {
+  padding-left: 8px;
+  padding-right: 8px;
+  .pwv-colorpicker-btn {
+    margin: 3px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.pwv-colorpicker-btn {
+  margin: 6px;
+  border: solid 2px rgba(0, 0, 0, 0);
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  &:hover {
+    border-color: rgba(0, 0, 0, .4)
+  }
+  &:active {
+    border-color: rgba(0, 0, 0, .7)
+  }
+  &.pwv-selected {
+    border-color: rgba(0, 0, 0, .9)
+  }
+  .pwv-selected & {
+    border-color: rgba(0, 0, 0, .9)
+  }
+}

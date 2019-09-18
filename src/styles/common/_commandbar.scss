@@ -1,0 +1,19 @@
+.pwv-commandbar {
+  display: flex;
+}
+.pwv-commandbar-item {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.pwv-disabled {
+  .pwv-btn-text, .pwv-icon, .pwv-dropdown-text {
+    opacity: .4;
+  }
+  &.pwv-btn {
+    opacity: .4;
+  }
+}

@@ -1,0 +1,55 @@
+
+.pt-pwv {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: $gray-light;
+  @include font-style;
+  font-weight: 300;
+  touch-action: none;
+  > * {
+    -webkit-user-select: none;  
+    -moz-user-select: none;    
+    -ms-user-select: none;      
+    user-select: none;
+  }
+  
+  input, select, textarea, button {
+    @include font-style;
+    font-weight: 400;
+    border-radius: 0;
+    &:focus {
+      outline: none;
+    }
+    touch-action: manipulation;
+  }
+  h2 {
+    font-weight: 200;
+  }
+}
+
+.pwv-content {
+  display: flex;
+  height: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+.pwv-document-view {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  flex-shrink: 1;
+  background-color: $document-view-bg-color;
+}
+
+.pwv-icon {
+  svg {
+    fill: $gray-darker;
+  }
+}

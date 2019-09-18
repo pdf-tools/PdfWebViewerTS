@@ -1,0 +1,50 @@
+@mixin screen-md-up {
+  .pwv-screen-md &, .pwv-screen-lg &, .pwv-screen-xl & {
+    @content;
+  }
+}
+@mixin screen-lg-up {
+  .pwv-screen-lg &, .pwv-screen-xl & {
+    @content;
+  }
+}
+@mixin screen-xl {
+  .pwv-screen-xl & {
+    @content;
+  }
+}
+@mixin screen-xs {
+  .pwv-screen-xs & {
+    @content;
+  }
+}
+@mixin screen-sm {
+  .pwv-screen-sm & {
+    @content;
+  }
+}
+@mixin screen-md {
+  .pwv-screen-md & {
+    @content;
+  }
+}
+@mixin screen-lg {
+  .pwv-screen-lg & {
+    @content;
+  }
+}
+@mixin screen-sm-down {
+  .pwv-screen-sm &, .pwv-screen-xs & {
+    @content;
+  }
+}
+@mixin screen-md-down {
+  .pwv-screen-md &, .pwv-screen-sm &, .pwv-screen-xs & {
+    @content;
+  }
+}
+@mixin screen-lg-down {
+  .pwv-screen-lg &, .pwv-screen-md &, .pwv-screen-sm &, .pwv-screen-xs & {
+    @content;
+  }
+}
