@@ -182,9 +182,6 @@ export class PdfViewerCanvas {
     this.pdfViewerApi.addEventListener('pageChanged', this.onPageChanged)
     this.pdfViewerApi.addEventListener('rotation', this.onRotationChanged)
     this.pdfViewerApi.addEventListener('error', this.onApiError)
-    // if (this.options.promptOnUnsavedChanges) {
-    //   this.pdfViewerApi.addEventListener('unsavedChanges', this.onUnsavedChanges)
-    // }
 
     if (this.options.promptOnUnsavedChanges) {
       window.addEventListener('beforeunload', this.beforeUnloadCallback)
