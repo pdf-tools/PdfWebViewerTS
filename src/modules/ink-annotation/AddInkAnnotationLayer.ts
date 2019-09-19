@@ -61,7 +61,6 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   public onRemove(): void {
-    this.createInkAnnotation()
     this.removeCanvasElements()
     this.context = null
     /* tslint:disable-next-line:align */

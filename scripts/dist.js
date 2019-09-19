@@ -31,7 +31,7 @@ if ($sh.test('-d', distDir.root)) {
 }
 
 // typescript compile
-const tscRes = $sh.exec(`tsc --pretty --noEmitOnError --stripInternal --extendedDiagnostics`) // --stripInternal --emitDeclarationOnly
+const tscRes = $sh.exec('npm run tsc')
 if (tscRes.code !== 0) {
   console.log('BUILD FAILED!')
   return

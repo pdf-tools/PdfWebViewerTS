@@ -46,7 +46,7 @@ module.exports = {
         to: 'pdfwebviewer/',
       },
       {
-        from: 'static/pdfwebviewer/webworker/',
+        from: 'static/pdfwebviewer/webworker',
         to: 'pdfwebviewer/webworker/',
       },
       {

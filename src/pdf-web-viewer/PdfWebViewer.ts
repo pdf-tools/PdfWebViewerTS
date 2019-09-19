@@ -7,7 +7,7 @@ import { PdfViewerCanvas } from '../pdf-viewer-canvas/PdfViewerCanvas'
 import { translations } from './translations'
 import { translationManager } from '../common/TranslationManager'
 import { OutlineNavigationItem } from './state/navigationPanel'
-import { PdfDestination } from '../pdf-viewer-api'
+import { PdfDestination, PdfFitMode, PdfPageLayoutMode } from '../pdf-viewer-api'
 import { PopupModule } from '../modules/popup/PopupModule'
 import { MobilePopupModule } from '../modules/mobile-popup/MobilePopupModule'
 import { OptionsToVerify, PdfViewerCanvasOptions, ColorPaletteMap } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
@@ -67,6 +67,7 @@ export interface PdfWebViewerActions extends ActionDefinitions {
     goTo(pdfDestination: PdfDestination): void,
     setPageLayoutMode(layoutMode: number): void,
     rotate(): void,
+    setRotation(rotation: number): void,
     resetViewerMode(): void,
     startSearch(): void,
     nextSearchMatch(): void,
@@ -221,6 +222,24 @@ export class PdfWebViewer {
   public setZoom(zoom: number) {
     if (this.view) {
       this.view.api.setZoom(zoom)
+    }
+  }
+
+  public setFitMode(mode: PdfFitMode) {
+    if (this.view) {
+      this.view.api.setFitMode(mode)
+    }
+  }
+
+  public setPageLayoutMode(mode: PdfPageLayoutMode) {
+    if (this.view) {
+      this.view.api.setPageLayoutMode(mode)
+    }
+  }
+
+  public setRotation(rotation: number) {
+    if (this.view) {
+      this.view.api.setRotation(rotation)
     }
   }
 
@@ -470,6 +489,11 @@ export class PdfWebViewer {
           if (this.viewerCanvas) {
             const r = this.viewerCanvas.getRotation()
             const rotation = r >= 270 ? 0 : r + 90
+            this.viewerCanvas.setRotation(rotation)
+          }
+        },
+        setRotation: (rotation: number) => {
+          if (this.viewerCanvas) {
             this.viewerCanvas.setRotation(rotation)
           }
         },
