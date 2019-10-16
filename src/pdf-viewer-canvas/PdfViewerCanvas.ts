@@ -416,22 +416,7 @@ export class PdfViewerCanvas {
   }
 
   public getDocumentOutline() {
-    const getOutlines = (parent: OutlineItem | null) => {
-      return new Promise<OutlineItem[]>((resolve, reject) => {
-        this.pdfViewerApi.getOutlines(parent)
-          .then(items => {
-            items.forEach(item => {
-              if (item.hasDescendants) {
-                getOutlines(item).then(i => {
-                  (item as any).descendants = i
-                })
-              }
-            })
-            resolve(items)
-          })
-      })
-    }
-    return getOutlines(null)
+    return this.getOutlines(null)
   }
 
   public goTo(pdfDestination: PdfDestination) {
@@ -491,6 +476,17 @@ export class PdfViewerCanvas {
       const listeners = this.eventListeners.get(type) as PdfViewerCanvasEventListener[]
       listeners.forEach(listener => listener(args))
     }
+  }
+
+  private async getOutlines(parent: OutlineItem | null) {
+    const outlineItems = await this.pdfViewerApi.getOutlines(parent)
+    for (const item of outlineItems) {
+      if (item.hasDescendants) {
+        const children = await this.getOutlines(item);
+        (item as any).descendants = children
+      }
+    }
+    return outlineItems
   }
 
   private doSearch(reverse: boolean) {

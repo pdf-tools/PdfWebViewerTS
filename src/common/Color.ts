@@ -54,6 +54,10 @@ export class Color {
     }
   }
 
+  public isDark(): boolean {
+    return ((this.pR * 0.3 + this.pG * 0.59 + this.pB * 0.11) < 127)
+  }
+
   public get r(): number {
     return this.pR
   }

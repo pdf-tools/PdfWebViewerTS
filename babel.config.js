@@ -48,6 +48,7 @@ module.exports = function (api) {
   plugins.push("@babel/proposal-class-properties")
   plugins.push("@babel/proposal-object-rest-spread")
   plugins.push(['inline-replace-variables', {"__VERSION__": packageJson.version}])
+  plugins.push(["@babel/plugin-transform-runtime", { regenerator: true }])
 
   return {
     presets,

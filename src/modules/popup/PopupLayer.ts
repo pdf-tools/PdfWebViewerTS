@@ -211,13 +211,6 @@ export class PopupLayer extends CanvasLayer {
     if (this.popupView) {
       const openPopups = getOpenPopups(state.annotations, state.document.firstVisiblePage, state.document.lastVisiblePage)
 
-      if (state.viewer.mode === ViewerMode.POPUP_SELECTED && state.viewer.selectedPopupId) {
-        const selectedPopup = openPopups.find(p => p.id === state.viewer.selectedPopupId)
-        if (!selectedPopup) {
-          openPopups.push(state.annotations.all[state.viewer.selectedPopupId])
-        }
-      }
-
       const zoom = state.document.zoom
       const popups = openPopups.map(an => {
         const width = this.pdfApi.transformPdfLengthToDeviceLength(an.popup.pdfRect.pdfW) / zoom
