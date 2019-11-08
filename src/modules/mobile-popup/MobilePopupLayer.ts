@@ -48,9 +48,6 @@ export class MobilePopupLayer extends CanvasLayer {
       if (state.viewer.selectedPopupChanged) {
         if (state.viewer.selectedPopupId) {
           this.openPopup(state.viewer.selectedPopupId)
-        } else if (this.selectedPopupId) {
-          const currAnnot = state.annotations.all[this.selectedPopupId]
-          this.closePopup(this.selectedPopupId, currAnnot ? currAnnot.content ? currAnnot.content : '' : '')
         }
       }
     }
@@ -71,9 +68,6 @@ export class MobilePopupLayer extends CanvasLayer {
           colorPalette: getColorPalette(annotation.itemType, this.options),
           isLocked: annotation.isLocked(),
         })
-        annotation.popup.isOpen = true
-        this.store.annotations.updateAnnotation(annotation)
-        this.pdfApi.updateItem(annotation)
       }
     }
   }
@@ -88,6 +82,7 @@ export class MobilePopupLayer extends CanvasLayer {
         item.content = content
         this.store.annotations.updateAnnotation(item)
         this.pdfApi.updateItem(item)
+        this.store.viewer.selectPopup(null)
       }
     }
   }

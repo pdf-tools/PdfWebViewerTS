@@ -115,7 +115,22 @@
           highlightOpacity: .5,
           textSelectionColor: '#006395',
           searchMatchColor: '#3ABCFF',
+          /*****
+           * EXAMPLE: Custom event handlers for open and save.
+           *****/
+          // onOpenFileButtonClicked: () => {
+          //   alert('open file button clicked')
+          //   viewer.openFile(...)
+          // },
+          // onSaveFileButtonClicked: () => {
+          //   alert('close file button clicked')
+          //   const promise = viewer.saveFile(true)
+          //   if (promise) {
+          //     promise.then( res => console.log(res))
+          //   }
+          // },
         };
+
         var viewer = new PdfTools.PdfWebViewer(viewerContainer, license, options);
 
         viewer.addEventListener('appLoaded', function() {
@@ -133,7 +148,15 @@
           //   console.log(error.target.status)
           // })
         })
-      }  
+
+        viewer.addEventListener('documentLoaded', file => {
+          console.log('*** document loaded ***')
+          console.log('name          : ' + file.name)
+          console.log('size          : ' + Math.floor(file.size / 1024) + 'kb')
+          console.log('last modified : ' + file.lastModified)
+          console.log('type          : ' + file.type)
+        })
+      }
   </script>
 </body>
 

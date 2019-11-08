@@ -2,6 +2,7 @@ import { h, Component, app, ActionsType } from 'hyperapp'
 import { icons } from '../../common/Icon'
 import { ColorPicker } from '../../common/ColorPicker'
 import { CommandbarButton } from '../../common/CommandbarButton'
+import { Color } from '../../common/Color'
 
 /** @internal */
 export interface MobilePopupViewProps {
@@ -21,6 +22,7 @@ interface MobilePopup {
   lastModified: string | null
   originalAuthor: string | null
   isLocked: boolean
+  timer?: number
 }
 
 /** @internal */
@@ -37,7 +39,6 @@ export interface MobilePopupViewActions {
 
 /** @internal */
 export const createMobilePopupView = (props: MobilePopupViewProps, element: HTMLElement) => {
-
   const state: MobilePopupViewState = {
     id: null,
     content: null,
@@ -46,6 +47,7 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
     lastModified: null,
     originalAuthor: null,
     isLocked: false,
+    timer: 0,
   }
 
   const actions: ActionsType<MobilePopupViewState, MobilePopupViewActions> = {
@@ -76,6 +78,20 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
   )
 
   const MobilePopupView: Component<{}, MobilePopupViewState, MobilePopupViewActions> = ({ }) => ($state, $actions) => {
+    let colorString
+
+    if ($state.color != null) {
+      const color = new Color($state.color)
+      if (color.isDark()) {
+        colorString = 'rgba(255, 255, 255, 0.9)'
+      } else {
+        colorString = 'rgba(0, 0, 0, 0.9)'
+      }
+    }
+
+    const headerStyles: any = {
+      color : colorString,
+    }
     return (
       <div
         class="pwv-popup"
@@ -92,7 +108,8 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
       >
         <div>
           <div class="pwv-popup-header">
-            <div class="pwv-popup-header-info">
+            <div class="pwv-popup-header-info"
+            style = {headerStyles}>
               <div class="pwv-popup-header-author">
                 {$state.originalAuthor}
               </div>
@@ -126,6 +143,9 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
                 <CommandbarButton
                   onClick={() => {
                     if ($state.id) {
+                      if ($state.timer) {
+                        window.clearTimeout($state.timer)
+                      }
                       const content = (document.getElementById('pwv-popup-' + $state.id) as HTMLTextAreaElement).value
                       props.onClose($state.id, content)
                     }
@@ -140,8 +160,11 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
               id={'pwv-popup-' + $state.id}
               onchange={(e: UIEvent) => {
                 if ($state.id) {
+                  const id = $state.id
                   const content = (e.currentTarget as HTMLTextAreaElement).value
-                  props.onUpdateContent($state.id, content)
+                  $state.timer = window.setTimeout(() => {
+                    props.onUpdateContent(id, content)
+                  }, 20)
                 }
               }}
               value={$state.content}

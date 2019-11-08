@@ -7,6 +7,7 @@ import { DragMoveHandler, DragMoveEvent, DragMoveEndEvent } from '../../common/D
 import { PdfRect, Rect } from '../../pdf-viewer-api'
 import { TooltipPosition } from '../../common/Tooltip'
 import { translationManager } from '../../common/TranslationManager'
+import { Color } from '../../common/Color'
 
 /** @internal */
 export interface PopupViewProps {
@@ -186,6 +187,20 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
     width: popup.cssWidth + 'px',
     height: popup.cssHeight + 'px',
   }
+
+  let colorString
+  if (popup.color != null) {
+    const color = new Color(popup.color)
+    if (color.isDark()) {
+      colorString = 'rgba(255, 255, 255, 0.9)'
+    } else {
+      colorString = 'rgba(0, 0, 0, 0.9)'
+    }
+  }
+
+  const headerStyles: any = {
+    color : colorString,
+  }
   if (!popup.positionCalculated) {
     styles.display = 'none'
   }
@@ -207,7 +222,9 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
         }}
       >
         <div class="pwv-popup-header">
-          <div class="pwv-popup-header-info">
+          <div class="pwv-popup-header-info"
+          style = { headerStyles}
+          >
             <div class="pwv-popup-header-author">
               {popup.originalAuthor}
             </div>

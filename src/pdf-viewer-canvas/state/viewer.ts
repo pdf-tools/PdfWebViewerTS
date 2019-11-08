@@ -183,8 +183,8 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       ...$state,
       mode,
       modeChanged,
-      selectedPopupId: id,
       selectedPopupChanged: id !== $state.selectedPopupId,
+      selectedPopupId: id,
     }
   },
 }
