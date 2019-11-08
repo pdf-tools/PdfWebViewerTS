@@ -58,6 +58,7 @@ export class PdfViewerCanvas {
   private documentLoaded = false
   private renderLoopRunning = false
   private store: ViewerCanvasStore
+  private annotTimer: number
 
   constructor(containerElement: HTMLElement | null, license: string, options?: Partial<PdfViewerCanvasOptions>) {
 
@@ -65,6 +66,8 @@ export class PdfViewerCanvas {
       throw { error: 'PdfViewerCanvas container element is null' }
     }
     this.options = { ...PdfViewerCanvasDefaultOptions, ...options }
+
+    this.annotTimer = 0
 
     translationManager.setLanguage(this.options.language || 'en')
     translationManager.addTranslations(translations)
@@ -102,6 +105,7 @@ export class PdfViewerCanvas {
     this.onPageChanged = this.onPageChanged.bind(this)
     this.onApiError = this.onApiError.bind(this)
     this.beforeUnloadCallback = this.beforeUnloadCallback.bind(this)
+    this.getAnnotations = this.getAnnotations.bind(this)
 
     // create elements
     this.element = containerElement
@@ -532,20 +536,9 @@ export class PdfViewerCanvas {
     })
 
     this.startRenderLoop()
+    const document = this.store.getState().document;
+    this.getAnnotations(document.firstVisiblePage, document.lastVisiblePage)
 
-    // load annotations & textFragments
-    const pageCount = this.pdfViewerApi.getPageCount()
-    const getAnnotations = (page: number) => {
-      this.pdfViewerApi.getItemsFromPage(page, 1)
-        .then(itemsOnPage => {
-          this.store.annotations.setPageAnnotations(itemsOnPage)
-          if (page < pageCount) {
-            getAnnotations(page + 1)
-          }
-        })
-    }
-
-    getAnnotations(1)
     window.setTimeout(() => {
       this.canvasEvents.resume()
     }, 100)
@@ -867,11 +860,38 @@ export class PdfViewerCanvas {
 
   private onFirstVisiblePageChanged(page: number) {
     this.store.document.fistVisiblePageChanged(page)
+    this.maybeGetAnnotations(this.store.getState().document.firstVisiblePage, this.store.getState().document.lastVisiblePage)
     this.dispatchEvent('firstVisiblePage', page)
+  }
+
+  /**
+   * This function works with a timer. This avoids mass loading of annotation when scrolling
+   * through a large document. It only loads the annotations once the viewport is stable (visible
+   * pages didn't change for 100ms). If there is an active timer that will be cancelled.
+   * @param begin first page to get annotations from
+   * @param end last page to get annotations from
+   */
+  private maybeGetAnnotations(begin: number, end: number) {
+    if (this.annotTimer) {
+      window.clearTimeout(this.annotTimer)
+    }
+    this.annotTimer = window.setTimeout( () => { this.getAnnotations(begin, end) }, 100)
+  }
+
+  private getAnnotations(begin: number, end: number) {
+    for (let page = begin; page <= end; page++) {
+      if (this.store.getState().annotations.byPage[page] === undefined) {
+        this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION)
+          .then( itemsOnPage => {
+            this.store.annotations.setPageAnnotations(itemsOnPage)
+          })
+      }
+    }
   }
 
   private onLastVisiblePageChanged(page: number) {
     this.store.document.lastVisiblePageChanged(page)
+    this.maybeGetAnnotations(this.store.getState().document.firstVisiblePage, this.store.getState().document.lastVisiblePage)
     this.dispatchEvent('lastVisiblePage', page)
   }
 
