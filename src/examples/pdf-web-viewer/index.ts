@@ -91,9 +91,14 @@ viewer.addEventListener('appLoaded', () => {
 })
 
 viewer.addEventListener('documentLoaded', file => {
-  console.log('*** document loaded ***')
-  console.log('name          : ' + file.name)
-  console.log('size          : ' + Math.floor(file.size / 1024) + 'kb')
-  console.log('last modified : ' + file.lastModified)
-  console.log('type          : ' + file.type)
+  if (file instanceof Blob) {
+    console.log('*** document loaded ***')
+    console.log('name          : ' + file.name)
+    console.log('size          : ' + Math.floor(file.size / 1024) + 'kb')
+    console.log('last modified : ' + file.lastModified)
+    console.log('type          : ' + file.type)
+  } else {
+      console.log('*** document loaded ***')
+      console.log('name          : ' + file)
+  }
 })
