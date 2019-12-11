@@ -13,11 +13,11 @@ export interface RootState {
   hasDocument?: boolean
   fileDropEnabled: boolean
   showPasswordForm: boolean
-  passwordDialogTempFile: File | null,
+  passwordDialogTempFile: File | string | null,
   showOpenFileErrorDialog: boolean,
   showUnsavedChangesDialog: boolean,
   unsavedChangesDialogDontSave: boolean,
-  unsavedChangesDialogTempFile: File | null,
+  unsavedChangesDialogTempFile: File | string | null,
   showLoadingIndicator: boolean
   hasError: boolean
   errorMessage: string
@@ -74,9 +74,9 @@ export interface ActionDefinitions {
   loadDocumentBegin(): RootState
   loadDocumentFulfilled(): RootState
   loadDocumentCancel(): RootState
-  loadDocumentPasswordForm(file: File): RootState
+  loadDocumentPasswordForm(file: File | string): RootState
   closeDocument(): RootState
-  showConfirmUnsavedChangesDialog(file: File | null): RootState
+  showConfirmUnsavedChangesDialog(file: File | string | null): RootState
   unsavedChangesDialogCancel(): RootState
   unsavedChangesDialogFileSaved(): RootState
   unsavedChangesDialogDontSave(): RootState
@@ -148,7 +148,7 @@ export const actions: ActionsType<RootState, ActionDefinitions> = {
     fileDropEnabled: true,
     showOpenFileErrorDialog: false,
   }),
-  loadDocumentPasswordForm: (file: File) => $state => {
+  loadDocumentPasswordForm: (file: File | string) => $state => {
     $state.passwordForm.invalidPasswordError = $state.passwordDialogTempFile !== null
     return {
       ...$state,
@@ -161,7 +161,7 @@ export const actions: ActionsType<RootState, ActionDefinitions> = {
     ...$state,
     hasDocument: false,
   }),
-  showConfirmUnsavedChangesDialog: (file: File) => $state => {
+  showConfirmUnsavedChangesDialog: (file: File | string) => $state => {
     return {
       ...$state,
       unsavedChangesDialogTempFile: file,

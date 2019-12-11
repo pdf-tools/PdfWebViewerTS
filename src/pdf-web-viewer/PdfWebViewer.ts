@@ -53,6 +53,7 @@ const breakPoints = {
 export interface PdfWebViewerActions extends ActionDefinitions {
   api: {
     openFile(openFile: { file: File, password?: string }): void,
+    openUri(openUri: {pdfUri: string, password?: string}): void,
     openFDF(openFDF: { pdfFile: File, fdfFile: File, password?: string}): void,
     downloadFile(): Promise<void>,
     close(): Promise<void>,
@@ -81,7 +82,7 @@ export interface PdfWebViewerActions extends ActionDefinitions {
 export interface PdfWebViewerEventMap {
   busyState: boolean
   appLoaded: boolean
-  documentLoaded: File
+  documentLoaded: File | string
   error: Error
 }
 
@@ -165,9 +166,13 @@ export class PdfWebViewer {
     this.resizeObserver.observe(this.element)
   }
 
-  public openFile(file: File, password?: string) {
+  public openFile(file: File | string, password?: string) {
     if (this.view) {
-      this.view.api.openFile({ file, password})
+      if (typeof file === 'object') {
+        this.view.api.openFile({ file, password})
+      } else {
+        this.view.api.openUri({ pdfUri: file, password})
+      }
     }
   }
 
@@ -314,85 +319,79 @@ export class PdfWebViewer {
             }
             this.view.navigationPanel.clear()
             this.view.loadDocumentBegin()
-            const reader = new FileReader()
-            reader.onload = (e: any) => {
-              if (this.viewerCanvas && e.target && e.target.result) {
-                this.viewerCanvas.openBlob(new Blob([e.target.result]), x.password || '')
-                  .then(() => {
-                    if (this.viewerCanvas) {
-                      this.view.pdfDocument.setFileInfo(x.file)
-                      this.view.pdfDocument.setHasChanges(false)
+            this.viewerCanvas.openBlob(x.file, x.password || '')
+              .then(() => {
+                if (this.viewerCanvas) {
+                  this.view.pdfDocument.setFileInfo(x.file)
+                  this.view.pdfDocument.setHasChanges(false)
 
-                      const pageCount = this.viewerCanvas.getPageCount()
-                      this.view.pdfDocument.setPageCount(pageCount)
+                  const pageCount = this.viewerCanvas.getPageCount()
+                  this.view.pdfDocument.setPageCount(pageCount)
 
-                      this.handleDocumentOpened()
-                      this.view.loadDocumentFulfilled()
-                      this.dispatchEvent('documentLoaded', x.file)
-                    }
-                  })
-                  .catch((error: Error) => {
-                    if (error.message === 'password required') {
-                      this.view.loadDocumentPasswordForm(x.file)
-                    } else {
-                      this.view.loadDocumentRejected(error.message)
-                    }
-                  })
-              }
+                  this.handleDocumentOpened()
+                  this.view.loadDocumentFulfilled()
+                  this.dispatchEvent('documentLoaded', x.file)
+                }
+              })
+              .catch((error: Error) => {
+                if (error.message === 'password required') {
+                  this.view.loadDocumentPasswordForm(x.file)
+                } else {
+                  this.view.loadDocumentRejected(error.message)
+                }
+              })
+          }
+        },
+        openUri: (x: {pdfUri: string, password?: string}) => {
+          if (this.viewerCanvas) {
+            const currentState = this.view.getState()
+            const hasChanges = this.viewerCanvas.hasChanges()
+            if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
+              this.view.showConfirmUnsavedChangesDialog(x.pdfUri)
+              return
             }
-            reader.readAsArrayBuffer(x.file)
+            this.view.navigationPanel.clear()
+            this.view.loadDocumentBegin()
+            this.viewerCanvas.openUri(x.pdfUri, x.password)
+              .then(() => {
+                if (this.viewerCanvas) {
+                  this.view.pdfDocument.setFileInfo(x.pdfUri)
+                  this.view.pdfDocument.setHasChanges(false)
+
+                  const pageCount = this.viewerCanvas.getPageCount()
+                  this.view.pdfDocument.setPageCount(pageCount)
+
+                  this.handleDocumentOpened()
+                  this.view.loadDocumentFulfilled()
+                  this.dispatchEvent('documentLoaded', x.pdfUri)
+                }
+              })
           }
         },
         openFDF: (x: { pdfFile: File, fdfFile: File, password?: string }) => {
-          const pdfPromise: Promise<Blob> = new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = (e: any) => {
-              if (e.target && e.target.result) {
-                resolve(new Blob([e.target.result]))
-              } else {
-                reject(new Error())
-              }
-            }
-            reader.readAsArrayBuffer(x.pdfFile)
-          })
+          if (this.viewerCanvas) {
+            this.viewerCanvas.openFDFBlob(x.pdfFile, x.fdfFile, x.password || '')
+              .then(() => {
+                if (this.viewerCanvas) {
+                  this.view.pdfDocument.setFileInfo(x.pdfFile)
+                  this.view.pdfDocument.setHasChanges(false)
 
-          const fdfPromise: Promise<Blob> = new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = (e: any) => {
-              if (e.target && e.target.result) {
-                resolve(new Blob([e.target.result]))
-              } else {
-                reject(new Error())
-              }
-            }
-            reader.readAsArrayBuffer(x.fdfFile)
-          })
+                  const pageCount = this.viewerCanvas.getPageCount()
+                  this.view.pdfDocument.setPageCount(pageCount)
 
-          Promise.all([pdfPromise, fdfPromise]).then(resultBlobs => {
-            if (this.viewerCanvas) {
-              this.viewerCanvas.openFDFBlob(resultBlobs[0], resultBlobs[1], x.password || '')
-                .then(() => {
-                  if (this.viewerCanvas) {
-                    this.view.pdfDocument.setFileInfo(x.pdfFile)
-                    this.view.pdfDocument.setHasChanges(false)
-
-                    const pageCount = this.viewerCanvas.getPageCount()
-                    this.view.pdfDocument.setPageCount(pageCount)
-
-                    this.handleDocumentOpened()
-                    this.view.loadDocumentFulfilled()
-                    this.dispatchEvent('documentLoaded', x.pdfFile)
-                  }
-                })
-                .catch((error: Error) => {
-                  if (error.message === 'password required') {
-                    this.view.loadDocumentPasswordForm(x.pdfFile)
-                  } else {
-                    this.view.loadDocumentRejected(error.message)
-                  }
-                })
-            }
-          })
+                  this.handleDocumentOpened()
+                  this.view.loadDocumentFulfilled()
+                  this.dispatchEvent('documentLoaded', x.pdfFile)
+                }
+              })
+              .catch((error: Error) => {
+                if (error.message === 'password required') {
+                  this.view.loadDocumentPasswordForm(x.pdfFile)
+                } else {
+                  this.view.loadDocumentRejected(error.message)
+                }
+              })
+          }
         },
         close: () => {
           return new Promise((resolve, reject) => {

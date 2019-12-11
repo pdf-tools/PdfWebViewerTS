@@ -223,6 +223,36 @@ export class PdfViewerCanvas {
     return this.pdfViewerApi.openFDF(pdfBuffer, fdfBuffer, password)
   }
 
+  public openUri(pdfUri: string, password?: string) {
+    return new Promise((resolve, reject) => {
+      if (this.pdfViewerApi.isOpen()) {
+        this.close().then(() => {
+          this.pdfViewerApi.openUri(pdfUri, password).then(() => {
+            this.onDocumentOpened()
+            resolve()
+          }).catch(error => {
+            if (error.message === 'The authentication failed due to a wrong password.') {
+              reject(new Error('password required'))
+            } else {
+              reject(new Error('unsupported file'))
+            }
+          })
+        })
+      } else {
+        this.pdfViewerApi.openUri(pdfUri, password).then(() => {
+          this.onDocumentOpened()
+          resolve()
+        }).catch(error => {
+          if (error.message === 'The authentication failed due to a wrong password.') {
+            reject(new Error('password required'))
+          } else {
+            reject(new Error('unsupported file'))
+          }
+        })
+      }
+    })
+  }
+
   public openBlob(blob: Blob, password?: string) {
     return new Promise((resolve, reject) => {
       if (this.pdfViewerApi.isOpen()) {
@@ -538,6 +568,7 @@ export class PdfViewerCanvas {
     this.startRenderLoop()
     const document = this.store.getState().document;
     this.getAnnotations(document.firstVisiblePage, document.lastVisiblePage)
+
 
     window.setTimeout(() => {
       this.canvasEvents.resume()

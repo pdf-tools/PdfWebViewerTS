@@ -119,6 +119,23 @@ export class PdfViewerApi {
   }
 
   /**
+   * Open a PDF file via URL.
+   * NOTE: Any previously opened file must be closed first.
+   * @param pdfUri           A URI string of the PDF
+   * @param password         The password needed to decrypt the PDF
+   * @returns                A promise returning void if resolved or returning an error message if rejected.
+   */
+  public openUri(pdfUri: string, password?: string) {
+    checkType(pdfUri, 'string', 'openUri')
+    checkType(password, 'string', 'openUri', true)
+    return new Promise<void>((resolve, reject) => {
+      this.apiCallbackHandler.openResolve = resolve
+      this.apiCallbackHandler.openReject = reject
+      this.instance.openUri(pdfUri, password)
+    })
+  }
+
+  /**
    * Open a PDF file from a blob.
    * NOTE: Any previously opened file must be closed first.
    * @param blob              The blob of the file.

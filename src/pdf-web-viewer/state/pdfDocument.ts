@@ -42,7 +42,7 @@ export interface PdfDocumentActions {
   setPageCount(page: number): PdfDocumentState
   setFirstVisiblePage(page: number): PdfDocumentState
   setLastVisiblePage(page: number): PdfDocumentState
-  setFileInfo(file: File): PdfDocumentState
+  setFileInfo(file: File | string): PdfDocumentState
 }
 
 /** @internal */

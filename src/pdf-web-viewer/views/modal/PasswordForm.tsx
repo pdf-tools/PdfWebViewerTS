@@ -21,10 +21,17 @@ export const PasswordForm: Component<{}, PdfWebViewerState, PdfWebViewerActions>
             const password = data.get('password') as string
             if (password) {
               if (state.passwordDialogTempFile) {
-                actions.api.openFile({
-                  file: state.passwordDialogTempFile,
-                  password,
-                })
+                if (typeof state.passwordDialogTempFile === 'object') {
+                  actions.api.openFile({
+                    file: state.passwordDialogTempFile,
+                    password,
+                  })
+                } else {
+                    actions.api.openUri({
+                      pdfUri: state.passwordDialogTempFile,
+                      password,
+                  })
+                }
               } else {
                 actions.loadDocumentRejected('error')
               }

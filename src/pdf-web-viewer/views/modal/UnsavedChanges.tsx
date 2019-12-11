@@ -23,9 +23,15 @@ export const UnsavedChanges: Component<{}, PdfWebViewerState, PdfWebViewerAction
                 .then(() => {
                   $actions.unsavedChangesDialogFileSaved()
                   if ($state.unsavedChangesDialogTempFile) {
-                    $actions.api.openFile({
-                      file: $state.unsavedChangesDialogTempFile,
-                    })
+                    if (typeof $state.unsavedChangesDialogTempFile === 'object') {
+                      $actions.api.openFile({
+                        file: $state.unsavedChangesDialogTempFile,
+                      })
+                    } else {
+                      $actions.api.openUri({
+                        pdfUri: $state.unsavedChangesDialogTempFile,
+                      })
+                    }
                   }
                 })
             }}
@@ -37,8 +43,13 @@ export const UnsavedChanges: Component<{}, PdfWebViewerState, PdfWebViewerAction
             onclick={() => {
               $actions.unsavedChangesDialogDontSave()
               if ($state.unsavedChangesDialogTempFile) {
-                $actions.api.openFile({
-                file: $state.unsavedChangesDialogTempFile})
+                if (typeof $state.unsavedChangesDialogTempFile === 'object') {
+                  $actions.api.openFile({
+                  file: $state.unsavedChangesDialogTempFile})
+                } else {
+                  $actions.api.openUri({
+                    pdfUri: $state.unsavedChangesDialogTempFile})
+                }
               }
             }}
           >
