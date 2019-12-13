@@ -78,16 +78,22 @@ viewer.addEventListener('appLoaded', () => {
   console.log('app loaded')
 
   /*****
-   * EXAMPLE: Open PDF document from a link. 
+   * EXAMPLE: Get PDF via fetch and then pass the blob
    *****/
 
   // fetch('http://url/to/a/pdf/sample.pdf').then( data => {
   //   data.blob().then( blob => {
   //     viewer.openFile(blob as File)
   //   })
-  // }).catch( error => { 
+  // }).catch( error => {
   //   console.log(error.target.status)
   // })
+
+  /*****
+   * EXAMPLE: Open PDF via URL. Large files will be opened piecewise.
+   * CORS rules apply: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+   *****/
+  // viewer.openFile('http://url/to/cors/accessible/file.pdf')
 })
 
 viewer.addEventListener('documentLoaded', file => {
@@ -98,7 +104,7 @@ viewer.addEventListener('documentLoaded', file => {
     console.log('last modified : ' + file.lastModified)
     console.log('type          : ' + file.type)
   } else {
-      console.log('*** document loaded ***')
-      console.log('name          : ' + file)
+    console.log('*** document loaded ***')
+    console.log('uri: file')
   }
 })
