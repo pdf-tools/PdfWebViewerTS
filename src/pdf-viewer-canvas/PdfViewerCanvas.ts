@@ -106,6 +106,7 @@ export class PdfViewerCanvas {
     this.onApiError = this.onApiError.bind(this)
     this.beforeUnloadCallback = this.beforeUnloadCallback.bind(this)
     this.getAnnotations = this.getAnnotations.bind(this)
+    this.openRoutine = this.openRoutine.bind(this)
 
     // create elements
     this.element = containerElement
@@ -223,95 +224,20 @@ export class PdfViewerCanvas {
     return this.pdfViewerApi.openFDF(pdfBuffer, fdfBuffer, password)
   }
 
-  public openUri(pdfUri: string, password?: string) {
-    return new Promise((resolve, reject) => {
-      if (this.pdfViewerApi.isOpen()) {
-        this.close().then(() => {
-          this.pdfViewerApi.openUri(pdfUri, password).then(() => {
-            this.onDocumentOpened()
-            resolve()
-          }).catch(error => {
-            if (error.message === 'The authentication failed due to a wrong password.') {
-              reject(new Error('password required'))
-            } else {
-              reject(new Error('unsupported file'))
-            }
-          })
-        })
-      } else {
-        this.pdfViewerApi.openUri(pdfUri, password).then(() => {
-          this.onDocumentOpened()
-          resolve()
-        }).catch(error => {
-          if (error.message === 'The authentication failed due to a wrong password.') {
-            reject(new Error('password required'))
-          } else {
-            reject(new Error('unsupported file'))
-          }
-        })
-      }
-    })
+  public openUri(pdfUri: string, password?: string, pdfAuthorization?: string) {
+    return this.openRoutine(this.pdfViewerApi.openUri, pdfUri, password, pdfAuthorization)
+  }
+
+  public openFDFUri(pdfUri: string, fdfUri: string, password?: string, pdfAuthorization?: string, fdfAuthorization?: string) {
+    return this.openRoutine(this.pdfViewerApi.openFDFUri, pdfUri, fdfUri, password, pdfAuthorization, fdfAuthorization)
   }
 
   public openBlob(blob: Blob, password?: string) {
-    return new Promise((resolve, reject) => {
-      if (this.pdfViewerApi.isOpen()) {
-        this.close().then(() => {
-          this.pdfViewerApi.openBlob(blob, password).then(() => {
-            this.onDocumentOpened()
-            resolve()
-          }).catch(error => {
-            if (error.message === 'The authentication failed due to a wrong password.') {
-              reject(new Error('password required'))
-            } else {
-              reject(new Error('unsupported file'))
-            }
-          })
-        })
-      } else {
-        this.pdfViewerApi.openBlob(blob, password).then(() => {
-          this.onDocumentOpened()
-          resolve()
-        }).catch(error => {
-          if (error.message === 'The authentication failed due to a wrong password.') {
-            reject(new Error('password required'))
-          } else {
-            reject(new Error('unsupported file'))
-          }
-        })
-      }
-    })
+    return this.openRoutine(this.pdfViewerApi.openBlob, blob, password)
   }
 
   public openFDFBlob(pdfBlob: Blob, fdfBlob: Blob, password?: string) {
-    return new Promise((resolve, reject) => {
-      if (this.pdfViewerApi.isOpen()) {
-        this.pdfViewerApi.close().then(() => {
-          this.onDocumentClosed()
-          this.pdfViewerApi.openFDFBlob(pdfBlob, fdfBlob, password).then(() => {
-            this.onDocumentOpened()
-            resolve()
-          }).catch(error => {
-            if (error.message === 'The authentication failed due to a wrong password.') {
-              reject(new Error('password required'))
-            } else {
-              reject(new Error('unsupported file'))
-            }
-          })
-        })
-      } else {
-        this.pdfViewerApi.openFDFBlob(pdfBlob, fdfBlob, password).then(() => {
-          this.onDocumentOpened()
-          resolve()
-        }).catch(error => {
-          if (error.message === 'The authentication failed due to a wrong password.') {
-            reject(new Error('password required'))
-          } else {
-            reject(new Error('unsupported file'))
-          }
-        })
-      }
-    })
+    return this.openRoutine(this.pdfViewerApi.openFDFBlob, pdfBlob, fdfBlob, password)
   }
 
   public saveFile(asFdf: boolean) {
@@ -521,6 +447,36 @@ export class PdfViewerCanvas {
       }
     }
     return outlineItems
+  }
+
+  private openRoutine(openFunction: (...args: any[]) => Promise<void>, ...args: any[]) {
+    return new Promise((resolve, reject) => {
+      if (this.pdfViewerApi.isOpen()) {
+        this.close().then(() => {
+          openFunction(...args).then(() => {
+            this.onDocumentOpened()
+            resolve()
+          }).catch(error => {
+            if (error.message === 'The authentication failed due to a wrong password.') {
+              reject(new Error('password required'))
+            } else {
+              reject(new Error('unsupported file'))
+            }
+          })
+        })
+      } else {
+        openFunction(...args).then(() => {
+          this.onDocumentOpened()
+          resolve()
+        }).catch(error => {
+          if (error.message === 'The authentication failed due to a wrong password.') {
+            reject(new Error('password required'))
+          } else {
+            reject(new Error('unsupported file'))
+          }
+        })
+      }
+    })
   }
 
   private doSearch(reverse: boolean) {

@@ -7,6 +7,8 @@ import { PasswordForm } from './PasswordForm'
 import { LoadApplication } from './LoadApplication'
 import { ApplicationError } from './ApplicationError'
 import { LoadFile } from './LoadFile'
+import { SaveFile } from './SaveFile'
+
 
 /** @internal */
 export const Modal: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({ }) => (state, actions) => {
@@ -23,6 +25,8 @@ export const Modal: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({ }
     return <LoadApplication />
   } else if (state.showLoadingIndicator) {
     return <LoadFile />
+  } else if (state.showSaveIndicator) {
+    return <SaveFile />
   } else if (!state.hasDocument && state.options.allowFileDrop) {
     return <OpenFile />
   } else {

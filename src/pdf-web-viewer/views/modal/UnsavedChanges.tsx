@@ -22,14 +22,31 @@ export const UnsavedChanges: Component<{}, PdfWebViewerState, PdfWebViewerAction
               $actions.api.downloadFile()
                 .then(() => {
                   $actions.unsavedChangesDialogFileSaved()
-                  if ($state.unsavedChangesDialogTempFile) {
-                    if (typeof $state.unsavedChangesDialogTempFile === 'object') {
+                  if (!$state.unsavedChangesDialogTempPdfFile) {
+                    return
+                  }
+                  if ($state.unsavedChangesDialogTempFdfFile) {
+                    if ($state.unsavedChangesDialogTempPdfFile instanceof Blob && $state.unsavedChangesDialogTempFdfFile instanceof Blob) {
+                      $actions.api.openFDF({
+                        pdfFile: $state.unsavedChangesDialogTempPdfFile,
+                        fdfFile: $state.unsavedChangesDialogTempFdfFile,
+                      })
+                    } else if (typeof $state.unsavedChangesDialogTempPdfFile === 'string' && typeof $state.unsavedChangesDialogTempFdfFile === 'string') {
+                      $actions.api.openFDFUri({
+                        pdfUri: $state.unsavedChangesDialogTempPdfFile,
+                        fdfUri: $state.unsavedChangesDialogTempFdfFile,
+                        pdfAuthorization: $state.pdfAuthorization,
+                        fdfAuthorization: $state.fdfAuthorization,
+                      })
+                    }
+                  } else {
+                    if ($state.unsavedChangesDialogTempPdfFile instanceof Blob) {
                       $actions.api.openFile({
-                        file: $state.unsavedChangesDialogTempFile,
+                        file: $state.unsavedChangesDialogTempPdfFile,
                       })
                     } else {
                       $actions.api.openUri({
-                        pdfUri: $state.unsavedChangesDialogTempFile,
+                        pdfUri: $state.unsavedChangesDialogTempPdfFile,
                       })
                     }
                   }
@@ -42,13 +59,32 @@ export const UnsavedChanges: Component<{}, PdfWebViewerState, PdfWebViewerAction
             class="pwv-btn"
             onclick={() => {
               $actions.unsavedChangesDialogDontSave()
-              if ($state.unsavedChangesDialogTempFile) {
-                if (typeof $state.unsavedChangesDialogTempFile === 'object') {
+              if (!$state.unsavedChangesDialogTempPdfFile) {
+                return
+              }
+              if ($state.unsavedChangesDialogTempFdfFile) {
+                if ($state.unsavedChangesDialogTempPdfFile instanceof Blob && $state.unsavedChangesDialogTempFdfFile instanceof Blob) {
+                  $actions.api.openFDF({
+                    pdfFile: $state.unsavedChangesDialogTempPdfFile,
+                    fdfFile: $state.unsavedChangesDialogTempFdfFile,
+                  })
+                } else if (typeof $state.unsavedChangesDialogTempPdfFile === 'string' && typeof $state.unsavedChangesDialogTempFdfFile === 'string') {
+                  $actions.api.openFDFUri({
+                    pdfUri: $state.unsavedChangesDialogTempPdfFile,
+                    fdfUri: $state.unsavedChangesDialogTempFdfFile,
+                    pdfAuthorization: $state.pdfAuthorization,
+                    fdfAuthorization: $state.fdfAuthorization,
+                  })
+                }
+              } else {
+                if ($state.unsavedChangesDialogTempPdfFile instanceof Blob) {
                   $actions.api.openFile({
-                  file: $state.unsavedChangesDialogTempFile})
+                    file: $state.unsavedChangesDialogTempPdfFile,
+                  })
                 } else {
                   $actions.api.openUri({
-                    pdfUri: $state.unsavedChangesDialogTempFile})
+                    pdfUri: $state.unsavedChangesDialogTempPdfFile,
+                  })
                 }
               }
             }}

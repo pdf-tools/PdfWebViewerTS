@@ -13,12 +13,17 @@ export interface RootState {
   hasDocument?: boolean
   fileDropEnabled: boolean
   showPasswordForm: boolean
-  passwordDialogTempFile: File | string | null,
-  showOpenFileErrorDialog: boolean,
-  showUnsavedChangesDialog: boolean,
-  unsavedChangesDialogDontSave: boolean,
-  unsavedChangesDialogTempFile: File | string | null,
+  passwordDialogTempPdfFile: File | string | null
+  passwordDialogTempFdfFile?: File | string | null
+  showOpenFileErrorDialog: boolean
+  showUnsavedChangesDialog: boolean
+  unsavedChangesDialogDontSave: boolean
+  unsavedChangesDialogTempPdfFile: File | string | null
+  pdfAuthorization?: string
+  fdfAuthorization?: string
+  unsavedChangesDialogTempFdfFile?: File | string | null
   showLoadingIndicator: boolean
+  showSaveIndicator: boolean
   hasError: boolean
   errorMessage: string
   language: string
@@ -36,12 +41,15 @@ const defaultState: RootState = {
   fileDropEnabled: false,
   hasDocument: false,
   showPasswordForm: false,
-  passwordDialogTempFile: null,
+  passwordDialogTempPdfFile: null,
+  passwordDialogTempFdfFile: null,
   showOpenFileErrorDialog: false,
   showUnsavedChangesDialog: false,
-  unsavedChangesDialogTempFile: null,
+  unsavedChangesDialogTempPdfFile: null,
+  unsavedChangesDialogTempFdfFile: null,
   unsavedChangesDialogDontSave: false,
   showLoadingIndicator: false,
+  showSaveIndicator: false,
   hasError: false,
   errorMessage: '',
   language: 'en',
@@ -74,9 +82,10 @@ export interface ActionDefinitions {
   loadDocumentBegin(): RootState
   loadDocumentFulfilled(): RootState
   loadDocumentCancel(): RootState
-  loadDocumentPasswordForm(file: File | string): RootState
+  loadDocumentPasswordForm( x: {pdfFile: File | string, fdfFile?: File | string | null, pdfAuthorization?: string, fdfAuthorization?: string} ): RootState
   closeDocument(): RootState
-  showConfirmUnsavedChangesDialog(file: File | string | null): RootState
+  // tslint:disable-next-line: max-line-length
+  showConfirmUnsavedChangesDialog( x: {pdfFile: File | string | null, fdfFile?: File | string, pdfAuthorization?: string, fdfAuthorization?: string} ): RootState
   unsavedChangesDialogCancel(): RootState
   unsavedChangesDialogFileSaved(): RootState
   unsavedChangesDialogDontSave(): RootState
@@ -125,20 +134,20 @@ export const actions: ActionsType<RootState, ActionDefinitions> = {
     hasDocument: true,
     fileDropEnabled: true,
     showPasswordForm: false,
-    passwordDialogTempFile: null,
+    passwordDialogTempPdfFile: null,
     showLoadingIndicator: false,
   }),
   loadDocumentCancel: () => $state => ({
     ...$state,
     fileDropEnabled: true,
     showPasswordForm: false,
-    passwordDialogTempFile: null,
+    passwordDialogTempPdfFile: null,
     showLoadingIndicator: false,
   }),
   loadDocumentRejected: (error: string) => $state => ({
     ...$state,
     fileDropEnabled: false,
-    passwordDialogTempFile: null,
+    passwordDialogTempPdfFile: null,
     showPasswordForm: false,
     showLoadingIndicator: false,
     showOpenFileErrorDialog: true,
@@ -148,11 +157,14 @@ export const actions: ActionsType<RootState, ActionDefinitions> = {
     fileDropEnabled: true,
     showOpenFileErrorDialog: false,
   }),
-  loadDocumentPasswordForm: (file: File | string) => $state => {
-    $state.passwordForm.invalidPasswordError = $state.passwordDialogTempFile !== null
+  loadDocumentPasswordForm: (x: { pdfFile: File | string, fdfFile?: File | string, pdfAuthorization?: string, fdfAuthorization?: string }) => $state => {
+    $state.passwordForm.invalidPasswordError = $state.passwordDialogTempPdfFile !== null
     return {
       ...$state,
-      passwordDialogTempFile: file,
+      passwordDialogTempPdfFile: x.pdfFile,
+      passwordDialogTempFdfFile: x.fdfFile,
+      pdfAuthorization: x.pdfAuthorization,
+      fdfAuthorization: x.fdfAuthorization,
       showPasswordForm: true,
       showLoadingIndicator: false,
     }
@@ -161,45 +173,54 @@ export const actions: ActionsType<RootState, ActionDefinitions> = {
     ...$state,
     hasDocument: false,
   }),
-  showConfirmUnsavedChangesDialog: (file: File | string) => $state => {
+  // tslint:disable-next-line: max-line-length
+  showConfirmUnsavedChangesDialog: (x: { pdfFile: File | string, fdfFile?: File | string | null, pdfAuthorization?: string, fdfAuthorization?: string }) => $state => {
     return {
       ...$state,
-      unsavedChangesDialogTempFile: file,
+      unsavedChangesDialogTempPdfFile: x.pdfFile,
+      unsavedChangesDialogTempFdfFile: x.fdfFile,
+      pdfAuthorization: x.pdfAuthorization,
+      fdfAuthorization: x.fdfAuthorization,
       showUnsavedChangesDialog: true,
     }
   },
-  unsavedChangesDialogCancel: () => $state => ({
-    ...$state,
-    unsavedChangesDialogTempFile: null,
-    showUnsavedChangesDialog: false,
-    hasDocument: true,
-  }),
-  unsavedChangesDialogFileSaved: () => $state => ({
-    ...$state,
-    unsavedChangesDialogTempFile: null,
-    showUnsavedChangesDialog: false,
-  }),
-  unsavedChangesDialogDontSave: () => $state => ({
-    ...$state,
-    unsavedChangesDialogDontSave: false,
-    unsavedChangesDialogTempFile: null,
-    showUnsavedChangesDialog: false,
-    hasDocument: false,
-  }),
+  unsavedChangesDialogCancel: () => $state => {
+    return {
+      ...$state,
+      showUnsavedChangesDialog: false,
+      hasDocument: true,
+    }
+  },
+  unsavedChangesDialogFileSaved: () => $state => {
+    return {
+      ...$state,
+      unsavedChangesDialogTempPdfFile: null,
+      unsavedChangesDialogTempFdfFile: null,
+      showUnsavedChangesDialog: false,
+   }
+  },
+  unsavedChangesDialogDontSave: () => $state => {
+    return {
+      ...$state,
+      unsavedChangesDialogDontSave: false,
+      showUnsavedChangesDialog: false,
+      hasDocument: false,
+    }
+  },
   saveDocumentBegin: (error: string) => $state => ({
     ...$state,
-    showLoadingIndicator: true,
+    showSaveIndicator: true,
   }),
   saveDocumentFulfilled: (error: string) => $state => ({
     ...$state,
-    showLoadingIndicator: false,
+    showSaveIndicator: false,
   }),
   saveDocumentRejected: (error: string) => $state => ({
     ...$state,
     hasError: true,
     errorMessage: error,
     appInitialized: true,
-    showLoadingIndicator: false,
+    showSaveIndicator: false,
   }),
   setError: (error: string) => $state => ({
     ...$state,

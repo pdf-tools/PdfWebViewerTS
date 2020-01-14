@@ -71,6 +71,11 @@ export class PdfViewerApi {
     this.apiCallbackHandler.pageChanged = page => { this.dispatchEvent('pageChanged', page) }
     this.apiCallbackHandler.outlinesLoaded = outlinesItems => { this.dispatchEvent('outlinesLoaded', outlinesItems)}
 
+    this.openBlob = this.openBlob.bind(this)
+    this.openFDFBlob = this.openFDFBlob.bind(this)
+    this.openUri = this.openUri.bind(this)
+    this.openFDFUri = this.openFDFUri.bind(this)
+
     this.instance = new PdfToolsApi.PdfWebViewerAPI(this.apiCallbackHandler)
 
     /* iOS warns whenever an app uses resources too aggressively.
@@ -125,13 +130,35 @@ export class PdfViewerApi {
    * @param password         The password needed to decrypt the PDF
    * @returns                A promise returning void if resolved or returning an error message if rejected.
    */
-  public openUri(pdfUri: string, password?: string) {
+  public openUri(pdfUri: string, password?: string, pdfAuthorization?: string) {
     checkType(pdfUri, 'string', 'openUri')
     checkType(password, 'string', 'openUri', true)
+    checkType(pdfAuthorization, 'string', 'openUri', true)
     return new Promise<void>((resolve, reject) => {
       this.apiCallbackHandler.openResolve = resolve
       this.apiCallbackHandler.openReject = reject
-      this.instance.openUri(pdfUri, password)
+      this.instance.openUri(pdfUri, password, pdfAuthorization)
+    })
+  }
+
+  /**
+   * Open a PDF with an FDF via URL.
+   * NOTE: Any previously opened file must be closed first
+   * @param pdfUri          A URI string of the PDF
+   * @param fdfUri          A URI string of the FDF
+   * @param password        The password needed to decrypt the PDF
+   * @returns               A promise returning void if resolved or returning an error message if rejected.
+   */
+  public openFDFUri(pdfUri: string, fdfUri: string, password?: string, pdfAuthorization?: string, fdfAuthorization?: string) {
+    checkType(pdfUri, 'string', 'openFDFUri')
+    checkType(fdfUri, 'string', 'openFDFUri')
+    checkType(password, 'string', 'openFDFUri', true)
+    checkType(pdfAuthorization, 'string', 'openFDFUri', true)
+    checkType(fdfAuthorization, 'string', 'openFDFUri', true)
+    return new Promise<void>((resolve, reject) => {
+      this.apiCallbackHandler.openResolve = resolve
+      this.apiCallbackHandler.openReject = reject
+      this.instance.openFDFUri(pdfUri, fdfUri, password, pdfAuthorization, fdfAuthorization)
     })
   }
 

@@ -20,20 +20,23 @@ export const PasswordForm: Component<{}, PdfWebViewerState, PdfWebViewerActions>
             const data = new FormData(e.currentTarget as HTMLFormElement)
             const password = data.get('password') as string
             if (password) {
-              if (state.passwordDialogTempFile) {
-                if (typeof state.passwordDialogTempFile === 'object') {
-                  actions.api.openFile({
-                    file: state.passwordDialogTempFile,
-                    password,
-                  })
-                } else {
-                    actions.api.openUri({
-                      pdfUri: state.passwordDialogTempFile,
-                      password,
-                  })
+              if (!state.passwordDialogTempPdfFile) {
+                actions.loadDocumentRejected('error')
+                return
+              }
+              if (state.passwordDialogTempFdfFile) {
+                if (state.passwordDialogTempPdfFile instanceof Blob && state.passwordDialogTempFdfFile instanceof Blob) {
+                  actions.api.openFDF({pdfFile: state.passwordDialogTempPdfFile, fdfFile: state.passwordDialogTempFdfFile, password })
+                } else if (typeof state.passwordDialogTempPdfFile === 'string' && typeof state.passwordDialogTempFdfFile === 'string') {
+                  // tslint:disable-next-line: max-line-length
+                  actions.api.openFDFUri({pdfUri: state.passwordDialogTempPdfFile, fdfUri: state.passwordDialogTempFdfFile, password, pdfAuthorization: state.pdfAuthorization, fdfAuthorization: state.fdfAuthorization })
                 }
               } else {
-                actions.loadDocumentRejected('error')
+                if (state.passwordDialogTempPdfFile instanceof Blob) {
+                  actions.api.openFile({file: state.passwordDialogTempPdfFile, password })
+                } else {
+                  actions.api.openUri({pdfUri: state.passwordDialogTempPdfFile, password, pdfAuthorization: state.pdfAuthorization})
+                }
               }
             }
           }}>

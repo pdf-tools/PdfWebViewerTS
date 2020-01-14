@@ -37,8 +37,13 @@ export const translations = {
   },
   'loadFile.title': {
     en: 'Loading file...',
-      de: 'Datei wird geladen...',
+    de: 'Datei wird geladen...',
     fr: 'Chargement du fichier',
+  },
+  'saveFile.title': {
+    en: 'Saving file...',
+    de: 'Datei wird gespeichert...',
+    fr: 'Le fichier est sauvegardé',
   },
   'passwordForm.title': {
     en: 'Password required',

@@ -52,9 +52,10 @@ const breakPoints = {
 /** @internal */
 export interface PdfWebViewerActions extends ActionDefinitions {
   api: {
-    openFile(openFile: { file: File, password?: string }): void,
-    openUri(openUri: {pdfUri: string, password?: string}): void,
-    openFDF(openFDF: { pdfFile: File, fdfFile: File, password?: string}): void,
+    openFile(openFile: { file: File, password?: string}): void,
+    openUri(openUri: {pdfUri: string, password?: string, pdfAuthorization?: string}): void,
+    openFDF(openFDF: { pdfFile: File, fdfFile: File, password?: string, pdfAuthorization?: string, fdfAuthorization?: string}): void,
+    openFDFUri(openFDFUri: { pdfUri: string, fdfUri: string, password?: string, pdfAuthorization?: string, fdfAuthorization?: string}): void,
     downloadFile(): Promise<void>,
     close(): Promise<void>,
     hasChanges(): void,
@@ -166,19 +167,25 @@ export class PdfWebViewer {
     this.resizeObserver.observe(this.element)
   }
 
-  public openFile(file: File | string, password?: string) {
+  public openFile(file: File | string, password?: string, pdfAuthorization?: string) {
     if (this.view) {
-      if (typeof file === 'object') {
-        this.view.api.openFile({ file, password})
+      if (file instanceof Blob) {
+        this.view.api.openFile({ file, password })
       } else {
-        this.view.api.openUri({ pdfUri: file, password})
+        this.view.api.openUri({ pdfUri: file, password, pdfAuthorization })
       }
     }
   }
 
-  public openFDF(pdfFile: File, fdfFile: File, password?: string) {
+  public openFDF(pdfFile: File | string, fdfFile: File | string, password?: string, pdfAuthorization?: string, fdfAuthorization?: string) {
     if (this.view) {
-      this.view.api.openFDF({ pdfFile, fdfFile, password})
+      if (pdfFile instanceof Blob && fdfFile instanceof Blob) {
+        this.view.api.openFDF({ pdfFile, fdfFile, password})
+      } else if (typeof pdfFile === 'string' && typeof fdfFile === 'string') {
+        this.view.api.openFDFUri({pdfUri: pdfFile, fdfUri: fdfFile, password, pdfAuthorization, fdfAuthorization})
+      } else {
+        throw new Error('Both PDF and FDF have to either a blob or string. They cannot be mixed or have any other type')
+      }
     }
   }
 
@@ -311,85 +318,59 @@ export class PdfWebViewer {
       a.api = {
         openFile: (x: { file: File, password?: string }) => {
           if (this.viewerCanvas) {
-            const currentState = this.view.getState()
-            const hasChanges = this.viewerCanvas.hasChanges()
-            if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
-              this.view.showConfirmUnsavedChangesDialog(x.file)
+            if (!this.beforeOpen(x.file)) {
               return
             }
-            this.view.navigationPanel.clear()
-            this.view.loadDocumentBegin()
-            this.viewerCanvas.openBlob(x.file, x.password || '')
+            this.viewerCanvas.openBlob(x.file, x.password)
               .then(() => {
-                if (this.viewerCanvas) {
-                  this.view.pdfDocument.setFileInfo(x.file)
-                  this.view.pdfDocument.setHasChanges(false)
-
-                  const pageCount = this.viewerCanvas.getPageCount()
-                  this.view.pdfDocument.setPageCount(pageCount)
-
-                  this.handleDocumentOpened()
-                  this.view.loadDocumentFulfilled()
-                  this.dispatchEvent('documentLoaded', x.file)
-                }
+                this.openResolve(x.file)
               })
               .catch((error: Error) => {
-                if (error.message === 'password required') {
-                  this.view.loadDocumentPasswordForm(x.file)
-                } else {
-                  this.view.loadDocumentRejected(error.message)
-                }
+                this.openReject(x.file, null, error)
               })
           }
         },
-        openUri: (x: {pdfUri: string, password?: string}) => {
+        openUri: (x: {pdfUri: string, password?: string, pdfAuthorization?: string}) => {
           if (this.viewerCanvas) {
-            const currentState = this.view.getState()
-            const hasChanges = this.viewerCanvas.hasChanges()
-            if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
-              this.view.showConfirmUnsavedChangesDialog(x.pdfUri)
+            if (!this.beforeOpen(x.pdfUri)) {
               return
             }
-            this.view.navigationPanel.clear()
-            this.view.loadDocumentBegin()
-            this.viewerCanvas.openUri(x.pdfUri, x.password)
+            this.viewerCanvas.openUri(x.pdfUri, x.password, x.pdfAuthorization)
               .then(() => {
                 if (this.viewerCanvas) {
-                  this.view.pdfDocument.setFileInfo(x.pdfUri)
-                  this.view.pdfDocument.setHasChanges(false)
-
-                  const pageCount = this.viewerCanvas.getPageCount()
-                  this.view.pdfDocument.setPageCount(pageCount)
-
-                  this.handleDocumentOpened()
-                  this.view.loadDocumentFulfilled()
-                  this.dispatchEvent('documentLoaded', x.pdfUri)
+                  this.openResolve(x.pdfUri)
                 }
+              })
+              .catch( (error: Error) => {
+                this.openReject(x.pdfUri, null, error)
               })
           }
         },
         openFDF: (x: { pdfFile: File, fdfFile: File, password?: string }) => {
           if (this.viewerCanvas) {
-            this.viewerCanvas.openFDFBlob(x.pdfFile, x.fdfFile, x.password || '')
+            if (!this.beforeOpen(x.pdfFile, x.fdfFile)) {
+              return
+            }
+            this.viewerCanvas.openFDFBlob(x.pdfFile, x.fdfFile, x.password)
               .then(() => {
-                if (this.viewerCanvas) {
-                  this.view.pdfDocument.setFileInfo(x.pdfFile)
-                  this.view.pdfDocument.setHasChanges(false)
-
-                  const pageCount = this.viewerCanvas.getPageCount()
-                  this.view.pdfDocument.setPageCount(pageCount)
-
-                  this.handleDocumentOpened()
-                  this.view.loadDocumentFulfilled()
-                  this.dispatchEvent('documentLoaded', x.pdfFile)
-                }
+                this.openResolve(x.pdfFile)
               })
               .catch((error: Error) => {
-                if (error.message === 'password required') {
-                  this.view.loadDocumentPasswordForm(x.pdfFile)
-                } else {
-                  this.view.loadDocumentRejected(error.message)
-                }
+                this.openReject(x.pdfFile, x.fdfFile, error)
+              })
+          }
+        },
+        openFDFUri: (x: {pdfUri: string, fdfUri: string, password?: string, pdfAuthorization?: string, fdfAuthorization?: string}) => {
+          if (this.viewerCanvas) {
+            if (!this.beforeOpen(x.pdfUri, x.fdfUri)) {
+              return
+            }
+            this.viewerCanvas.openFDFUri(x.pdfUri, x.fdfUri, x.password, x.pdfAuthorization, x.fdfAuthorization)
+              .then( () => {
+                this.openResolve(x.pdfUri)
+              })
+              .catch((error: Error) => {
+                this.openReject(x.pdfUri, x.fdfUri, error)
               })
           }
         },
@@ -399,7 +380,7 @@ export class PdfWebViewer {
               const currentState = this.view.getState()
               const hasChanges = this.viewerCanvas.hasChanges()
               if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
-                this.view.showConfirmUnsavedChangesDialog(null)
+                this.view.showConfirmUnsavedChangesDialog({pdfFile: null})
                 return
               }
               this.view.closeDocument()
@@ -568,6 +549,42 @@ export class PdfWebViewer {
       if (e.keyCode === 70) {
         e.preventDefault()
       }
+    }
+  }
+
+  private beforeOpen(pdfFile: File | string, fdfFile?: File | string) {
+    if (this.viewerCanvas) {
+      const currentState = this.view.getState()
+      const hasChanges = this.viewerCanvas.hasChanges()
+      if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
+        this.view.showConfirmUnsavedChangesDialog({ pdfFile, fdfFile })
+        return false
+      }
+      this.view.navigationPanel.clear()
+      this.view.loadDocumentBegin()
+      return true
+    }
+  }
+
+  private openResolve(file: File | string) {
+    if (this.viewerCanvas) {
+      this.view.pdfDocument.setFileInfo(file)
+      this.view.pdfDocument.setHasChanges(false)
+
+      const pageCount = this.viewerCanvas.getPageCount()
+      this.view.pdfDocument.setPageCount(pageCount)
+
+      this.handleDocumentOpened()
+      this.view.loadDocumentFulfilled()
+      this.dispatchEvent('documentLoaded', file)
+    }
+  }
+
+  private openReject(pdfFile: File | string, fdfFile: File | string | null, error: Error) {
+    if (error.message === 'password required') {
+      this.view.loadDocumentPasswordForm({pdfFile, fdfFile})
+    } else {
+      this.view.loadDocumentRejected(error.message)
     }
   }
 
