@@ -169,8 +169,10 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
                 this.options.defaultFontSize,
     }
     this.pdfApi.createItem(annotation).then(item => {
+      this.onAnnotationCreated(item as Annotation)
+
       /* tslint:disable-next-line:align */
-      (this.module as FreetextAnnotationModule).onEdit(item.id)
+      ; (this.module as FreetextAnnotationModule).onEdit(item.id)
     })
   }
 

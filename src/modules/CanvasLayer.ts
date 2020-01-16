@@ -1,5 +1,6 @@
 import { ViewerCanvasState, ViewerCanvasStore } from '../pdf-viewer-canvas/state/store'
 import { PdfViewerApi } from '../pdf-viewer-api'
+import { Annotation } from '../pdf-viewer-api/types'
 import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { CanvasModule } from './CanvasModule'
 
@@ -103,4 +104,17 @@ export abstract class CanvasLayer {
       this.canvasContexts = []
     }
   }
+
+  protected onAnnotationCreated(annotation: Annotation) {
+    if (this.options.ms_custom) {
+      let history = annotation.custom
+      if (history === undefined) {
+        history = []
+      }
+      history.push({Type: '/Create', D: `(${annotation.lastModified})`, T: `(${annotation.originalAuthor})`})
+      annotation.custom = history
+      this.pdfApi.updateItem(annotation)
+    }
+  }
+
 }

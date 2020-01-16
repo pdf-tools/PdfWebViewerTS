@@ -6,7 +6,7 @@ import { Annotation, PdfRect, PdfItemType, Point, Rect } from '../../pdf-viewer-
 import { renderPopupMarker } from '../../pdf-viewer-canvas/view-layers/canvasShapes'
 import { ViewerMode, CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { Color } from '../../common/Color'
-import { getColorPalette } from '../../common/Tools'
+import { getColorPalette, createPdfTime } from '../../common/Tools'
 
 export class PopupLayer extends CanvasLayer {
 
@@ -406,6 +406,16 @@ export class PopupLayer extends CanvasLayer {
     if (this.pdfApi) {
       const annotation = this.pdfApi.getItem(id) as Annotation
       if (annotation) {
+        if (this.options.ms_custom) {
+          const params = []
+          if (annotation.content !== content) {
+            params.push('/Contents')
+            params.push(content)
+          }
+          if (params.length > 0) {
+            annotation.custom.push({Type: '/Edit', D: createPdfTime(), Parms: params, T: this.options.author})
+          }
+        }
         annotation.content = content
         this.pdfApi.updateItem(annotation)
       }

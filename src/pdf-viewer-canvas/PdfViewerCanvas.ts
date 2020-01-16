@@ -1,7 +1,7 @@
 import { createStore, ViewerCanvasStore } from './state/store'
 import {
   PdfViewerApi, PdfFitMode, PdfPageLayoutMode, Point, Annotation,
-  Rect, OutlineItem, PdfDestination, SearchResultType, PdfItemType, LinkAnnotation, PdfActionType, DeletedItem, PdfItemCategory, PdfItem,
+  Rect, OutlineItem, PdfDestination, SearchResultType, PdfItemType, LinkAnnotation, PdfActionType, DeletedItem, PdfItemCategory, PdfItem, PdfItemsOnPage,
 } from '../pdf-viewer-api'
 import ResizeObserver from 'resize-observer-polyfill'
 import { PdfViewerCanvasOptions, PdfViewerCanvasDefaultOptions } from './PdfViewerCanvasOptions'
@@ -36,6 +36,11 @@ export interface PdfViewerCanvasEventMap {
   appLoaded: boolean
   pageChanged: number
   error: Error
+  itemSelected: PdfItem
+  itemDeselected: PdfItem
+  itemCreated: PdfItem
+  itemUpdated: PdfItem
+  itemDeleted: DeletedItem
 }
 
 export type PdfViewerCanvasEventListener = <K extends keyof PdfViewerCanvasEventMap>(e: PdfViewerCanvasEventMap[K]) => void
@@ -411,6 +416,18 @@ export class PdfViewerCanvas {
     this.store.viewer.setDefaultMode()
   }
 
+  public getAnnotationsFromPage(page: number): Promise<PdfItemsOnPage> {
+    return this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION)
+  }
+
+  public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {
+    const dest: PdfDestination = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
+    dest.destinationType = 8
+    dest.top = annotation.pdfRect.pdfY
+    dest.page = annotation.pdfRect.page
+    this.goTo(dest)
+  }
+
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
       (this.eventListeners.get(type) as PdfViewerCanvasEventListener[]).push(listener)
@@ -524,7 +541,6 @@ export class PdfViewerCanvas {
     this.startRenderLoop()
     const document = this.store.getState().document;
     this.getAnnotations(document.firstVisiblePage, document.lastVisiblePage)
-
 
     window.setTimeout(() => {
       this.canvasEvents.resume()
@@ -908,18 +924,21 @@ export class PdfViewerCanvas {
     if (item.itemCategory === PdfItemCategory.ANNOTATION) {
       this.store.annotations.addAnnotation(item as Annotation)
     }
+    this.dispatchEvent('itemCreated', item)
   }
 
   private onItemUpdated(item: PdfItem) {
     if (item.itemCategory === PdfItemCategory.ANNOTATION) {
       this.store.annotations.updateAnnotation(item as Annotation)
     }
+    this.dispatchEvent('itemUpdated', item)
   }
 
   private onItemDeleted(deletedItem: DeletedItem) {
     if (deletedItem.categoryType === PdfItemCategory.ANNOTATION) {
       this.store.annotations.deleteAnnotation(deletedItem.id)
     }
+    this.dispatchEvent('itemDeleted', deletedItem)
   }
 
   private onPageChanged(pageNumber: number) {

@@ -102,8 +102,10 @@ export interface Annotation extends PdfPositionalItem {
   itemType: PdfItemType
   lastModified: string
   borderWidth: number
+  custom: object[]
   page: number
   content: string | null
+  subject: string | null
   color: string | null
   originalAuthor: string
   popup: AnnotationPopup

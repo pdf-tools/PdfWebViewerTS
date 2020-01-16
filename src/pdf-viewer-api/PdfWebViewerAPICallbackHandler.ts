@@ -137,6 +137,7 @@ export class PdfWebViewerAPICallbackHandler {
   }
 
   public onGetAnnotationsFromPageCompleted(result: any) {
+    console.log(result)
     const promiseCallback = this.GetAnnotationsFromPagePromiseQueue.shift()
     if (!result.ok) {
       promiseCallback && promiseCallback.reject(new Error(result.message))

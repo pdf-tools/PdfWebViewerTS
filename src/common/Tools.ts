@@ -24,3 +24,27 @@ export function getColorPalette(type: PdfItemType, options: PdfViewerCanvasOptio
     return options.highlightColors
   }
 }
+
+export function createPdfTime() {
+  const time = new Date()
+  const year = time.getUTCFullYear()
+  let month = `${time.getUTCMonth() + 1}`
+  month = padString(month, 2, '0')
+  let day = `${time.getUTCDate()}`
+  day = padString(day, 2, '0')
+  let hour = `${time.getUTCHours()}`
+  hour = padString(hour, 2, '0')
+  let minutes = `${time.getUTCMinutes()}`
+  minutes = padString(minutes, 2, '0')
+  let seconds = `${time.getUTCSeconds()}`
+  seconds = padString(seconds, 2, '0')
+  const dateString = `(D:${year}${month}${day}${hour}${minutes}${seconds}Z)`
+  return dateString
+}
+
+export function padString(s: string, paddingSize: number, fill: string) {
+  if (s.length < paddingSize) {
+    s = `${fill.repeat(paddingSize - s.length)}${s}`
+  }
+  return s
+}
