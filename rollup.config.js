@@ -1,16 +1,11 @@
-// import babel from 'rollup-plugin-babel'
-import localResolve from 'rollup-plugin-local-resolve'
-import resolve from 'rollup-plugin-node-resolve'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 import { uglify } from 'rollup-plugin-uglify'
-import commonjs from 'rollup-plugin-commonjs'
 
 const plugins = [
-  localResolve(),
-  resolve({
-    module: true
-  }),
+  resolve({}),
   commonjs({
-    include: "node_modules/**"
+    include: 'node_modules/**'
   }),
   uglify({
     compress: {
