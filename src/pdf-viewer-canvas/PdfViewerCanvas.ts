@@ -16,7 +16,6 @@ import { AnnotationSelectionLayer } from './view-layers/AnnotationSelectionLayer
 import { TextSelectionLayer } from './view-layers/TextSelectionLayer'
 import { ViewerMode, CursorStyle, copyTextToClipboard } from './state/viewer'
 import { CanvasModuleClass, CanvasModule } from '../modules/CanvasModule'
-import { getAnnotationOnPoint } from './state/annotations'
 
 /** @internal */
 declare var __VERSION__: 'dev'
@@ -448,7 +447,7 @@ export class PdfViewerCanvas {
     }
   }
 
-  private dispatchEvent<K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) {
+  public dispatchEvent<K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) {
     if (this.eventListeners.has(type)) {
       const listeners = this.eventListeners.get(type) as PdfViewerCanvasEventListener[]
       listeners.forEach(listener => listener(args))

@@ -217,17 +217,24 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       this.updateSelectionElementPosition(annotation)
       this.store.viewer.selectAnnotation(annotation)
       this.store.viewer.setCursorStyle(CursorStyle.DEFAULT)
+      if (this.viewerCanvas) {
+        this.viewerCanvas.dispatchEvent('itemSelected', annotation)
+      }
     }
   }
 
   private deselectAnnotation() {
     if (this.context && this.selectionElement && this.annotationBorder) {
+      const annot = this.selectedAnnotation
       this.selectedAnnotation = null
       this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height)
       this.annotationBorder.deselectAnnotation()
       this.context.canvas.style.display = 'none'
       this.selectionElement.style.display = 'none'
       this.store.viewer.deselectAnnotation()
+      if (this.viewerCanvas && annot !== null) {
+        this.viewerCanvas.dispatchEvent('itemDeselected', annot)
+      }
     }
   }
 
