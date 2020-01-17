@@ -218,7 +218,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       this.store.viewer.selectAnnotation(annotation)
       this.store.viewer.setCursorStyle(CursorStyle.DEFAULT)
       if (this.viewerCanvas) {
-        this.viewerCanvas.dispatchEvent('itemSelected', annotation)
+        this.dispatchEvent('itemSelected', annotation)
       }
     }
   }
@@ -233,7 +233,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       this.selectionElement.style.display = 'none'
       this.store.viewer.deselectAnnotation()
       if (this.viewerCanvas && annot !== null) {
-        this.viewerCanvas.dispatchEvent('itemDeselected', annot)
+        this.dispatchEvent('itemDeselected', annot)
       }
     }
   }

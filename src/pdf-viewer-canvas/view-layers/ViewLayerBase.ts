@@ -1,5 +1,5 @@
 import { PdfViewerApi } from '../../pdf-viewer-api'
-import { PdfViewerCanvas } from '../PdfViewerCanvas'
+import { PdfViewerCanvas, PdfViewerCanvasEventMap } from '../PdfViewerCanvas'
 import { PdfViewerCanvasOptions } from '../PdfViewerCanvasOptions'
 import { ViewerCanvasState, ViewerCanvasStore } from '../state/store'
 
@@ -10,6 +10,7 @@ export interface ViewLayer {
 
 export abstract class ViewLayerBase implements ViewLayer {
   protected viewerCanvas: PdfViewerCanvas | undefined
+  protected dispatchEvent: any
   protected containerElement: HTMLElement | undefined
 
   private canvasContexts: CanvasRenderingContext2D[]
@@ -53,7 +54,6 @@ export abstract class ViewLayerBase implements ViewLayer {
     }
     return this.pOptions
   }
-
   public resize(width: number, height: number, pixelRatio: number): void {
 
     const tempCanvas = document.createElement('canvas')
@@ -71,8 +71,9 @@ export abstract class ViewLayerBase implements ViewLayer {
     })
   }
 
-  public register(viewerCanvas: PdfViewerCanvas): void {
+  public register(viewerCanvas: PdfViewerCanvas, dispatchEvent: <K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) => void) {
     this.viewerCanvas = viewerCanvas
+    this.dispatchEvent = dispatchEvent
     this.containerElement = this.viewerCanvas.viewLayersElement
     this.create()
   }

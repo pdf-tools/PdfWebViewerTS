@@ -82,6 +82,7 @@ export class PdfViewerCanvas {
     this.updateViewLayerContext = this.updateViewLayerContext.bind(this)
     this.onKeyboardShortcuts = this.onKeyboardShortcuts.bind(this)
     this.externalLinkHandler = this.externalLinkHandler.bind(this)
+    this.dispatchEvent = this.dispatchEvent.bind(this)
 
     this.onCanvasPointerDown = this.onCanvasPointerDown.bind(this)
     this.onCanvasPointerMove = this.onCanvasPointerMove.bind(this)
@@ -447,7 +448,7 @@ export class PdfViewerCanvas {
     }
   }
 
-  public dispatchEvent<K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) {
+  private dispatchEvent<K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) {
     if (this.eventListeners.has(type)) {
       const listeners = this.eventListeners.get(type) as PdfViewerCanvasEventListener[]
       listeners.forEach(listener => listener(args))
@@ -591,7 +592,7 @@ export class PdfViewerCanvas {
   private registerViewLayers(viewLayers: ViewLayerBaseClass[]) {
     viewLayers.forEach(viewLayerBaseClass => {
       const viewLayer = new viewLayerBaseClass()
-      viewLayer.register(this)
+      viewLayer.register(this, this.dispatchEvent)
       this.viewLayers.push(viewLayer)
     })
   }
