@@ -1,7 +1,7 @@
 import { ActionsType } from 'hyperapp'
 import { OutlineItem } from '../../pdf-viewer-api'
 
-type NavigationType = 'pages' | 'outline'
+type NavigationType = 'pages' | 'outline' | 'annotations'
 
 /** @internal */
 export interface PageNavigationItem {
@@ -46,7 +46,10 @@ export interface NavigationPanelActions {
 }
 
 /** @internal */
-export const actions: ActionsType<NavigationPanelState, NavigationPanelActions> = {
+export const actions: ActionsType<
+  NavigationPanelState,
+  NavigationPanelActions
+> = {
   clear: () => $state => ({
     ...$state,
     outlineItemsLoaded: false,
@@ -68,7 +71,9 @@ export const actions: ActionsType<NavigationPanelState, NavigationPanelActions> 
   },
   updateThumbnail: (newThumbnail: PageNavigationItem) => $state => ({
     ...$state,
-    pages: $state.pages.map(p => p.pageNumber === newThumbnail.pageNumber ? newThumbnail : p),
+    pages: $state.pages.map(p =>
+      p.pageNumber === newThumbnail.pageNumber ? newThumbnail : p,
+    ),
   }),
   setOutlines: (outlines: OutlineNavigationItem[]) => $state => ({
     ...$state,
@@ -85,9 +90,11 @@ export const actions: ActionsType<NavigationPanelState, NavigationPanelActions> 
   }),
   toggleOutlineItem: (path: string[]) => $state => {
     const newState = { ...$state }
-    let currentItem =  { descendants: newState.outlines, open: false }
+    let currentItem = { descendants: newState.outlines, open: false }
     path.forEach(id => {
-      const nextItem = currentItem.descendants.find(item => item.id.toString() === id)
+      const nextItem = currentItem.descendants.find(
+        item => item.id.toString() === id,
+      )
       if (nextItem) {
         currentItem = nextItem
       }

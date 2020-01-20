@@ -1,4 +1,3 @@
-
 import {
   PdfViewerCanvasOptions,
   PdfViewerCanvasDefaultOptions,
@@ -6,15 +5,16 @@ import {
 import { PdfPageLayoutMode } from '../pdf-viewer-api'
 
 export interface PdfWebViewerOptions extends PdfViewerCanvasOptions {
-  allowFileDrop: boolean,
-  allowSaveFile: boolean,
-  allowOpenFile: boolean,
-  enableThumbnailNavigation: boolean,
-  enableOutlineNavigation: boolean,
-  enableSearch: boolean,
-  pageLayoutModes: PdfPageLayoutMode[],
-  onOpenFileButtonClicked?(): void,
-  onSaveFileButtonClicked?(): void,
+  allowFileDrop: boolean
+  allowSaveFile: boolean
+  allowOpenFile: boolean
+  enableThumbnailNavigation: boolean
+  enableOutlineNavigation: boolean
+  enableAnnotationNavigation: boolean
+  enableSearch: boolean
+  pageLayoutModes: PdfPageLayoutMode[]
+  onOpenFileButtonClicked?(): void
+  onSaveFileButtonClicked?(): void
 }
 
 export const pdfWebViewerDefaultOptions: PdfWebViewerOptions = {
@@ -23,6 +23,7 @@ export const pdfWebViewerDefaultOptions: PdfWebViewerOptions = {
   allowOpenFile: true,
   enableThumbnailNavigation: true,
   enableOutlineNavigation: true,
+  enableAnnotationNavigation: true,
   enableSearch: true,
   pageLayoutModes: [
     PdfPageLayoutMode.ONE_COLUMN,

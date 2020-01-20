@@ -1,11 +1,10 @@
-
 .pwv-navigation-panel {
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
   width: 0;
   position: relative;
-  transition: width .5s;
+  transition: width 0.5s;
   z-index: 2;
   > div {
     background-color: $gray-lighter;
@@ -22,9 +21,9 @@
 .pwv-show-navigation-panel {
   .pwv-navigation-panel {
     width: 320px;
-    transition: width .5s;
+    transition: width 0.5s;
   }
-  
+
   .pwv-scroll-container-sc {
     > div {
       width: 306px;
@@ -58,7 +57,7 @@
       background-color: transparent;
       cursor: pointer;
       &:focus {
-        outline:none;
+        outline: none;
       }
     }
     &.pwv-active {
@@ -70,7 +69,7 @@
     &.pwv-disabled {
       button {
         cursor: default;
-        opacity: .4;
+        opacity: 0.4;
       }
     }
   }
@@ -90,7 +89,6 @@
     right: 0;
     bottom: 0;
   }
-
 }
 
 .pwv-page-navigation {
@@ -99,7 +97,7 @@
     margin: 18px 0 30px 0;
     padding: 0;
   }
-  li  {
+  li {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -112,25 +110,25 @@
     .pwv-page-placeholder {
       height: 200px;
       width: 145px;
-      background-color: rgba(255,255,255,.7);
+      background-color: rgba(255, 255, 255, 0.7);
     }
     .pwv-page-placeholder,
     img {
       border: 2px solid $gray-light;
-      transition: border-color .4s;
+      transition: border-color 0.4s;
       max-width: 200px;
       max-height: 200px;
       cursor: pointer;
       &:hover {
-        transition: .3s;
-        box-shadow: 0 0 10px rgba($blue-dark, .15);
+        transition: 0.3s;
+        box-shadow: 0 0 10px rgba($blue-dark, 0.15);
       }
     }
     &.pwv-selected {
       .pwv-page-placeholder,
       img {
         border-color: $blue;
-        transition: border-color .4s;
+        transition: border-color 0.4s;
       }
     }
   }
@@ -148,14 +146,16 @@
     margin: 0;
     padding: 0;
     padding-left: 14px;
-    >div {
+    > div {
       display: flex;
       padding: 8px 2px;
     }
   }
 }
 
-.pwv-outline-tree-indent, .pwv-outline-tree-btn-expand, .pwv-outline-tree-btn-collapse {
+.pwv-outline-tree-indent,
+.pwv-outline-tree-btn-expand,
+.pwv-outline-tree-btn-collapse {
   display: block;
   flex-shrink: 0;
   text-align: center;
@@ -166,7 +166,8 @@
   margin: 0 2px 0 0;
   border: none;
 }
-.pwv-outline-tree-btn-expand, .pwv-outline-tree-btn-collapse {
+.pwv-outline-tree-btn-expand,
+.pwv-outline-tree-btn-collapse {
   cursor: pointer;
   .pwv-icon {
     height: 12px;
@@ -177,7 +178,6 @@
   }
 }
 .pwv-outline-tree-btn-collapse {
-  
   .pwv-icon {
     svg {
       fill: $blue;
@@ -187,9 +187,88 @@
 .pwv-outline-tree-lnk {
   display: block;
   cursor: pointer;
-  transition: .15s;
+  transition: 0.15s;
   &:hover {
-    transition: .15s;
+    transition: 0.15s;
     color: $blue;
+  }
+}
+
+.pwv-annotation-navigation {
+  padding: 4px 4px 4px 19px;
+  margin: 0;
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  h4 {
+    margin: 10px 0 8px 4px;
+  }
+}
+
+.pwv-annotation-navigation-item {
+  position: relative;
+  margin: 6px 0;
+  padding: 6px 0 8px 0;
+  background-color: #ffffff;
+  border: solid 2px $gray-light;
+  transition: box-shadow 0.3s;
+  cursor: pointer;
+  &.pwv-selected {
+    border: solid 2px $blue;
+  }
+  &:hover {
+    transition: box-shadow 0.3s;
+    box-shadow: 0 0 10px rgba($blue-dark, 0.15);
+  }
+  > div {
+    padding: 4px 10px;
+  }
+  > div:first-child {
+    display: flex;
+    align-items: center;
+    color: $gray-dark;
+    .pwv-author {
+      font-style: italic;
+      font-weight: 500;
+      display: inline-block;
+      margin-right: 4px;
+      &:after {
+        content: ',';
+      }
+    }
+    time {
+      font-style: italic;
+      display: inline-block;
+    }
+    .pwv-icon {
+      height: 18px;
+      width: 24px;
+      margin-right: 4px;
+      svg {
+        height: 18px;
+      }
+    }
+  }
+  p,
+  h5 {
+    padding: 0;
+    margin: 0 0 4px 0;
+    font-size: 16px;
+  }
+  .pwv-icon {
+    height: 18px;
+    svg {
+      height: 18px;
+    }
+    &.pwv-locked-icon {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      svg {
+        fill: $gray;
+      }
+    }
   }
 }
