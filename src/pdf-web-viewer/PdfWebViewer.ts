@@ -12,6 +12,7 @@ import {
   ActionDefinitions,
 } from './state/index'
 import { PdfViewerCanvas } from '../pdf-viewer-canvas/PdfViewerCanvas'
+import { getAnnotationBehaviors } from '../pdf-viewer-canvas/AnnotationBehaviors'
 import { translations } from './translations'
 import { translationManager } from '../common/TranslationManager'
 import { PdfItemsOnPage, DeletedItem, PdfItem } from '../pdf-viewer-api/types'
@@ -21,6 +22,7 @@ import {
   PdfFitMode,
   PdfPageLayoutMode,
   Annotation,
+  PdfItemCategory,
 } from '../pdf-viewer-api'
 import { PopupModule } from '../modules/popup/PopupModule'
 import { MobilePopupModule } from '../modules/mobile-popup/MobilePopupModule'
@@ -909,6 +911,7 @@ export class PdfWebViewer {
   }
 
   private async loadAnnotations() {
+    this.view.navigationPanel.clearAnnotations()
     const loadNext = (pages: number[]) => {
       if (this.viewerCanvas) {
         const pageNumber = pages.shift()
@@ -917,7 +920,17 @@ export class PdfWebViewer {
           this.viewerCanvas
             .getAnnotationsFromPage(pageNumber)
             .then((itemsOnPage: PdfItemsOnPage) => {
-              this.view.navigationPanel.setPageAnnotations(itemsOnPage)
+              const selectableItems = itemsOnPage.items.filter(
+                item =>
+                  getAnnotationBehaviors((item as Annotation).itemType)
+                    .selectable,
+              )
+
+              this.view.navigationPanel.setPageAnnotations({
+                page: itemsOnPage.page,
+                itemCategory: PdfItemCategory.ANNOTATION,
+                items: selectableItems,
+              })
               if (pages.length > 0) {
                 loadNext(pages)
               }

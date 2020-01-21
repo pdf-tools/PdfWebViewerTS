@@ -14,9 +14,10 @@ export const AnnotationList: Component<
     k => annotationsObj[k as any],
   )
 
-  console.log('annotations ----')
-  console.log(annotations)
-  console.log('annotations ++++')
+  // const sortedAnnotations = annotations.sort(
+  //   (f, s) => f.pdfRect.pdfY - s.pdfRect.pdfY,
+  // )
+  annotations.sort((f, s) => f.pdfRect.pdfY - s.pdfRect.pdfY)
 
   return (
     <ul>

@@ -2,8 +2,6 @@ import { ActionsType } from 'hyperapp'
 import {
   OutlineItem,
   Annotation,
-  PdfItemCategory,
-  PdfItemType,
   PdfItemsOnPage,
   DeletedItem,
 } from '../../pdf-viewer-api'
@@ -68,6 +66,7 @@ export interface NavigationPanelActions {
   selectNavigation(navigation: NavigationType): NavigationPanelState
   toggleNavigationPanel(): NavigationPanelState
   toggleOutlineItem(path: string[]): NavigationPanelState
+  clearAnnotations(): NavigationPanelState
   setPageAnnotations(itemsOnPage: PdfItemsOnPage): NavigationPanelState
   updateAnnotation(annotation: Annotation): NavigationPanelState
   deleteAnnotation(deletedItem: DeletedItem): NavigationPanelState
@@ -132,6 +131,11 @@ export const actions: ActionsType<
     currentItem.open = !currentItem.open
     return newState
   },
+  clearAnnotations: () => $state => ({
+    ...$state,
+    annotations: {},
+    selectedAnnotation: undefined,
+  }),
   setPageAnnotations: (itemsOnPage: PdfItemsOnPage) => $state => {
     const itemState: AnnotationItemState = {}
 

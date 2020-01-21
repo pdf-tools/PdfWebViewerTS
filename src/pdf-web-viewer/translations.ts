@@ -165,6 +165,11 @@ export const translations = {
     de: 'Annotationen',
     fr: 'Annotation',
   },
+  'sideNavigation.annotation.page': {
+    en: 'Page',
+    de: 'Seite',
+    fr: 'Page',
+  },
   'navigation.of': {
     en: 'of',
     de: 'von',

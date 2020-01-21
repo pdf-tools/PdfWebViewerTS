@@ -11,25 +11,26 @@ const AnnotationIcon: Component<
   PdfWebViewerState,
   PdfWebViewerActions
 > = ({ itemType, fill }) => (state, actions) => {
+  const bg = fill ? fill : undefined
   switch (itemType) {
     case PdfItemType.HIGHLIGHT:
     case PdfItemType.SQUIGGLY:
     case PdfItemType.UNDERLINE:
     case PdfItemType.STRIKE_OUT:
-      return <Icon icon={icons.highlighter} fill={fill ? fill : undefined} />
+      return <Icon icon={icons.highlighter} bg={bg} />
 
     case PdfItemType.STAMP:
-      return <Icon icon={icons.stamp} fill={fill ? fill : undefined} />
+      return <Icon icon={icons.stamp} bg={bg} />
 
     case PdfItemType.FREE_TEXT:
-      return <Icon icon={icons.freeText} fill={fill ? fill : undefined} />
+      return <Icon icon={icons.freeText} bg={bg} />
 
     case PdfItemType.TEXT:
     case PdfItemType.POPUP:
-      return <Icon icon={icons.stickyNote} fill={fill ? fill : undefined} />
+      return <Icon icon={icons.stickyNote} bg={bg} />
 
     case PdfItemType.INK:
-      return <Icon icon={icons.pencil} fill={fill ? fill : undefined} />
+      return <Icon icon={icons.pencil} bg={bg} />
 
     default:
       return <Icon icon={icons.freeText} fill={fill ? fill : undefined} />
@@ -66,12 +67,12 @@ export const AnnotationListItem: Component<
     }}
   >
     <div>
+      <strong>{annotation.itemType}</strong>
       <AnnotationIcon itemType={annotation.itemType} fill={annotation.color} />
       {annotation.originalAuthor && (
         <span class="pwv-author">{annotation.originalAuthor}</span>
       )}
       <time>{formatDate(annotation.lastModified)}</time>
-      <span>{annotation.itemType}</span>
     </div>
     <div>
       <h5>{annotation.subject}</h5>
