@@ -6,9 +6,12 @@ import { icons } from '../../common/icons'
 import { ExecCommandArgs } from './RichTextEditor'
 import { Commandbar } from '../../common/Commandbar'
 import { CommandbarSeparator } from '../../common/CommandbarSeparator'
+import { Annotation } from '../../pdf-viewer-api'
+import { translationManager } from '../../common/TranslationManager'
 
 /** @internal */
 export interface EditFreetextAnnotationToolbarProps {
+  annotation: Annotation
   backgroundColors: string[]
   fontColors: string[]
   fontFamilies: string[]
@@ -23,6 +26,7 @@ export interface EditFreetextAnnotationToolbarProps {
 
 /** @internal */
 export interface EditFreetextAnnotationToolbarState {
+  annotation: Annotation
   backgroundColors: string[]
   fontColors: string[]
   fontFamilies: string[]
@@ -49,6 +53,7 @@ export interface EditFreetextAnnotationToolbarActions {
 export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotationToolbarProps, element: HTMLElement) => {
 
   const state: EditFreetextAnnotationToolbarState = {
+    annotation: props.annotation,
     backgroundColors: props.backgroundColors,
     fontColors: props.fontColors,
     fontFamilies: props.fontFamilies,
@@ -167,6 +172,18 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
           icon={icons.underline}
           onClick={() => { $actions.executeCommand({ cmd: 'underline' }) }}
         />
+        <CommandbarSeparator />
+      </Commandbar>
+      <Commandbar>
+      <div class={'pwv-freetext-subject'}>
+        <input
+          id={'pwv-freetext-subject-' + $state.annotation.id}
+          placeholder={translationManager.getText('annotation.subject')}
+          onchange={(e: UIEvent) => {
+            $state.annotation.subject = (e.currentTarget as HTMLTextAreaElement).value
+          }}
+          value={$state.annotation.subject} />
+      </div>
       </Commandbar>
       <Commandbar>
         <CommandbarButton

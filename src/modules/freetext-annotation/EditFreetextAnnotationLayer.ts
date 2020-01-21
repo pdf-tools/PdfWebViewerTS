@@ -73,6 +73,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     ; const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
 
     createEditFreetextAnnotationToolbar({
+      annotation: this.freetextAnnotation,
       backgroundColors: [...this.options.backgroundColors],
       fontColors: [...this.options.foregroundColors],
       fontFamilies: this.options.fontFamilies,
@@ -135,6 +136,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       this.freetextAnnotation.fontName = content.fontName !== null ? content.fontName : 'Helvetica'
       this.freetextAnnotation.fontSize = content.fontSizeCSS ? convertCssToPdfPixel(content.fontSizeCSS) : this.freetextAnnotation.fontSize
       this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
+      console.log(this.freetextAnnotation)
       this.pdfApi.updateItem(this.freetextAnnotation)
     }
   }

@@ -93,10 +93,12 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
             if (state.viewer.selectedAnnotationId) {
               this.deselectAnnotation()
             }
-            this.selectAnnotation(annotationOnPoint)
-            breakRenderLoop = true
+            if (!annotationOnPoint.isHidden()) {
+              this.selectAnnotation(annotationOnPoint)
+              breakRenderLoop = true
+            }
           }
-        } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup) {
+        } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup && !annotationOnPoint.isHidden()) {
           this.openPopup(annotationOnPoint.id)
           breakRenderLoop = true
         }
@@ -318,14 +320,19 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
   private deleteAnnotation(id: number) {
     if (this.pdfViewerApi) {
       const item = this.pdfViewerApi.getItem(id) as Annotation
-
-      this.pdfViewerApi.deleteItem(item)
+      if (this.options.ms_custom) {
+        item.setHidden(true)
+        this.addDeleteHistory(item)
+        this.deselectAnnotation()
+      } else {
+        this.pdfViewerApi.deleteItem(item)
         .then(() => {
-          this.deselectAnnotation()
-        })
-        .catch(error => {
-          console.error(error)
-        })
+            this.deselectAnnotation()
+          })
+          .catch(error => {
+            console.error(error)
+          })
+      }
     }
   }
 

@@ -1,7 +1,8 @@
-import { PdfViewerApi } from '../../pdf-viewer-api'
+import { PdfViewerApi, Annotation } from '../../pdf-viewer-api'
 import { PdfViewerCanvas, PdfViewerCanvasEventMap } from '../PdfViewerCanvas'
 import { PdfViewerCanvasOptions } from '../PdfViewerCanvasOptions'
 import { ViewerCanvasState, ViewerCanvasStore } from '../state/store'
+import { createPdfTime } from '../../common/Tools'
 
 export interface ViewLayer {
   resize(width: number, height: number, devicePixelRatio: number): void
@@ -127,5 +128,19 @@ export abstract class ViewLayerBase implements ViewLayer {
       }
       this.canvasContexts = []
     }
+  }
+
+  protected addDeleteHistory(annotation: Annotation) {
+      let history = annotation.custom
+      if (!history) {
+        history = []
+      }
+      history.push({Type: '/Delete', D: createPdfTime(), T: this.options.author})
+      annotation.custom = history
+      if (annotation.popup) {
+        annotation.popup.isOpen = false
+      }
+      this.store.annotations.updateAnnotation(annotation)
+      this.pdfViewerApi.updateItem(annotation)
   }
 }

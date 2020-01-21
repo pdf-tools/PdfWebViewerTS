@@ -108,13 +108,17 @@ export abstract class CanvasLayer {
   protected onAnnotationCreated(annotation: Annotation) {
     if (this.options.ms_custom) {
       let history = annotation.custom
-      if (history === undefined) {
-        history = []
-      }
+      history = []
       history.push({Type: '/Create', D: `(${annotation.lastModified})`, T: `(${annotation.originalAuthor})`})
       annotation.custom = history
       this.pdfApi.updateItem(annotation)
     }
   }
 
+  protected canEdit(author: string) {
+    if (this.options.ms_custom) {
+        return this.options.author === author
+      }
+    return true
+  }
 }
