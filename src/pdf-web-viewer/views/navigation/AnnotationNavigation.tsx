@@ -2,7 +2,7 @@ import { h, Component } from 'hyperapp'
 import { PdfWebViewerState, PdfWebViewerActions } from '../../PdfWebViewer'
 import { ScrollContainer } from '../../../common/ScrollContainer'
 import { Icon, icons } from '../../../common/Icon'
-import { AnnotationItem } from './AnnotationItem'
+import { AnnotationList } from './AnnotationList'
 
 /* ****/
 import { Annotation } from '../../../pdf-viewer-api/types'
@@ -106,19 +106,24 @@ export const AnnotationNavigation: Component<
   {},
   PdfWebViewerState,
   PdfWebViewerActions
-> = ({}) => (state, actions) => (
-  <ScrollContainer>
-    <div class="pwv-annotation-navigation">
-      <ul>
-        <li class="pwv-annotation-navigation-page">
-          <h4>Page 1</h4>
-          <ul>
-            {items.map((annotation, index) => (
-              <AnnotationItem annotation={annotation} selected={index === 1} />
-            ))}
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </ScrollContainer>
-)
+> = ({}) => (state, actions) => {
+  if (!state.navigationPanel) {
+    return <div>loading</div>
+  }
+
+  const { annotations } = state.navigationPanel
+  const pageNumbers = Object.keys(annotations)
+
+  return (
+    <ScrollContainer>
+      <div class="pwv-annotation-navigation">
+        {pageNumbers.map(pageNumber => (
+          <div>
+            <h4>Page {pageNumber}</h4>
+            <AnnotationList pageNumber={pageNumber as any} />
+          </div>
+        ))}
+      </div>
+    </ScrollContainer>
+  )
+}

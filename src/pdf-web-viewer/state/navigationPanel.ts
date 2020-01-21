@@ -1,5 +1,12 @@
 import { ActionsType } from 'hyperapp'
-import { OutlineItem } from '../../pdf-viewer-api'
+import {
+  OutlineItem,
+  Annotation,
+  PdfItemCategory,
+  PdfItemType,
+  PdfItemsOnPage,
+  DeletedItem,
+} from '../../pdf-viewer-api'
 
 type NavigationType = 'pages' | 'outline' | 'annotations'
 
@@ -16,13 +23,29 @@ export interface OutlineNavigationItem extends OutlineItem {
   descendants: OutlineNavigationItem[]
 }
 
+export interface AnnotationItemState {
+  [annotationId: number]: Annotation
+}
+
+export interface AnnotationsState {
+  [page: number]: AnnotationItemState
+}
+
+export interface AnnotationSelection {
+  page: number
+  annotationId: number
+}
+
 /** @internal */
 export interface NavigationPanelState {
   showNavigation: boolean
   selectedNavigation: NavigationType
   outlineItemsLoaded: boolean
+  annotationsLoaded: boolean
   pages: PageNavigationItem[]
   outlines: OutlineNavigationItem[]
+  annotations: AnnotationsState
+  selectedAnnotation?: AnnotationSelection
 }
 
 /** @internal */
@@ -30,8 +53,10 @@ export const state: NavigationPanelState = {
   showNavigation: false,
   selectedNavigation: 'pages',
   outlineItemsLoaded: false,
+  annotationsLoaded: false,
   pages: [],
   outlines: [],
+  annotations: {},
 }
 
 /** @internal */
@@ -43,6 +68,11 @@ export interface NavigationPanelActions {
   selectNavigation(navigation: NavigationType): NavigationPanelState
   toggleNavigationPanel(): NavigationPanelState
   toggleOutlineItem(path: string[]): NavigationPanelState
+  setPageAnnotations(itemsOnPage: PdfItemsOnPage): NavigationPanelState
+  updateAnnotation(annotation: Annotation): NavigationPanelState
+  deleteAnnotation(deletedItem: DeletedItem): NavigationPanelState
+  selectAnnotation(annotation: Annotation): NavigationPanelState
+  deselectAnnotation(): NavigationPanelState
 }
 
 /** @internal */
@@ -102,4 +132,59 @@ export const actions: ActionsType<
     currentItem.open = !currentItem.open
     return newState
   },
+  setPageAnnotations: (itemsOnPage: PdfItemsOnPage) => $state => {
+    const itemState: AnnotationItemState = {}
+
+    itemsOnPage.items.forEach(an => {
+      const annotation = an as Annotation
+      itemState[annotation.id] = annotation
+    })
+
+    return {
+      ...$state,
+      annotations: { ...$state.annotations, [itemsOnPage.page]: itemState },
+    }
+  },
+  updateAnnotation: (annotation: Annotation) => $state => {
+    const page = annotation.pdfRect.page
+    const id = annotation.id
+    const itemsOnPage = $state.annotations[page]
+      ? { ...$state.annotations[page] }
+      : {}
+    itemsOnPage[id] = annotation
+
+    console.log('updateAnnotation view')
+    console.log(annotation)
+    console.log(itemsOnPage)
+    return {
+      ...$state,
+      annotations: { ...$state.annotations, [page]: itemsOnPage },
+    }
+  },
+  deleteAnnotation: (deletedItem: DeletedItem) => $state => {
+    // const page = deletedItem.
+    // const id = annotation.id
+    // const itemsOnPage = $state.annotations[page]
+    //   ? { ...$state.annotations[page] }
+    //   : {}
+    // itemsOnPage[id] = annotation
+    // console.log('updateAnnotation view')
+    // console.log(annotation)
+    // console.log(itemsOnPage)
+    // return {
+    //   ...$state,
+    //   annotations: { ...$state.annotations, [page]: itemsOnPage },
+    // }
+  },
+  selectAnnotation: (annotation: Annotation) => $state => ({
+    ...$state,
+    selectedAnnotation: {
+      page: annotation.pdfRect.page,
+      annotationId: annotation.id,
+    },
+  }),
+  deselectAnnotation: () => $state => ({
+    ...$state,
+    selectedAnnotation: undefined,
+  }),
 }
