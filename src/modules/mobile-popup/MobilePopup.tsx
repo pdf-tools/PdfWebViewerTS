@@ -133,7 +133,7 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
                 color={$state.color || 'transparent'}
                 onChange={color => {
                   if ($state.id) {
-                    $state.content = (document.getElementById('pwv-popup-' + $state.id) as HTMLTextAreaElement).value
+                    $state.content = (document.getElementById('pwv-popup-content-' + $state.id) as HTMLTextAreaElement).value
                     props.onUpdateColor($state.id, color)
                   }
                 }}
@@ -146,7 +146,7 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
                       if ($state.timer) {
                         window.clearTimeout($state.timer)
                       }
-                      const content = (document.getElementById('pwv-popup-' + $state.id) as HTMLTextAreaElement).value
+                      const content = (document.getElementById('pwv-popup-content-' + $state.id) as HTMLTextAreaElement).value
                       props.onClose($state.id, content)
                     }
                   }}
@@ -157,7 +157,7 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
           </div>
           <div class="pwv-popup-content">
             <textarea
-              id={'pwv-popup-' + $state.id}
+              id={'pwv-popup-content-' + $state.id}
               onchange={(e: UIEvent) => {
                 if ($state.id) {
                   const id = $state.id

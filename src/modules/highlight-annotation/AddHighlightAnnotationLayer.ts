@@ -173,7 +173,9 @@ export class AddHighlightAnnotationLayer extends CanvasLayer {
               originalAuthor: this.options.author,
               quadPointRects,
             }
-            this.pdfApi.createItem(args).then(item => this.onAnnotationCreated(item as Annotation))
+            this.pdfApi.createItem(args).then(item => {
+              this.onAnnotationCreated(item as Annotation)
+            })
           }
         }
       }

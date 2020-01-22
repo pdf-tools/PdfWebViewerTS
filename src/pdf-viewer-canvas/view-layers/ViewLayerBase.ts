@@ -1,7 +1,8 @@
-import { PdfViewerApi } from '../../pdf-viewer-api'
+import { PdfViewerApi, Annotation } from '../../pdf-viewer-api'
 import { PdfViewerCanvas, PdfViewerCanvasEventMap } from '../PdfViewerCanvas'
 import { PdfViewerCanvasOptions } from '../PdfViewerCanvasOptions'
 import { ViewerCanvasState, ViewerCanvasStore } from '../state/store'
+import { addHistoryEntry } from '../../custom/history'
 
 export interface ViewLayer {
   resize(width: number, height: number, devicePixelRatio: number): void
@@ -127,5 +128,9 @@ export abstract class ViewLayerBase implements ViewLayer {
       }
       this.canvasContexts = []
     }
+  }
+
+  protected addDeleteHistory(annotation: Annotation) {
+      addHistoryEntry(annotation, 'delete', this.options.author)
   }
 }

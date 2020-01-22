@@ -8,19 +8,22 @@ import { PdfRect, Rect } from '../../pdf-viewer-api'
 import { TooltipPosition } from '../../common/Tooltip'
 import { translationManager } from '../../common/TranslationManager'
 import { Color } from '../../common/Color'
+import { actions } from 'pdf-viewer-canvas/state/canvas';
 
 /** @internal */
 export interface PopupViewProps {
   maxPopupWidth: number
   maxPopupHeight: number
+  currentUser: string
   onSelect: (id: number) => void
-  onDeselect: () => void
-  onClose: (id: number, content: string) => void
+  onDeselect: (syncronize: boolean) => void
+  onClose: () => void
   onDelete: (id: number) => void
-  onUpdateContent: (id: number, content: string) => void
   onUpdatePosition: (id: number, top: number, left: number) => void
   onUpdateSize: (id: number, width: number, height: number) => void
   onUpdateColor: (id: number, color: string) => void
+  onLock: (id: number) => void
+  canEdit: (author: string) => boolean
 }
 
 /** @internal */
@@ -28,6 +31,7 @@ export interface Popup {
   id: number
   colorPalette: string[]
   content: string
+  subject: string | null
   color: string | null
   isLocked: boolean
   selected: boolean
@@ -44,6 +48,9 @@ interface PopupViewState {
   openPopups: Popup[]
   maxPopupWidth: number
   maxPopupHeight: number
+  currentUser: string
+  activeContent: string | null
+  activeSubject: string | null
 }
 
 export interface PopupViewActions {
@@ -61,6 +68,9 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     openPopups: [],
     maxPopupWidth: props.maxPopupWidth,
     maxPopupHeight: props.maxPopupHeight,
+    currentUser: props.currentUser,
+    activeContent: null,
+    activeSubject: null,
   }
 
   const actions: ActionsType<PopupViewState, PopupViewActions> = {
@@ -90,7 +100,7 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     selectPopup: (id: number) => $state => {
       if ($state.selectedPopup !== id) {
         window.setTimeout(() => {
-          const txt = document.getElementById('pwv-popup-' + id) as HTMLTextAreaElement
+          const txt = document.getElementById('pwv-popup-content-' + id) as HTMLTextAreaElement
           if (txt) {
             txt.focus()
           }
@@ -100,14 +110,17 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
       return {
         ...$state,
         openPopups,
+        activeContent: null,
+        activeSubject: null,
         selectedPopup: id,
       }
     },
     deselectPopup: () => $state => {
-      const openPopups = $state.openPopups.map(p => ({...p, selected: false }))
       return {
         ...$state,
         selectedPopup: null,
+        activeContent: null,
+        activeSubject: null,
       }
     },
   }
@@ -126,9 +139,8 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
             close={props.onClose}
             remove={props.onDelete}
             select={props.onSelect}
-            updateContent={payload => {
-              props.onUpdateContent(payload.id, payload.content)
-            }}
+            toggleLock={props.onLock}
+            canEdit={props.canEdit}
             updatePosition={payload => {
               props.onUpdatePosition(payload.id, payload.x, payload.y)
             }}
@@ -145,11 +157,6 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
   }
 
   return app(state, actions, App, element)
-}
-
-interface UpdatePopupContentPayload {
-  id: number
-  content: string
 }
 
 interface UpdatePopupPositionPayload {
@@ -171,17 +178,18 @@ interface UpdatePopupColorPayload {
 interface PopupProps {
   popup: Popup
   colorPalette: string[]
-  updateContent(payload: UpdatePopupContentPayload): void
   updateColor(payload: UpdatePopupColorPayload): void
   updatePosition(payload: UpdatePopupPositionPayload): void
   updateSize(payload: UpdatePopupSizePayload): void
-  close(id: number, content: string): void
+  close(): void
   select(id: number): void
   remove(id: number): void
+  toggleLock(id: number): void
+  canEdit(author: string): boolean
 }
 
 /* tslint:disable-next-line:max-line-length */
-const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup, colorPalette, updateContent, updateColor, close, select, remove, updatePosition, updateSize }) => ($state, $actions) => {
+const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup, colorPalette, updateColor, close, select, remove, toggleLock, updatePosition, updateSize, canEdit}) => ($state, $actions) => {
   const styles: any = {
     backgroundColor: popup.color,
     width: popup.cssWidth + 'px',
@@ -210,7 +218,7 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
       key={popup.id}
       style={styles}
       data-id={popup.id}
-    >
+      >
       <div
         onclick={(e: MouseEvent) => {
           if (!(e as any).openDropdown) {
@@ -236,9 +244,14 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             <CommandbarButton
               icon={icons.delete}
               onClick={() => { remove(popup.id) }}
-              disabled={popup.isLocked}
+              disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
               tooltipPos={TooltipPosition.top}
               tooltip={popup.isLocked ? translationManager.getText('lockedAnnotation') : ''}
+            />
+            <CommandbarButton
+                onClick={() => { toggleLock(popup.id) }}
+                disabled={!canEdit(popup.originalAuthor)}
+                icon={popup.isLocked ? icons.lock : icons.unlock}
             />
             <ColorPicker
               colors={colorPalette}
@@ -250,42 +263,65 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
                   color,
                 })
               }}
-              disabled={popup.isLocked}
+              disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
               tooltipPos={TooltipPosition.top}
               tooltip={popup.isLocked ? translationManager.getText('lockedAnnotation') : ''}
             />
+
             <div style={{ marginLeft: 'auto' }}>
               <CommandbarButton
                 onClick={(e: Event) => {
                   e.stopPropagation()
-                  const content = (document.getElementById('pwv-popup-' + popup.id) as HTMLTextAreaElement).value
-                  close(popup.id, content)
+                  // const content = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
+                  // const subject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value
+                  $state.selectedPopup = popup.id
+                  close()
                 }}
                 icon={icons.close}
               />
             </div>
           </div>
         </div>
+        <div class="pwv-popup-subject">
+          <input
+            id={'pwv-popup-subject-' + popup.id}
+            placeholder={translationManager.getText('annotation.subject')}
+            onchange={() => {
+              $state.activeSubject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value
+            }}
+            // onblur={(e: UIEvent) => {
+            //   updateContent({
+            //     id: popup.id,
+            //     content: (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value,
+            //     subject: (e.currentTarget as HTMLTextAreaElement).value,
+            //   })
+            // }}
+            disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
+            value={popup.subject} />
+        </div>
         <div class="pwv-popup-content">
-          <textarea
-            id={'pwv-popup-' + popup.id}
-            onchange={(e: UIEvent) => {
-              updateContent({
-                id: popup.id,
-                content: (e.currentTarget as HTMLTextAreaElement).value,
-              })
-            }}
-            oncreate={(element: HTMLElement) => {
-              if (popup.selected) {
-                window.setTimeout(() => {
-                  element.focus()
-                }, 200)
-              }
-            }}
-            disabled={popup.isLocked}
-          >
-            {popup.content}
-          </textarea>
+          { (canEdit(popup.originalAuthor) && !popup.isLocked) ?
+            <textarea
+              id={'pwv-popup-content-' + popup.id}
+              onchange={() => {
+                $state.activeContent = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
+              }}
+              oncreate={(element: HTMLElement) => {
+                if (popup.selected) {
+                  window.setTimeout(() => {
+                    element.focus()
+                  }, 200)
+                }
+              }}
+            >
+              {popup.content}
+            </textarea>
+            :
+            <div
+              id={'pwv-popup-locked'}>
+              {popup.content}
+            </div>
+          }
         </div>
       </div>
       <div>
