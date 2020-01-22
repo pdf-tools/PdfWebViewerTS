@@ -103,10 +103,10 @@ export interface PdfWebViewerActions extends ActionDefinitions {
     previousPage(): void
     setFitMode(fitMode: number): void
     goTo(pdfDestination: PdfDestination): void
-    goToAnnotation(
-      annotation: Annotation,
-      action?: 'select' | 'edit' | 'popup' | 'history',
-    ): void
+    goToAnnotation(target: {
+      annotation: Annotation
+      action?: 'select' | 'edit' | 'popup' | 'history'
+    }): void
     setPageLayoutMode(layoutMode: number): void
     rotate(): void
     setRotation(rotation: number): void
@@ -691,12 +691,19 @@ export class PdfWebViewer {
             this.viewerCanvas.goTo(pdfDestination)
           }
         },
-        goToAnnotation: (
-          annotation: Annotation,
-          action?: 'select' | 'edit' | 'popup' | 'history',
-        ) => {
+        goToAnnotation: (target: {
+          annotation: Annotation
+          action?: 'select' | 'edit' | 'popup' | 'history'
+        }) => {
           if (this.viewerCanvas) {
-            this.viewerCanvas.goToAnnotation(annotation, action)
+            /////////////
+            console.log('goToAnnotation -> ' + target.action, target.annotation)
+            /////////////
+            try {
+              this.viewerCanvas.goToAnnotation(target.annotation, target.action)
+            } catch (err) {
+              console.error(err)
+            }
           }
         },
         resetViewerMode: (pdfDestination: PdfDestination) => {
@@ -804,6 +811,7 @@ export class PdfWebViewer {
       const pageCount = this.viewerCanvas.getPageCount()
       this.view.navigationPanel.setThumbnailPlaceholders(pageCount)
       const viewerState = this.view.getState()
+      this.view.navigationPanel.clearAnnotations()
       if (viewerState.navigationPanel.showNavigation) {
         if (viewerState.navigationPanel.selectedNavigation === 'pages') {
           this.loadPageThumbnails()
@@ -910,13 +918,19 @@ export class PdfWebViewer {
     })
   }
 
-  private async loadAnnotations() {
-    this.view.navigationPanel.clearAnnotations()
+  private loadAnnotations() {
+    console.log('loadAnnotations...')
+    if (this.view.getState().navigationPanel.annotationsLoaded) {
+      console.log('... skip')
+      return
+    }
+
     const loadNext = (pages: number[]) => {
       if (this.viewerCanvas) {
         const pageNumber = pages.shift()
         console.log('load annotations for page ' + pageNumber)
         if (typeof pageNumber === 'number') {
+          console.log('... ')
           this.viewerCanvas
             .getAnnotationsFromPage(pageNumber)
             .then((itemsOnPage: PdfItemsOnPage) => {
@@ -933,6 +947,8 @@ export class PdfWebViewer {
               })
               if (pages.length > 0) {
                 loadNext(pages)
+              } else {
+                this.view.navigationPanel.setAnnotationLoaded()
               }
             })
         }
@@ -940,11 +956,11 @@ export class PdfWebViewer {
     }
 
     const pageCount = this.getPageCount() || 0
-    // const currentPage
     const pageNumbers: number[] = []
     for (let i = 1; i <= pageCount; i++) {
       pageNumbers.push(i)
     }
+    console.log(`start loading Annotations - ${pageCount} pages`)
     loadNext(pageNumbers)
   }
 
@@ -1002,35 +1018,25 @@ export class PdfWebViewer {
   }
 
   private handleAnnotationSelected(item: PdfItem) {
-    console.log('annotation selected')
-    console.log(item)
     const annotation = item as Annotation
     this.view.navigationPanel.selectAnnotation(annotation)
   }
 
   private handleAnnotationDeselected(item: PdfItem) {
-    console.log('annotation deselected')
-    console.log(item)
     this.view.navigationPanel.deselectAnnotation()
   }
 
   private handleAnnotationCreated(item: PdfItem) {
-    console.log('annotation created')
-    console.log(item)
     const annotation = item as Annotation
     this.view.navigationPanel.updateAnnotation(annotation)
   }
 
   private handleAnnotationUpdated(item: PdfItem) {
-    console.log('annotation changed')
-    console.log(item)
     const annotation = item as Annotation
     this.view.navigationPanel.updateAnnotation(annotation)
   }
 
   private handleAnnotationDeleted(deletedItem: DeletedItem) {
-    console.log('annotation changed')
-    console.log(deletedItem)
     this.view.navigationPanel.deleteAnnotation(deletedItem)
   }
 

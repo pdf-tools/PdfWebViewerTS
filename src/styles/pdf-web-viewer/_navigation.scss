@@ -195,22 +195,22 @@
 }
 
 .pwv-annotation-navigation {
-  padding: 4px 4px 4px 19px;
+  padding: 4px 4px 4px 15px;
   margin: 0;
   ul {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 24px 0;
   }
   h4 {
-    margin: 10px 0 8px 4px;
+    margin: 12px 0 8px 4px;
   }
 }
 
 .pwv-annotation-navigation-item {
   position: relative;
   margin: 6px 0;
-  padding: 6px 0 8px 0;
+  padding: 6px 0 6px 0;
   background-color: #ffffff;
   border: solid 2px $gray-light;
   transition: box-shadow 0.3s;

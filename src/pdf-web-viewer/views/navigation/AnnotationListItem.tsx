@@ -25,15 +25,15 @@ const AnnotationIcon: Component<
     case PdfItemType.FREE_TEXT:
       return <Icon icon={icons.freeText} bg={bg} />
 
-    case PdfItemType.TEXT:
     case PdfItemType.POPUP:
+    case PdfItemType.TEXT:
       return <Icon icon={icons.stickyNote} bg={bg} />
 
     case PdfItemType.INK:
       return <Icon icon={icons.pencil} bg={bg} />
 
     default:
-      return <Icon icon={icons.freeText} fill={fill ? fill : undefined} />
+      return <Icon icon={icons.annotation} bg={bg} />
   }
 }
 
@@ -54,20 +54,15 @@ export const AnnotationListItem: Component<
         window.clearTimeout(dblClickTimer)
       } else {
         dblClickTimer = window.setTimeout(() => {
-          console.log('goToAnnotation -> select')
-          console.log(annotation)
-          actions.api.goToAnnotation(annotation, 'select')
+          actions.api.goToAnnotation({ annotation, action: 'select' })
         }, 250)
       }
     }}
     ondblclick={() => {
-      console.log('goToAnnotation -> edit')
-      console.log(annotation)
-      actions.api.goToAnnotation(annotation, 'edit')
+      actions.api.goToAnnotation({ annotation, action: 'edit' })
     }}
   >
     <div>
-      <strong>{annotation.itemType}</strong>
       <AnnotationIcon itemType={annotation.itemType} fill={annotation.color} />
       {annotation.originalAuthor && (
         <span class="pwv-author">{annotation.originalAuthor}</span>

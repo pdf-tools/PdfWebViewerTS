@@ -14,14 +14,13 @@ export const AnnotationList: Component<
     k => annotationsObj[k as any],
   )
 
-  // const sortedAnnotations = annotations.sort(
-  //   (f, s) => f.pdfRect.pdfY - s.pdfRect.pdfY,
-  // )
-  annotations.sort((f, s) => f.pdfRect.pdfY - s.pdfRect.pdfY)
+  const sortedAnnotations = annotations.sort(
+    (f, s) => f.pdfRect.pdfY - s.pdfRect.pdfY,
+  )
 
   return (
     <ul>
-      {annotations.map(annotation => (
+      {sortedAnnotations.map(annotation => (
         <AnnotationListItem
           annotation={annotation}
           selected={
