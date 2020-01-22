@@ -919,18 +919,14 @@ export class PdfWebViewer {
   }
 
   private loadAnnotations() {
-    console.log('loadAnnotations...')
     if (this.view.getState().navigationPanel.annotationsLoaded) {
-      console.log('... skip')
       return
     }
 
     const loadNext = (pages: number[]) => {
       if (this.viewerCanvas) {
         const pageNumber = pages.shift()
-        console.log('load annotations for page ' + pageNumber)
         if (typeof pageNumber === 'number') {
-          console.log('... ')
           this.viewerCanvas
             .getAnnotationsFromPage(pageNumber)
             .then((itemsOnPage: PdfItemsOnPage) => {
@@ -949,6 +945,7 @@ export class PdfWebViewer {
                 loadNext(pages)
               } else {
                 this.view.navigationPanel.setAnnotationLoaded()
+                console.log(`load Annotations completed`)
               }
             })
         }

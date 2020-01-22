@@ -169,16 +169,16 @@ export const actions: ActionsType<
     }
   },
   deleteAnnotation: (deletedItem: DeletedItem) => $state => {
-    // const page = deletedItem.
-    // const id = annotation.id
-    // const itemsOnPage = $state.annotations[page]
-    //   ? { ...$state.annotations[page] }
-    //   : {}
-    // itemsOnPage[id] = annotation
-    // return {
-    //   ...$state,
-    //   annotations: { ...$state.annotations, [page]: itemsOnPage },
-    // }
+    const page = deletedItem.page
+    const id = deletedItem.id
+    const itemsOnPage = $state.annotations[page]
+
+    delete itemsOnPage[id]
+
+    return {
+      ...$state,
+      annotations: { ...$state.annotations, [page]: itemsOnPage },
+    }
   },
   selectAnnotation: (annotation: Annotation) => $state => ({
     ...$state,
