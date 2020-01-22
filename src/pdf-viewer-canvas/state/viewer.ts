@@ -84,6 +84,7 @@ export interface ViewerActions {
   deselectAnnotation(): ViewerState
   setTextSelection(selection: PdfRect[] | null): ViewerState
   selectPopup(id: number | null): ViewerState
+  deselectPopup(): ViewerState
 }
 
 /** @internal */
@@ -185,6 +186,15 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       modeChanged,
       selectedPopupChanged: id !== $state.selectedPopupId,
       selectedPopupId: id,
+    }
+  },
+  deselectPopup: () => $state => {
+    const mode = ViewerMode.DEFAULT
+    const modeChanged = true
+    return {
+      ...$state,
+      mode,
+      modeChanged,
     }
   },
 }

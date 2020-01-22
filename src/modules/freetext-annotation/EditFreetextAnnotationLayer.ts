@@ -2,9 +2,10 @@ import { CanvasLayer } from '../CanvasLayer'
 import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
 import { Color } from '../../common/Color'
 import { FreetextAnnotationModule } from './FreetextAnnotationModule'
-import { createEditFreetextAnnotationToolbar } from './EditFreetextAnnotationToolbar'
+import { createEditFreetextAnnotationToolbar, EditFreetextAnnotationToolbarActions } from './EditFreetextAnnotationToolbar'
 import { RichTextEditor } from './RichTextEditor'
 import { convertPdfToCssPixel, convertCssToPdfPixel } from '../../common/Tools'
+import { addHistoryEntry } from '../../custom/history'
 
 const moduleLayerName = 'AddFreetextAnnotation'
 
@@ -13,6 +14,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
   private freetextAnnotation: any | null = null
   private editorElement: HTMLElement | null = null
   private richTextEditor: RichTextEditor | null = null
+  private toolbarView: EditFreetextAnnotationToolbarActions | null = null
   private color: string = this.options.defaultForegroundColor
   private fontSize: string = `${this.options.defaultFontSize}pt`
   private fontSizeCSS: string = convertPdfToCssPixel(`${this.options.defaultFontSize}`)
@@ -61,6 +63,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     }
 
     this.richTextEditor = new RichTextEditor(this.editorElement, {
+      content: this.freetextAnnotation.content,
       richText: this.freetextAnnotation.richText,
       backgroundColor: this.freetextAnnotation.color,
       borderColor: 'red',
@@ -72,7 +75,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     /* tslint:disable-next-line:align */
     ; const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
 
-    createEditFreetextAnnotationToolbar({
+    this.toolbarView = createEditFreetextAnnotationToolbar({
       annotation: this.freetextAnnotation,
       backgroundColors: [...this.options.backgroundColors],
       fontColors: [...this.options.foregroundColors],
@@ -128,15 +131,21 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
 
   private updateFreeTextAnnotation() {
     if (this.richTextEditor && this.freetextAnnotation) {
-      const content = this.richTextEditor.getContent()
-      const fontColor = new Color(content.fontColor as string)
-      const backgroundColor = content.backgroundColor === '' ? null : new Color(content.backgroundColor as string)
-      this.freetextAnnotation.richText = content.richText
+      const richTextObj = this.richTextEditor.getEditorValues()
+      let subject = this.freetextAnnotation.subject
+      if (this.toolbarView) {
+        const tbState = this.toolbarView.getState()
+        subject = tbState.newSubject
+        addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, tbState.newSubject)
+      }
+      const fontColor = new Color(richTextObj.fontColor as string)
+      const backgroundColor = richTextObj.backgroundColor === '' ? null : new Color(richTextObj.backgroundColor as string)
+      this.freetextAnnotation.subject = subject
+      this.freetextAnnotation.richText = richTextObj.richText
       this.freetextAnnotation.fontColor = fontColor.toHexRgb()
-      this.freetextAnnotation.fontName = content.fontName !== null ? content.fontName : 'Helvetica'
-      this.freetextAnnotation.fontSize = content.fontSizeCSS ? convertCssToPdfPixel(content.fontSizeCSS) : this.freetextAnnotation.fontSize
+      this.freetextAnnotation.fontName = richTextObj.fontName !== null ? richTextObj.fontName : 'Helvetica'
+      this.freetextAnnotation.fontSize = richTextObj.fontSizeCSS ? convertCssToPdfPixel(richTextObj.fontSizeCSS) : this.freetextAnnotation.fontSize
       this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
-      console.log(this.freetextAnnotation)
       this.pdfApi.updateItem(this.freetextAnnotation)
     }
   }

@@ -6,6 +6,7 @@ import { getAnnotationBehaviors } from '../AnnotationBehaviors'
 import { ViewerMode, copyTextToClipboard, CursorStyle } from '../state/viewer'
 import { createAnnotationContextBar, ContextBarActions } from './views/AnnotationContextBar'
 import { AnnotationBorder } from './views/AnnotationBorder'
+import { addHistoryEntry } from '../../custom/history'
 
 /** @internal */
 export class AnnotationSelectionLayer extends ViewLayerBase {
@@ -322,7 +323,9 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       const item = this.pdfViewerApi.getItem(id) as Annotation
       if (this.options.ms_custom) {
         item.setHidden(true)
-        this.addDeleteHistory(item)
+        addHistoryEntry(item, 'delete', this.options.author)
+        this.store.annotations.updateAnnotation(item)
+        this.pdfViewerApi.updateItem(item)
         this.deselectAnnotation()
       } else {
         this.pdfViewerApi.deleteItem(item)

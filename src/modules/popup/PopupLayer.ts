@@ -8,6 +8,7 @@ import { ViewerMode, CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { Color } from '../../common/Color'
 import { getColorPalette, createPdfTime } from '../../common/Tools'
 import { formatDate } from '../../common/formatDate'
+import { addHistoryEntry } from '../../custom/history'
 
 export class PopupLayer extends CanvasLayer {
 
@@ -387,6 +388,8 @@ export class PopupLayer extends CanvasLayer {
 
   private closePopup() {
     const annot = this.updateSelectedPopupContent(false)
+    this.store.viewer.deselectPopup()
+
     if (this.pdfApi) {
       if (annot) {
         annot.popup.isOpen = false
@@ -414,10 +417,7 @@ export class PopupLayer extends CanvasLayer {
       const annotation = this.updateSelectedPopupContent(false)
       if (annotation) {
         if (this.options.ms_custom) {
-          if (!annotation.custom) {
-            annotation.custom = []
-          }
-          annotation.custom.push({Type: annotation.isLocked() ? '/Unlock' : '/Lock', D: createPdfTime(), T: this.options.author })
+          addHistoryEntry(annotation, 'lock', this.options.author)
         }
         annotation.setLock(!annotation.isLocked())
         this.store.annotations.updateAnnotation(annotation)
@@ -437,23 +437,7 @@ export class PopupLayer extends CanvasLayer {
             const content = state.activeContent
             const subject = state.activeSubject
             if (this.options.ms_custom) {
-              if (!annotation.custom) {
-                annotation.custom = []
-              }
-              const params = []
-              if (annotation.content !== content) {
-                params.push('/Contents')
-                params.push(content)
-              }
-              if (annotation.subject !== subject) {
-                params.push('/Subj')
-                params.push(subject)
-              }
-              if (params.length > 0) {
-                params.push('/T')
-                params.push(this.options.author)
-                annotation.custom.push({Type: '/Edit', D: createPdfTime(), Parms: params, T: this.options.author})
-              }
+              addHistoryEntry(annotation, 'edit', this.options.author, state.activeContent, state.activeSubject)
             }
             annotation.content = content
             if (subject) {
