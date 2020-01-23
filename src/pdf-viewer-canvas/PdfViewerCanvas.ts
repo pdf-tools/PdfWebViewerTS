@@ -421,11 +421,12 @@ export class PdfViewerCanvas {
   }
 
   public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {
-    const dest: PdfDestination = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
+    const dest: any = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
     dest.destinationType = 8
     dest.top = annotation.pdfRect.pdfY
     dest.page = annotation.pdfRect.page
-    this.goTo(dest)
+    dest.customDestination = true
+    this.pdfViewerApi.goTo(dest)
   }
 
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
