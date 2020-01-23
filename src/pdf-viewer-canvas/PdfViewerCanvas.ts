@@ -539,7 +539,7 @@ export class PdfViewerCanvas {
     })
 
     this.startRenderLoop()
-    const document = this.store.getState().document;
+    const document = this.store.getState().document
     this.getAnnotations(document.firstVisiblePage, document.lastVisiblePage)
 
     window.setTimeout(() => {
