@@ -140,6 +140,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       }
       const fontColor = new Color(richTextObj.fontColor as string)
       const backgroundColor = richTextObj.backgroundColor === '' ? null : new Color(richTextObj.backgroundColor as string)
+      this.freetextAnnotation.content = richTextObj.content
       this.freetextAnnotation.subject = subject
       this.freetextAnnotation.richText = richTextObj.richText
       this.freetextAnnotation.fontColor = fontColor.toHexRgb()

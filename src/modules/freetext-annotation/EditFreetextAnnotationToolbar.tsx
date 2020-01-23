@@ -187,7 +187,10 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
       <Commandbar>
         <CommandbarButton
           icon={$state.annotation.isLocked() ? icons.lock : icons.unlock}
-          onClick={() => { $state.annotation.setLock(!$state.annotation.isLocked())}}
+          onClick={() => {
+            $state.annotation.setLock(!$state.annotation.isLocked())
+            $actions.close()
+          }}
         />
         <CommandbarSeparator />
         <div class={'pwv-freetext-subject'}>
