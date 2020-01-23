@@ -425,8 +425,7 @@ export class PdfViewerCanvas {
     dest.destinationType = 8
     dest.top = annotation.pdfRect.pdfY
     dest.page = annotation.pdfRect.page
-    dest.customDestination = true
-    this.pdfViewerApi.goTo(dest)
+    this.pdfViewerApi.goToViewerDestination(dest)
   }
 
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {

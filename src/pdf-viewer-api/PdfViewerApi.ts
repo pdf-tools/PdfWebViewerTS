@@ -346,10 +346,19 @@ export class PdfViewerApi {
 
   /**
    * Jump to a given destination in the document.
-   * @param destination       The target destination.
+   * @param destination       The target destination in PDF coordinates (page origin bottom left)
    */
   public goTo(destination: PdfDestination) {
+    console.log(destination)
     this.instance.goTo(destination)
+  }
+
+  /**
+   * Jump ot a given viewer destination in the document
+   * @param destination       The target destination in viewer coordinates (page origin top left)
+   */
+  public goToViewerDestination(destination: PdfDestination) {
+    this.instance.goToViewerDestination(destination)
   }
 
   /**
