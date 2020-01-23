@@ -67,6 +67,7 @@ export interface NavigationPanelActions {
   toggleNavigationPanel(): NavigationPanelState
   toggleOutlineItem(path: string[]): NavigationPanelState
   clearAnnotations(): NavigationPanelState
+  setAnnotationLoaded(): NavigationPanelState
   setPageAnnotations(itemsOnPage: PdfItemsOnPage): NavigationPanelState
   updateAnnotation(annotation: Annotation): NavigationPanelState
   deleteAnnotation(deletedItem: DeletedItem): NavigationPanelState
@@ -135,6 +136,11 @@ export const actions: ActionsType<
     ...$state,
     annotations: {},
     selectedAnnotation: undefined,
+    annotationsLoaded: false,
+  }),
+  setAnnotationLoaded: () => $state => ({
+    ...$state,
+    annotationsLoaded: true,
   }),
   setPageAnnotations: (itemsOnPage: PdfItemsOnPage) => $state => {
     const itemState: AnnotationItemState = {}
@@ -157,28 +163,22 @@ export const actions: ActionsType<
       : {}
     itemsOnPage[id] = annotation
 
-    console.log('updateAnnotation view')
-    console.log(annotation)
-    console.log(itemsOnPage)
     return {
       ...$state,
       annotations: { ...$state.annotations, [page]: itemsOnPage },
     }
   },
   deleteAnnotation: (deletedItem: DeletedItem) => $state => {
-    // const page = deletedItem.
-    // const id = annotation.id
-    // const itemsOnPage = $state.annotations[page]
-    //   ? { ...$state.annotations[page] }
-    //   : {}
-    // itemsOnPage[id] = annotation
-    // console.log('updateAnnotation view')
-    // console.log(annotation)
-    // console.log(itemsOnPage)
-    // return {
-    //   ...$state,
-    //   annotations: { ...$state.annotations, [page]: itemsOnPage },
-    // }
+    const page = deletedItem.page
+    const id = deletedItem.id
+    const itemsOnPage = $state.annotations[page]
+
+    delete itemsOnPage[id]
+
+    return {
+      ...$state,
+      annotations: { ...$state.annotations, [page]: itemsOnPage },
+    }
   },
   selectAnnotation: (annotation: Annotation) => $state => ({
     ...$state,

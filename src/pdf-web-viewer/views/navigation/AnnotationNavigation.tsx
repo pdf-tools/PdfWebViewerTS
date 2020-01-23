@@ -21,7 +21,12 @@ export const AnnotationNavigation: Component<
 
   return (
     <ScrollContainer>
-      <div class="pwv-annotation-navigation">
+      <div
+        class="pwv-annotation-navigation"
+        oncreate={(element: HTMLElement) => {
+          createAnnotationNavigation(element)
+        }}
+      >
         {pageNumbers.map(pageNumber => (
           <div>
             <h4>
@@ -34,4 +39,21 @@ export const AnnotationNavigation: Component<
       </div>
     </ScrollContainer>
   )
+}
+
+/* tslint:disable-next-line:max-line-length */
+const createAnnotationNavigation = (element: HTMLElement) => {
+  const findScrollContainer = (el: HTMLElement): HTMLElement | null => {
+    if (el.classList.contains('pwv-scroll-container-sc')) {
+      return el
+    } else {
+      const pEl = el.parentElement
+      if (pEl) {
+        return findScrollContainer(pEl)
+      } else {
+        return null
+      }
+    }
+  }
+  const scrollContainer = findScrollContainer(element) as HTMLElement
 }
