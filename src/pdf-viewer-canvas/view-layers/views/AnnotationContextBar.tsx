@@ -19,12 +19,13 @@ export interface AnnotationContextBarProps {
   onCreatePopup(id: number): void
   onOpenPopup(id: number): void
   onDeletePopup(id: number): void
+  onToggleLock(id: number): void
+  canEdit(autor: string): boolean
 }
 
 /** @internal */
 export interface ContextBarState {
-  annotationId: number
-  annotationType: PdfItemType
+  annotation: Annotation | null
   deletable: boolean
   canHavePopup: boolean
   canDeletePopup: boolean
@@ -47,14 +48,14 @@ export interface ContextBarActions {
   addPopup(): ContextBarState
   editPopup(): ContextBarState
   deletePopup(): ContextBarState
+  toggleLock(): ContextBarState
 }
 
 /** @internal */
 export const createAnnotationContextBar = (props: AnnotationContextBarProps, element: HTMLElement) => {
 
   const state: ContextBarState = {
-    annotationId: 0,
-    annotationType: PdfItemType.TEXT,
+    annotation: null,
     hasPopup: false,
     canRotate: false,
     deletable: false,
@@ -73,8 +74,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
         ...$state,
         showConfirmDelete: false,
         commands: payload.commands,
-        annotationId: payload.annotation.id,
-        annotationType: payload.annotation.itemType,
+        annotation: payload.annotation,
         hasPopup: annotationHasPopup(payload.annotation),
         canRotate: behaviors.rotatable,
         deletable: behaviors.deletable,
@@ -97,41 +97,48 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
       }
     },
     delete: () => $state => {
-      props.onDeleteAnnotation($state.annotationId)
+      props.onDeleteAnnotation($state.annotation ? $state.annotation.id : 0)
       return {
         ...$state,
       }
     },
     rotate: () => $state => {
-      props.onRotateAnnotation($state.annotationId)
+      props.onRotateAnnotation($state.annotation ? $state.annotation.id : 0)
       return {
         ...$state,
       }
     },
     copyText: () => $state => {
-      props.onCopy($state.annotationId)
+      props.onCopy($state.annotation ? $state.annotation.id : 0)
       return {
         ...$state,
       }
     },
     addPopup: () => $state => {
-      props.onCreatePopup($state.annotationId)
+      props.onCreatePopup($state.annotation ? $state.annotation.id : 0)
       return {
         ...$state,
         hasPopup: true,
       }
     },
     editPopup: () => $state => {
-      props.onOpenPopup($state.annotationId)
+      props.onOpenPopup($state.annotation ? $state.annotation.id : 0)
       return {
         ...$state,
       }
     },
     deletePopup: () => $state => {
-      props.onDeletePopup($state.annotationId)
+      props.onDeletePopup($state.annotation ? $state.annotation.id : 0)
       return {
         ...$state,
         hasPopup: false,
+      }
+    },
+    toggleLock: () => $state => {
+      props.onToggleLock($state.annotation ? $state.annotation.id : 0)
+      return {
+        ...$state,
+        isLocked: !$state.isLocked,
       }
     },
   }
@@ -162,7 +169,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
                 <CommandbarButton
                   icon={cmd.icon}
                   onClick={() => {
-                    cmd.onCmd($state.annotationId)
+                    cmd.onCmd($state.annotation ? $state.annotation.id : 0)
                   }}
                   disabled={$state.isLocked}
                   tooltipPos={TooltipPosition.top}
@@ -172,33 +179,37 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
               }
               {$state.canCopy &&
                 <CommandbarButton
-                  icon={icons.copy}
-                  onClick={$actions.copyText}
+                icon={icons.copy}
+                onClick={$actions.copyText}
                 />
               }
               {$state.canRotate &&
                 <CommandbarButton
-                  icon={icons.rotate}
-                  onClick={$actions.rotate}
-                  disabled={$state.isLocked}
-                  tooltipPos={TooltipPosition.top}
-                  tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
+                icon={icons.rotate}
+                onClick={$actions.rotate}
+                disabled={$state.isLocked}
+                tooltipPos={TooltipPosition.top}
+                tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
                 />
               }
               {$state.canHavePopup && !$state.hasPopup &&
                 <CommandbarButton
-                  icon={icons.stickyNoteAdd}
-                  onClick={$actions.addPopup}
-                  tooltipPos={TooltipPosition.top}
-                  tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
+                icon={icons.stickyNoteAdd}
+                onClick={$actions.addPopup}
+                tooltipPos={TooltipPosition.top}
+                tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
                 />
               }
               {$state.canHavePopup && $state.hasPopup &&
                 <CommandbarButton
-                  icon={icons.stickyNoteEdit}
-                  onClick={$actions.editPopup}
+                icon={icons.stickyNoteEdit}
+                onClick={$actions.editPopup}
                 />
               }
+              <CommandbarButton
+                icon={$state.isLocked ? icons.lock : icons.unlock}
+                onClick={$actions.toggleLock}
+              />
               {$state.canDeletePopup && $state.hasPopup &&
                 <CommandbarButton
                   icon={icons.stickyNoteRemove}

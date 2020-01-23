@@ -28,6 +28,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     this.openPopup = this.openPopup.bind(this)
     this.deletePopup = this.deletePopup.bind(this)
     this.moveAnnotation = this.moveAnnotation.bind(this)
+    this.toggleLock = this.toggleLock.bind(this)
     this.resizeAnnotation = this.resizeAnnotation.bind(this)
   }
 
@@ -55,6 +56,8 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       onCreatePopup: this.createPopup,
       onOpenPopup: this.openPopup,
       onDeletePopup: this.deletePopup,
+      onToggleLock: this.toggleLock,
+      canEdit: this.canEdit,
     }, this.selectionElement)
 
     this.annotationBorder = new AnnotationBorder(this.selectionElement, this.moveAnnotation, this.resizeAnnotation, this.openPopup)
@@ -315,6 +318,18 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
         const text = this.pdfViewerApi.getTextFromSelection(quadPointAnnotation.quadPointRects)
         copyTextToClipboard(text)
       }
+    }
+  }
+
+  private toggleLock(id: number) {
+    if (this.pdfViewerApi) {
+      const annot = this.pdfViewerApi.getItem(id) as Annotation
+      if (this.options.ms_custom) {
+        addHistoryEntry(annot, annot.isLocked() ? 'unlock' : 'lock', this.options.author)
+      }
+      annot.setLock(!annot.isLocked())
+      this.store.annotations.updateAnnotation(annot)
+      this.pdfViewerApi.updateItem(annot)
     }
   }
 

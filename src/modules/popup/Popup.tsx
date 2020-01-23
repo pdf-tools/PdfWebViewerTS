@@ -8,7 +8,6 @@ import { PdfRect, Rect } from '../../pdf-viewer-api'
 import { TooltipPosition } from '../../common/Tooltip'
 import { translationManager } from '../../common/TranslationManager'
 import { Color } from '../../common/Color'
-import { actions } from 'pdf-viewer-canvas/state/canvas';
 
 /** @internal */
 export interface PopupViewProps {
@@ -98,14 +97,6 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
       }
     },
     selectPopup: (id: number) => $state => {
-      if ($state.selectedPopup !== id) {
-        window.setTimeout(() => {
-          const txt = document.getElementById('pwv-popup-content-' + id) as HTMLTextAreaElement
-          if (txt) {
-            txt.focus()
-          }
-        }, 500)
-      }
       const openPopups = $state.openPopups.map(p => ({...p, selected: p.id === id }))
       return {
         ...$state,
@@ -272,8 +263,8 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
               <CommandbarButton
                 onClick={(e: Event) => {
                   e.stopPropagation()
-                  // const content = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
-                  // const subject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value
+                  $state.activeContent = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
+                  $state.activeSubject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value
                   $state.selectedPopup = popup.id
                   close()
                 }}
@@ -287,15 +278,8 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             id={'pwv-popup-subject-' + popup.id}
             placeholder={translationManager.getText('annotation.subject')}
             onchange={() => {
-              $state.activeSubject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value
+              $state.activeSubject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLInputElement).value
             }}
-            // onblur={(e: UIEvent) => {
-            //   updateContent({
-            //     id: popup.id,
-            //     content: (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value,
-            //     subject: (e.currentTarget as HTMLTextAreaElement).value,
-            //   })
-            // }}
             disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
             value={popup.subject} />
         </div>
@@ -306,19 +290,12 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
               onchange={() => {
                 $state.activeContent = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
               }}
-              oncreate={(element: HTMLElement) => {
-                if (popup.selected) {
-                  window.setTimeout(() => {
-                    element.focus()
-                  }, 200)
-                }
-              }}
             >
               {popup.content}
             </textarea>
             :
             <div
-              id={'pwv-popup-locked'}>
+              id={'pwv-popup-content-' + popup.id}>
               {popup.content}
             </div>
           }

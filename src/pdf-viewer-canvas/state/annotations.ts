@@ -40,7 +40,8 @@ export const annotationHasPopup = (annotation: Annotation) => {
   }
   const behaviors = getAnnotationBehaviors(annotation.itemType)
   return behaviors.canHavePopup && (
-    annotation.popup.isOpen === true || (typeof annotation.content === 'string' && annotation.content !== '')
+    // tslint:disable-next-line: max-line-length
+    annotation.popup.isOpen === true || (typeof annotation.content === 'string' && annotation.content !== '') || (typeof annotation.subject === 'string' && annotation.subject !== '')
   )
 }
 

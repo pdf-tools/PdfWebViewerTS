@@ -133,4 +133,11 @@ export abstract class ViewLayerBase implements ViewLayer {
   protected addDeleteHistory(annotation: Annotation) {
       addHistoryEntry(annotation, 'delete', this.options.author)
   }
+
+  protected canEdit(author: string) {
+    if (this.options.author) {
+      return author === this.options.author
+    }
+    return true
+  }
 }
