@@ -31,6 +31,8 @@ export abstract class CanvasLayer {
     this.name = name
 
     this.remove = this.remove.bind(this)
+    this.canEdit = this.canEdit.bind(this)
+    this.onAnnotationCreated = this.onAnnotationCreated.bind(this)
   }
 
   public abstract onCreate(args?: any): void

@@ -190,7 +190,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
   },
   deselectPopup: () => $state => {
     const mode = ViewerMode.DEFAULT
-    const modeChanged = true
+    const modeChanged = mode !== $state.mode
     return {
       ...$state,
       mode,

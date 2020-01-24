@@ -3,6 +3,7 @@ import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
 import { createMobilePopupView, MobilePopupViewActions } from './MobilePopup'
 import { PdfItemType, Annotation } from '../../pdf-viewer-api'
 import { getColorPalette } from '../../common/Tools'
+import { addHistoryEntry } from '../../custom/history'
 
 export class MobilePopupLayer extends CanvasLayer {
 
@@ -18,6 +19,8 @@ export class MobilePopupLayer extends CanvasLayer {
     this.updatePopupContent = this.updatePopupContent.bind(this)
     this.updatePopupColor = this.updatePopupColor.bind(this)
     this.formatDate = this.formatDate.bind(this)
+    this.toggleAnnotationLock = this.toggleAnnotationLock.bind(this)
+    this.updateSelectedPopupContent = this.updateSelectedPopupContent.bind(this)
 
     this.popupElement = this.createHtmlLayer()
     this.popupElement.style.display = 'none'
@@ -36,6 +39,8 @@ export class MobilePopupLayer extends CanvasLayer {
       onDelete: this.deletePopup,
       onUpdateContent: this.updatePopupContent,
       onUpdateColor: this.updatePopupColor,
+      canEdit: this.canEdit,
+      toggleLock: this.toggleAnnotationLock,
     }, this.popupElement)
   }
 
@@ -61,7 +66,8 @@ export class MobilePopupLayer extends CanvasLayer {
         this.popupElement.style.display = 'block'
         this.popupView.openPopup({
           id: annotation.id,
-          content: annotation.content as string,
+          content: annotation.content,
+          subject: annotation.subject,
           lastModified: this.formatDate(annotation.lastModified),
           originalAuthor: annotation.originalAuthor,
           color: annotation.color,
@@ -72,14 +78,16 @@ export class MobilePopupLayer extends CanvasLayer {
     }
   }
 
-  private closePopup(id: number, content: string) {
+  private closePopup(id: number, content: string, subject: string) {
     if (this.pdfApi && this.popupElement && this.popupView) {
       this.popupElement.style.display = 'none'
       this.popupView.closePopup()
       const item = this.pdfApi.getItem(id) as Annotation
-      if (item && !item.isLocked()) {
+      if (item) {
+        addHistoryEntry(item, 'edit', item.originalAuthor, content, subject)
         item.popup.isOpen = false
         item.content = content
+        item.subject = subject
         this.store.annotations.updateAnnotation(item)
         this.pdfApi.updateItem(item)
         this.store.viewer.selectPopup(null)
@@ -133,6 +141,53 @@ export class MobilePopupLayer extends CanvasLayer {
     }
   }
 
+  private toggleAnnotationLock() {
+    console.log('toggle1', this.pdfApi)
+    if (this.pdfApi) {
+      console.log('toggle2')
+      const annotation = this.updateSelectedPopupContent(false)
+      console.log('annotation', annotation)
+      if (annotation) {
+        if (this.options.ms_custom) {
+          addHistoryEntry(annotation, 'lock', this.options.author)
+        }
+        if (this.popupView) {
+          this.popupView.setLock(!annotation.isLocked())
+        }
+        annotation.setLock(!annotation.isLocked())
+        this.store.annotations.updateAnnotation(annotation)
+        this.pdfApi.updateItem(annotation)
+      }
+    }
+  }
+
+  private updateSelectedPopupContent(syncronize: boolean) {
+    if (this.pdfApi) {
+      if (this.popupView) {
+        const state = this.popupView.getState()
+        const id = state.id
+        if (id) {
+          const annotation = this.pdfApi.getItem(id) as Annotation
+          if (annotation) {
+            const content = state.content
+            const subject = state.subject
+            if (this.options.ms_custom) {
+              addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
+            }
+            annotation.content = content
+            if (subject) {
+              annotation.subject = subject
+            }
+            if (syncronize) {
+              this.pdfApi.updateItem(annotation)
+            } else {
+              return annotation
+            }
+          }
+        }
+      }
+    }
+  }
   private formatDate(dateStr: string) {
     return `${dateStr.substr(8, 2)}.${dateStr.substr(6, 2)}.${dateStr.substr(2, 4)} ${dateStr.substr(10, 2)}:${dateStr.substr(12, 2)}`
   }

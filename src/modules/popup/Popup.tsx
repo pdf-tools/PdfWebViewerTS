@@ -240,7 +240,10 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
               tooltip={popup.isLocked ? translationManager.getText('lockedAnnotation') : ''}
             />
             <CommandbarButton
-                onClick={() => { toggleLock(popup.id) }}
+                onClick={() => {
+                  $state.selectedPopup = popup.id
+                  toggleLock(popup.id)
+                }}
                 disabled={!canEdit(popup.originalAuthor)}
                 icon={popup.isLocked ? icons.lock : icons.unlock}
             />

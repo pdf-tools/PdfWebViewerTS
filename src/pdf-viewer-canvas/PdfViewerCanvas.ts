@@ -424,6 +424,7 @@ export class PdfViewerCanvas {
     const dest: any = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
     dest.destinationType = 8
     dest.top = annotation.pdfRect.pdfY
+    dest.left = annotation.pdfRect.pdfX
     dest.page = annotation.pdfRect.page
     this.pdfViewerApi.goToViewerDestination(dest)
   }

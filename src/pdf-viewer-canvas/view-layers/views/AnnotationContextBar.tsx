@@ -79,7 +79,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
         canRotate: behaviors.rotatable,
         deletable: behaviors.deletable,
         canCopy: behaviors.text,
-        isLocked: payload.annotation.isLocked(),
+        isLocked: (!props.canEdit(payload.annotation.originalAuthor)),
         canHavePopup: behaviors.canHavePopup,
         canDeletePopup: annotationHasPopup(payload.annotation) && payload.annotation.itemType !== PdfItemType.TEXT,
       }
@@ -209,6 +209,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
               <CommandbarButton
                 icon={$state.isLocked ? icons.lock : icons.unlock}
                 onClick={$actions.toggleLock}
+                disabled={$state.isLocked}
               />
               {$state.canDeletePopup && $state.hasPopup &&
                 <CommandbarButton

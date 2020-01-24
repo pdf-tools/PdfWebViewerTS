@@ -417,7 +417,7 @@ export class PopupLayer extends CanvasLayer {
       const annotation = this.updateSelectedPopupContent(false)
       if (annotation) {
         if (this.options.ms_custom) {
-          addHistoryEntry(annotation, annotation.isLocked() ? 'unlock' : 'lock', this.options.author)
+          addHistoryEntry(annotation, 'lock', this.options.author)
         }
         annotation.setLock(!annotation.isLocked())
         this.store.annotations.updateAnnotation(annotation)

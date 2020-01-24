@@ -22,6 +22,7 @@ export abstract class ViewLayerBase implements ViewLayer {
   private pOptions: PdfViewerCanvasOptions | undefined
 
   constructor() {
+    this.canEdit = this.canEdit.bind(this)
     this.canvasContexts = []
     this.htmlLayers = []
   }
