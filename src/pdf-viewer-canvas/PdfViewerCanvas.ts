@@ -427,6 +427,10 @@ export class PdfViewerCanvas {
     dest.left = annotation.pdfRect.pdfX
     dest.page = annotation.pdfRect.page
     this.pdfViewerApi.goToViewerDestination(dest)
+
+    if (action === 'select') {
+      this.dispatchEvent('itemSelected', annotation)
+    }
   }
 
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {

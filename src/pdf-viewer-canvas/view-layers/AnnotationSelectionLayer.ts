@@ -1,4 +1,4 @@
-import { Annotation, PdfItemType, Point, Rect } from '../../pdf-viewer-api'
+import { Annotation, PdfItemType, Point, Rect, PdfItem, PdfItemCategory } from '../../pdf-viewer-api'
 import { ViewLayerBase } from './ViewLayerBase'
 import { ViewerCanvasState } from '../state/store'
 import { getAnnotationOnPoint } from '../state/annotations'
@@ -30,9 +30,13 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     this.moveAnnotation = this.moveAnnotation.bind(this)
     this.toggleLock = this.toggleLock.bind(this)
     this.resizeAnnotation = this.resizeAnnotation.bind(this)
+    this.onItemSelected = this.onItemSelected.bind(this)
   }
 
   public create() {
+    if (this.viewerCanvas) {
+      this.viewerCanvas.addEventListener('itemSelected', this.onItemSelected)
+    }
     this.selectAnnotation = this.selectAnnotation.bind(this)
     this.deselectAnnotation = this.deselectAnnotation.bind(this)
     this.deleteAnnotation = this.deleteAnnotation.bind(this)
@@ -204,7 +208,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
 
   }
 
-  private selectAnnotation(annotation: Annotation) {
+  private selectAnnotation(annotation: Annotation, preventEvent?: boolean) {
     if (this.selectionElement && this.context && this.annotationBorder && this.contextBar) {
       this.selectedAnnotation = annotation
       const pageRect = this.store.getState().document.pageRects[annotation.pdfRect.page]
@@ -223,7 +227,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       this.updateSelectionElementPosition(annotation)
       this.store.viewer.selectAnnotation(annotation)
       this.store.viewer.setCursorStyle(CursorStyle.DEFAULT)
-      if (this.viewerCanvas) {
+      if (this.viewerCanvas && !preventEvent) {
         this.dispatchEvent('itemSelected', annotation)
       }
     }
@@ -402,6 +406,12 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
           this.store.viewer.selectPopup(item.id)
         })
       this.deselectAnnotation()
+    }
+  }
+
+  private onItemSelected(item: PdfItem) {
+    if (item.itemCategory === PdfItemCategory.ANNOTATION) {
+      this.selectAnnotation(item as Annotation, true)
     }
   }
 
