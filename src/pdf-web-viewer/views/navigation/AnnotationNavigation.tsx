@@ -56,4 +56,40 @@ const createAnnotationNavigation = (element: HTMLElement) => {
     }
   }
   const scrollContainer = findScrollContainer(element) as HTMLElement
+
+  const mutationObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(mutation => {
+      if (mutation.type === 'attributes') {
+        if (mutation.target.nodeType === 1) {
+          const elm = mutation.target as HTMLElement
+          if (elm.classList.contains('pwv-selected')) {
+            elm.scrollIntoView({
+              block: 'center',
+              behavior: 'smooth',
+            })
+          }
+        }
+      } else if (
+        mutation.type === 'childList' &&
+        mutation.addedNodes.length > 0
+      ) {
+        // todo: scroll to new created annotation
+        // console.log('scroll to new item')
+        // const newElm = mutation.addedNodes[0] as HTMLElement
+        // newElm.scrollIntoView({
+        //   block: 'center',
+        //   behavior: 'smooth',
+        // })
+      }
+    })
+  })
+
+  mutationObserver.observe(scrollContainer, {
+    attributes: true,
+    characterData: true,
+    childList: true,
+    subtree: true,
+    attributeOldValue: true,
+    characterDataOldValue: true,
+  })
 }

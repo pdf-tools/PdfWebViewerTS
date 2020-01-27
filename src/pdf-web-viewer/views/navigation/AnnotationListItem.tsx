@@ -52,14 +52,17 @@ export const AnnotationListItem: Component<
     onclick={() => {
       if (dblClickTimer) {
         window.clearTimeout(dblClickTimer)
+        dblClickTimer = undefined
       } else {
         dblClickTimer = window.setTimeout(() => {
           actions.api.goToAnnotation({ annotation, action: 'select' })
+          dblClickTimer = undefined
         }, 250)
       }
     }}
     ondblclick={() => {
       actions.api.goToAnnotation({ annotation, action: 'edit' })
+      dblClickTimer = undefined
     }}
   >
     <div>
