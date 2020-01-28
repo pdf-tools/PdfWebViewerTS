@@ -15,7 +15,6 @@ export interface PopupViewProps {
   maxPopupHeight: number
   currentUser: string
   onSelect: (id: number) => void
-  onDeselect: (syncronize: boolean) => void
   onClose: () => void
   onDelete: (id: number) => void
   onUpdatePosition: (id: number, top: number, left: number) => void
@@ -98,11 +97,12 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     },
     selectPopup: (id: number) => $state => {
       const openPopups = $state.openPopups.map(p => ({...p, selected: p.id === id }))
+      const sP = $state.openPopups.find(p => p.id === id)
       return {
         ...$state,
         openPopups,
-        activeContent: null,
-        activeSubject: null,
+        activeContent: sP ? sP.content : null,
+        activeSubject: sP ? sP.subject : null,
         selectedPopup: id,
       }
     },
@@ -110,8 +110,6 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
       return {
         ...$state,
         selectedPopup: null,
-        activeContent: null,
-        activeSubject: null,
       }
     },
   }

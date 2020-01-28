@@ -90,7 +90,7 @@ export class PopupLayer extends CanvasLayer {
       }
 
       if (viewerMode === ViewerMode.POPUP_SELECTED && state.pointer.action === 'click') {
-        this.deselectPopup(true)
+        this.deselectPopup()
       }
 
       const openPopups = this.popupView.getState().openPopups
@@ -343,7 +343,6 @@ export class PopupLayer extends CanvasLayer {
         maxPopupHeight: this.maxPopupHeight,
         currentUser: this.options.author ? this.options.author : '',
         onSelect: this.selectPopup,
-        onDeselect: this.deselectPopup,
         onClose: this.closePopup,
         onDelete: this.deletePopup,
         onUpdatePosition: this.updatePopupPosition,
@@ -362,11 +361,9 @@ export class PopupLayer extends CanvasLayer {
     }
   }
 
-  private deselectPopup(update: boolean) {
+  private deselectPopup() {
     if (this.popupView) {
-      if (update) {
-        this.updateSelectedPopupContent(update)
-      }
+      this.updateSelectedPopupContent(true)
       this.popupView.deselectPopup()
       this.store.viewer.selectPopup(null)
     }
@@ -401,7 +398,10 @@ export class PopupLayer extends CanvasLayer {
 
   private deletePopup(id: number) {
     if (this.pdfApi) {
-      this.deselectPopup(false)
+      if (this.popupView) {
+        this.popupView.deselectPopup()
+      }
+      this.store.viewer.selectPopup(null)
       const annotation = this.pdfApi.getItem(id) as Annotation
       if (annotation) {
         annotation.content = null
@@ -436,13 +436,13 @@ export class PopupLayer extends CanvasLayer {
           if (annotation) {
             const content = state.activeContent
             const subject = state.activeSubject
+            console.log('###', content, subject)
             if (this.options.ms_custom) {
               addHistoryEntry(annotation, 'edit', this.options.author, state.activeContent, state.activeSubject)
             }
             annotation.content = content
-            if (subject) {
-              annotation.subject = subject
-            }
+            annotation.subject = subject
+
             if (syncronize) {
               this.pdfApi.updateItem(annotation)
             } else {
