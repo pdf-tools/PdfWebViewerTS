@@ -64,7 +64,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       canEdit: this.canEdit,
     }, this.selectionElement)
 
-    this.annotationBorder = new AnnotationBorder(this.selectionElement, this.moveAnnotation, this.resizeAnnotation, this.openPopup)
+    this.annotationBorder = new AnnotationBorder(this.selectionElement, this.moveAnnotation, this.resizeAnnotation, this.openPopup, this.options)
   }
 
   public render(timestamp: number, state: ViewerCanvasState) {
