@@ -333,6 +333,11 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
         addHistoryEntry(annot, annot.isLocked() ? 'unlock' : 'lock', this.options.author)
       }
       annot.setLock(!annot.isLocked())
+      if (this.annotationBorder) {
+        this.annotationBorder.deselectAnnotation()
+        const pageRect = this.store.getState().document.pageRects[annot.pdfRect.page]
+        this.annotationBorder.setAnnotation(annot, pageRect)
+      }
       this.store.annotations.updateAnnotation(annot)
       this.pdfViewerApi.updateItem(annot)
     }

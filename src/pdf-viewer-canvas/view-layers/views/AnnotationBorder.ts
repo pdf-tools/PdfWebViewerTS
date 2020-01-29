@@ -18,7 +18,7 @@ export class AnnotationBorder {
   private resizable: boolean = false
   private aspectRatio: number | null = null
   private pageRect: Rect | null = null
-  private author: string = ''
+  private options: PdfViewerCanvasOptions
 
   private element: HTMLElement
   private border: HTMLElement
@@ -73,7 +73,7 @@ export class AnnotationBorder {
     this.onResized = onResized
     this.onDblClick = onDblClick
     this.element = element
-    this.author = options.author ? options.author : ''
+    this.options = options
 
     this.element.appendChild(this.dragElement)
     this.dragElement.classList.add('pwv-annotation-border-draghandle')
@@ -113,8 +113,8 @@ export class AnnotationBorder {
   public setAnnotation(annotation: Annotation, pageRect: Rect) {
     const behaviors = getAnnotationBehaviors(annotation.itemType)
     this.annotationId = annotation.id
-    this.movable = behaviors.movable && !annotation.isLocked() && annotation.originalAuthor === this.author
-    this.resizable = behaviors.resizable && !annotation.isLocked() && annotation.originalAuthor === this.author
+    this.movable = behaviors.movable && !annotation.isLocked() && (this.options.ms_custom ? annotation.originalAuthor === this.options.author : true)
+    this.resizable = behaviors.resizable && !annotation.isLocked() && (this.options.ms_custom ? annotation.originalAuthor === this.options.author : true)
     this.aspectRatio = behaviors.aspectRatioChangeable ? null : annotation.pdfRect.pdfW / annotation.pdfRect.pdfH
     this.pageRect = pageRect
 

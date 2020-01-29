@@ -55,7 +55,6 @@ export interface PopupViewActions {
   getState(): PopupViewState
   updateOpenPopups(openPopups: Popup[]): PopupViewState
   setPositionCalculated(id: number): PopupViewState
-  setContentAndSubject(id: number): PopupViewState
   selectPopup(id: number): PopupViewState
   deselectPopup(): PopupViewState
 }
@@ -96,18 +95,20 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
         ...$state,
       }
     },
-    setContentAndSubject: (id: number) => $state => {
-      return {
-        ...$state,
-        activeContent: (document.getElementById('pwv-popup-content-' + id) as HTMLTextAreaElement).value,
-        activeSubject: (document.getElementById('pwv-popup-subject-' + id) as HTMLTextAreaElement).value,
-      }
-    },
     selectPopup: (id: number) => $state => {
       const openPopups = $state.openPopups.map(p => ({...p, selected: p.id === id }))
+      const selected = $state.openPopups.find(popup => popup.id === id)
+      let activeContent = $state.activeContent
+      let activeSubject = $state.activeSubject
+      if (selected) {
+        activeContent = selected.content
+        activeSubject = selected.subject
+      }
       return {
         ...$state,
         openPopups,
+        activeContent,
+        activeSubject,
         selectedPopup: id,
       }
     },
