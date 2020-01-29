@@ -32,6 +32,7 @@ export interface ContextBarState {
   canRotate: boolean
   canCopy: boolean
   isLocked: boolean
+  canEdit: boolean
   hasPopup: boolean
   showConfirmDelete: boolean
   commands: ContextBarItem[]
@@ -61,6 +62,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
     deletable: false,
     canCopy: false,
     isLocked: false,
+    canEdit: true,
     canHavePopup: false,
     canDeletePopup: true,
     showConfirmDelete: false,
@@ -79,7 +81,8 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
         canRotate: behaviors.rotatable,
         deletable: behaviors.deletable,
         canCopy: behaviors.text,
-        isLocked: (!props.canEdit(payload.annotation.originalAuthor)),
+        isLocked: payload.annotation.isLocked(),
+        canEdit: props.canEdit(payload.annotation.originalAuthor),
         canHavePopup: behaviors.canHavePopup,
         canDeletePopup: annotationHasPopup(payload.annotation) && payload.annotation.itemType !== PdfItemType.TEXT,
       }
@@ -171,7 +174,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
                   onClick={() => {
                     cmd.onCmd($state.annotation ? $state.annotation.id : 0)
                   }}
-                  disabled={$state.isLocked}
+                  disabled={$state.isLocked || !$state.canEdit}
                   tooltipPos={TooltipPosition.top}
                   tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
                 />
@@ -187,7 +190,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
                 <CommandbarButton
                 icon={icons.rotate}
                 onClick={$actions.rotate}
-                disabled={$state.isLocked}
+                disabled={$state.isLocked || !$state.canEdit}
                 tooltipPos={TooltipPosition.top}
                 tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
                 />
@@ -206,25 +209,25 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
                 onClick={$actions.editPopup}
                 />
               }
+              {$state.canDeletePopup && $state.hasPopup &&
+                <CommandbarButton
+                icon={icons.stickyNoteRemove}
+                onClick={$actions.deletePopup}
+                disabled={$state.isLocked || !$state.canEdit}
+                tooltipPos={TooltipPosition.top}
+                tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
+                />
+              }
               <CommandbarButton
                 icon={$state.isLocked ? icons.lock : icons.unlock}
                 onClick={$actions.toggleLock}
-                disabled={$state.isLocked}
+                disabled={!$state.canEdit}
               />
-              {$state.canDeletePopup && $state.hasPopup &&
-                <CommandbarButton
-                  icon={icons.stickyNoteRemove}
-                  onClick={$actions.deletePopup}
-                  disabled={$state.isLocked}
-                  tooltipPos={TooltipPosition.top}
-                  tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
-                  />
-                }
               {$state.deletable &&
                 <CommandbarButton
                   icon={icons.delete}
                   onClick={$actions.startDelete}
-                  disabled={$state.isLocked}
+                  disabled={$state.isLocked || !$state.canEdit}
                   tooltipPos={TooltipPosition.top}
                   tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
                 />
