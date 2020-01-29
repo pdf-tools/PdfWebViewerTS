@@ -133,7 +133,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     if (this.richTextEditor && this.freetextAnnotation) {
       const richTextObj = this.richTextEditor.getEditorValues()
       let subject = this.freetextAnnotation.subject
-      if (this.toolbarView) {
+      if (this.toolbarView && this.options.ms_custom) {
         const tbState = this.toolbarView.getState()
         subject = tbState.newSubject
         addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, tbState.newSubject)

@@ -14,11 +14,11 @@ export function addHistoryEntry(annotation: Annotation, type: 'create' | 'edit' 
     annotation.custom = history
   } else if (type === 'edit') {
     const params = []
-    if (annotation.content !== content && content !== null) {
+    if (annotation.content !== content) {
       params.push('/Contents')
       params.push(content)
     }
-    if (annotation.subject !== subject && subject !== null) {
+    if (annotation.subject !== subject) {
       params.push('/Subj')
       params.push(subject)
     }

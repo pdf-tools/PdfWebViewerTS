@@ -84,7 +84,7 @@ export class MobilePopupLayer extends CanvasLayer {
       this.popupView.closePopup()
       const item = this.pdfApi.getItem(id) as Annotation
       if (item) {
-        addHistoryEntry(item, 'edit', item.originalAuthor, content, subject)
+        addHistoryEntry(item, 'edit', this.options.author, content, subject)
         item.popup.isOpen = false
         item.content = content
         item.subject = subject
