@@ -436,7 +436,6 @@ export class PopupLayer extends CanvasLayer {
           if (annotation) {
             const content = state.activeContent
             const subject = state.activeSubject
-            console.log('###', content, subject)
             if (this.options.ms_custom) {
               addHistoryEntry(annotation, 'edit', this.options.author, state.activeContent, state.activeSubject)
             }

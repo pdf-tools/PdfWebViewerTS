@@ -216,7 +216,7 @@ export const getPopups = ($state: AnnotationsState, startPage: number, endPage: 
   let popups: Annotation[] = []
   for (let page = startPage; page <= endPage; page++) {
     if ($state.popupsByPage[page]) {
-      popups = popups.concat($state.popupsByPage[page].map(id => $state.all[id]))
+      popups = popups.concat($state.popupsByPage[page].map(id => $state.all[id])).filter(annot => !annot.isHidden())
     }
   }
   return popups

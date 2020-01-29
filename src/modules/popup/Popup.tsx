@@ -55,6 +55,7 @@ export interface PopupViewActions {
   getState(): PopupViewState
   updateOpenPopups(openPopups: Popup[]): PopupViewState
   setPositionCalculated(id: number): PopupViewState
+  setContentAndSubject(id: number): PopupViewState
   selectPopup(id: number): PopupViewState
   deselectPopup(): PopupViewState
 }
@@ -95,14 +96,18 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
         ...$state,
       }
     },
+    setContentAndSubject: (id: number) => $state => {
+      return {
+        ...$state,
+        activeContent: (document.getElementById('pwv-popup-content-' + id) as HTMLTextAreaElement).value,
+        activeSubject: (document.getElementById('pwv-popup-subject-' + id) as HTMLTextAreaElement).value,
+      }
+    },
     selectPopup: (id: number) => $state => {
       const openPopups = $state.openPopups.map(p => ({...p, selected: p.id === id }))
-      const sP = $state.openPopups.find(p => p.id === id)
       return {
         ...$state,
         openPopups,
-        activeContent: sP ? sP.content : null,
-        activeSubject: sP ? sP.subject : null,
         selectedPopup: id,
       }
     },
@@ -239,7 +244,10 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             />
             <CommandbarButton
                 onClick={() => {
-                  $state.selectedPopup = popup.id
+                  if ($state.selectedPopup !== popup.id) {
+                    $actions.deselectPopup()
+                    $actions.selectPopup(popup.id)
+                  }
                   toggleLock(popup.id)
                 }}
                 disabled={!canEdit(popup.originalAuthor)}
@@ -275,6 +283,7 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
           </div>
         </div>
         <div class="pwv-popup-subject">
+          { (canEdit(popup.originalAuthor) && !popup.isLocked) ?
           <input
             id={'pwv-popup-subject-' + popup.id}
             placeholder={translationManager.getText('annotation.subject')}
@@ -283,6 +292,12 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             }}
             disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
             value={popup.subject} />
+            :
+            <div
+              id={'pwv-popup-subject-' + popup.id}>
+              {popup.subject}
+            </div>
+          }
         </div>
         <div class="pwv-popup-content">
           { (canEdit(popup.originalAuthor) && !popup.isLocked) ?
