@@ -212,6 +212,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     if (this.selectionElement && this.context && this.annotationBorder && this.contextBar) {
       this.selectedAnnotation = annotation
       const pageRect = this.store.getState().document.pageRects[annotation.pdfRect.page]
+      this.annotationBorder.deselectAnnotation()
       this.annotationBorder.setAnnotation(annotation, pageRect)
 
       const state = this.store.getState()
