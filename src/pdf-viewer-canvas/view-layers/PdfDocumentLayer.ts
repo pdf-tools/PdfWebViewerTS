@@ -1,7 +1,7 @@
 import { Rect, PdfItemType, PdfActionType, LinkAnnotation, PdfPoint } from '../../pdf-viewer-api'
 import { ViewLayerBase } from './ViewLayerBase'
 import { ViewerCanvasState } from '../state/store'
-import { getAnnotationOnPoint } from '../state/annotations'
+import { getAnnotationsOnPoint } from '../state/annotations'
 import { ViewerMode, CursorStyle } from '../state/viewer'
 import { renderTextSelection } from './canvasShapes'
 
@@ -46,8 +46,8 @@ export class PdfDocumentLayer extends ViewLayerBase {
 
         if (pointerPdfPos.isOnPage) {
           const pdfPoint = pointerPdfPos.pdfPoint
-          const annotationOnPoint = getAnnotationOnPoint(state.annotations, pdfPoint)
-
+          const annotationsOnPoint = getAnnotationsOnPoint(state.annotations, pdfPoint)
+          const annotationOnPoint = annotationsOnPoint ? annotationsOnPoint[0] : null
           if (annotationOnPoint) {
             const itemType = annotationOnPoint.itemType
             if ((itemType === PdfItemType.HIGHLIGHT ||

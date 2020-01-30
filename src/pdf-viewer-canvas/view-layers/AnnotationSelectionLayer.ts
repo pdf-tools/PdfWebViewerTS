@@ -1,7 +1,7 @@
 import { Annotation, PdfItemType, Point, Rect, PdfItem, PdfItemCategory } from '../../pdf-viewer-api'
 import { ViewLayerBase } from './ViewLayerBase'
 import { ViewerCanvasState } from '../state/store'
-import { getAnnotationOnPoint } from '../state/annotations'
+import { getAnnotationsOnPoint } from '../state/annotations'
 import { getAnnotationBehaviors } from '../AnnotationBehaviors'
 import { ViewerMode, copyTextToClipboard, CursorStyle } from '../state/viewer'
 import { createAnnotationContextBar, ContextBarActions } from './views/AnnotationContextBar'
@@ -90,25 +90,28 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       }
 
       const pointerPdfPos = this.pdfViewerApi.transformScreenPointToPdfPoint(pointerPos)
-      const annotationOnPoint = getAnnotationOnPoint(state.annotations, pointerPdfPos.pdfPoint, true)
+      const annotationsOnPoint = getAnnotationsOnPoint(state.annotations, pointerPdfPos.pdfPoint, true)
 
       let breakRenderLoop = false
 
-      if (annotationOnPoint) {
-        const behaviors = getAnnotationBehaviors(annotationOnPoint.itemType)
-        if (state.pointer.action === 'click') {
-          if (annotationOnPoint.id !== state.viewer.selectedAnnotationId) {
-            if (state.viewer.selectedAnnotationId) {
-              this.deselectAnnotation()
+      if (annotationsOnPoint && annotationsOnPoint.length) {
+        for (let i = 0; i < annotationsOnPoint.length; i++) {
+          const annotationOnPoint = annotationsOnPoint[i]
+          const behaviors = getAnnotationBehaviors(annotationOnPoint.itemType)
+          if (state.pointer.action === 'click') {
+            if (annotationOnPoint.id !== state.viewer.selectedAnnotationId) {
+              if (state.viewer.selectedAnnotationId) {
+                this.deselectAnnotation()
+              }
+              if (!annotationOnPoint.isHidden()) {
+                this.selectAnnotation(annotationOnPoint)
+                breakRenderLoop = true
+              }
             }
-            if (!annotationOnPoint.isHidden()) {
-              this.selectAnnotation(annotationOnPoint)
-              breakRenderLoop = true
-            }
+          } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup && !annotationOnPoint.isHidden()) {
+            this.openPopup(annotationOnPoint.id)
+            breakRenderLoop = true
           }
-        } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup && !annotationOnPoint.isHidden()) {
-          this.openPopup(annotationOnPoint.id)
-          breakRenderLoop = true
         }
       } else if (state.viewer.selectedAnnotationId) {
         this.deselectAnnotation()

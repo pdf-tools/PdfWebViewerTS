@@ -167,28 +167,8 @@ export const actions: ActionsType<AnnotationsState, AnnotationsActions> = {
 }
 
 /** @internal */
-export const getAnnotationsOnPoint = ($state: AnnotationsState, pdfPoint: PdfPoint) => {
-  let annotations: Annotation[] | null = null
-  const ids = $state.byPage[pdfPoint.page]
-  if (ids) {
-    const px = pdfPoint.pdfX
-    const py = pdfPoint.pdfY
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids[i]
-      const rect = $state.all[id].pdfRect
-      if (px > rect.pdfX && py > rect.pdfY && px < rect.pdfX + rect.pdfW && py < rect.pdfY + rect.pdfH) {
-        if (!annotations) {
-          annotations = []
-        }
-        annotations.push($state.all[id])
-      }
-    }
-  }
-  return annotations
-}
-
-/** @internal */
-export const getAnnotationOnPoint = ($state: AnnotationsState, pdfPoint: PdfPoint, isSelectable: boolean = false) => {
+export const getAnnotationsOnPoint = ($state: AnnotationsState, pdfPoint: PdfPoint, isSelectable: boolean = false) => {
+  const annotations = []
   const ids = $state.byPage[pdfPoint.page]
   if (ids) {
     const px = pdfPoint.pdfX
@@ -200,13 +180,14 @@ export const getAnnotationOnPoint = ($state: AnnotationsState, pdfPoint: PdfPoin
         const annotation = $state.all[id]
         if (isSelectable) {
           if (getAnnotationBehaviors(annotation.itemType).selectable) {
-            return annotation
+            annotations.push(annotation)
           }
         } else {
-          return annotation
+          annotations.push(annotation)
         }
       }
     }
+    return annotations
   }
   return null
 }
