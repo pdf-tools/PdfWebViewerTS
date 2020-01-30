@@ -10,7 +10,7 @@ export function addHistoryEntry(annotation: Annotation, type: 'create' | 'edit' 
   if (type === 'create') {
     let history = annotation.custom
     history = []
-    history.push({Type: '/Create', D: `(${annotation.lastModified})`, T: `(${annotation.originalAuthor})`})
+    history.push({Type: '/Create', D: createPdfTime(), T: `(${annotation.originalAuthor})`})
     annotation.custom = history
   } else if (type === 'edit') {
     const params = []

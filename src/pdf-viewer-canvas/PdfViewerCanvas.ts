@@ -427,7 +427,6 @@ export class PdfViewerCanvas {
   }
 
   public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {
-    console.log('goToAnnotation', annotation)
     const dest: any = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
     dest.destinationType = 8
     dest.top = annotation.pdfRect.pdfY
@@ -435,7 +434,7 @@ export class PdfViewerCanvas {
     dest.page = annotation.pdfRect.page
     this.pdfViewerApi.goToViewerDestination(dest)
 
-    if (action === 'select') {
+    if (action === 'select' && !annotation.isHidden()) {
       this.dispatchEvent('itemSelected', annotation)
     }
   }

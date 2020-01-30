@@ -244,10 +244,10 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
               tooltip={popup.isLocked ? translationManager.getText('lockedAnnotation') : ''}
             />
             <CommandbarButton
-                onClick={() => {
-                  if ($state.selectedPopup !== popup.id) {
-                    $actions.deselectPopup()
-                    $actions.selectPopup(popup.id)
+                onClick={(e: Event) => {
+                  e.stopPropagation()
+                  if (!popup.selected) {
+                    select(popup.id)
                   }
                   toggleLock(popup.id)
                 }}

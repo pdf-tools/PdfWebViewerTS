@@ -258,6 +258,7 @@ export class TextSelectionLayer extends ViewLayerBase {
             this.pdfViewerApi.createItem(args).then(annotation => {
               if (this.options.ms_custom) {
                 addHistoryEntry(annotation as Annotation, 'create', this.options.author)
+                this.pdfViewerApi.updateItem(annotation)
               }
             })
             this.endSelection()

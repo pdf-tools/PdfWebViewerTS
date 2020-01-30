@@ -356,6 +356,9 @@ export class PopupLayer extends CanvasLayer {
 
   private selectPopup(id: number) {
     if (this.popupView) {
+      if (this.popupView.getState().selectedPopup !== null) {
+        this.updateSelectedPopupContent(true)
+      }
       this.popupView.selectPopup(id)
       this.store.viewer.selectPopup(id)
     }
