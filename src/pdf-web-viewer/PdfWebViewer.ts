@@ -1,36 +1,18 @@
 import { app } from 'hyperapp'
 import ResizeObserver from 'resize-observer-polyfill'
-import {
-  PdfWebViewerOptions,
-  pdfWebViewerDefaultOptions,
-} from './PdfWebViewerOptions'
+import { PdfWebViewerOptions, pdfWebViewerDefaultOptions } from './PdfWebViewerOptions'
 import { App } from './views/App'
-import {
-  createState,
-  actions,
-  RootState,
-  ActionDefinitions,
-} from './state/index'
+import { createState, actions, RootState, ActionDefinitions } from './state/index'
 import { PdfViewerCanvas } from '../pdf-viewer-canvas/PdfViewerCanvas'
 import { getAnnotationBehaviors } from '../pdf-viewer-canvas/AnnotationBehaviors'
 import { translations } from './translations'
 import { translationManager } from '../common/TranslationManager'
 import { PdfItemsOnPage, DeletedItem, PdfItem } from '../pdf-viewer-api/types'
 import { OutlineNavigationItem } from './state/navigationPanel'
-import {
-  PdfDestination,
-  PdfFitMode,
-  PdfPageLayoutMode,
-  Annotation,
-  PdfItemCategory,
-} from '../pdf-viewer-api'
+import { PdfDestination, PdfFitMode, PdfPageLayoutMode, Annotation, PdfItemCategory } from '../pdf-viewer-api'
 import { PopupModule } from '../modules/popup/PopupModule'
 import { MobilePopupModule } from '../modules/mobile-popup/MobilePopupModule'
-import {
-  OptionsToVerify,
-  PdfViewerCanvasOptions,
-  ColorPaletteMap,
-} from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
+import { OptionsToVerify, PdfViewerCanvasOptions, ColorPaletteMap } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 
 /** @internal */
 declare var gwt: Promise<void>
@@ -73,25 +55,9 @@ const breakPoints = {
 export interface PdfWebViewerActions extends ActionDefinitions {
   api: {
     openFile(openFile: { file: File; password?: string }): void
-    openUri(openUri: {
-      pdfUri: string
-      password?: string
-      pdfAuthorization?: string
-    }): void
-    openFDF(openFDF: {
-      pdfFile: File
-      fdfFile: File
-      password?: string
-      pdfAuthorization?: string
-      fdfAuthorization?: string
-    }): void
-    openFDFUri(openFDFUri: {
-      pdfUri: string
-      fdfUri: string
-      password?: string
-      pdfAuthorization?: string
-      fdfAuthorization?: string
-    }): void
+    openUri(openUri: { pdfUri: string; password?: string; pdfAuthorization?: string }): void
+    openFDF(openFDF: { pdfFile: File; fdfFile: File; password?: string; pdfAuthorization?: string; fdfAuthorization?: string }): void
+    openFDFUri(openFDFUri: { pdfUri: string; fdfUri: string; password?: string; pdfAuthorization?: string; fdfAuthorization?: string }): void
     downloadFile(): Promise<void>
     close(): Promise<void>
     hasChanges(): void
@@ -103,10 +69,7 @@ export interface PdfWebViewerActions extends ActionDefinitions {
     previousPage(): void
     setFitMode(fitMode: number): void
     goTo(pdfDestination: PdfDestination): void
-    goToAnnotation(target: {
-      annotation: Annotation
-      action?: 'select' | 'edit' | 'popup' | 'history'
-    }): void
+    goToAnnotation(target: { annotation: Annotation; action?: 'select' | 'edit' | 'popup' | 'history' }): void
     setPageLayoutMode(layoutMode: number): void
     rotate(): void
     setRotation(rotation: number): void
@@ -127,9 +90,7 @@ export interface PdfWebViewerEventMap {
   error: Error
 }
 
-export type PdfWebViewerEventListener = <K extends keyof PdfWebViewerEventMap>(
-  e: PdfWebViewerEventMap[K],
-) => void
+export type PdfWebViewerEventListener = <K extends keyof PdfWebViewerEventMap>(e: PdfWebViewerEventMap[K]) => void
 export type PdfWebViewerEventTypes = keyof PdfWebViewerEventMap
 
 /** @internal */
@@ -140,10 +101,7 @@ export class PdfWebViewer {
     firstPage: 0,
     lastPage: 0,
   }
-  private eventListeners = new Map<
-    PdfWebViewerEventTypes,
-    PdfWebViewerEventListener[]
-  >()
+  private eventListeners = new Map<PdfWebViewerEventTypes, PdfWebViewerEventListener[]>()
   private options: PdfWebViewerOptions
   private element: HTMLElement
   private view: PdfWebViewerActions
@@ -155,11 +113,7 @@ export class PdfWebViewer {
   private thumbnailsInQueue: number[] = []
   private loadPageThumbnailsTimer: number | null = null
 
-  constructor(
-    containerElement: Element | null,
-    license: string,
-    options?: Partial<PdfWebViewerOptions>,
-  ) {
+  constructor(containerElement: Element | null, license: string, options?: Partial<PdfWebViewerOptions>) {
     if (!containerElement) {
       throw { error: 'PdfWebViewer container element is null' }
     }
@@ -174,17 +128,11 @@ export class PdfWebViewer {
     this.handleDocumentOpened = this.handleDocumentOpened.bind(this)
     this.handleDocumentClosed = this.handleDocumentClosed.bind(this)
 
-    this.handleFirstVisiblePageChanged = this.handleFirstVisiblePageChanged.bind(
-      this,
-    )
-    this.handleLastVisiblePageChanged = this.handleLastVisiblePageChanged.bind(
-      this,
-    )
+    this.handleFirstVisiblePageChanged = this.handleFirstVisiblePageChanged.bind(this)
+    this.handleLastVisiblePageChanged = this.handleLastVisiblePageChanged.bind(this)
     this.handleZoomChanged = this.handleZoomChanged.bind(this)
     this.handleFitModeChanged = this.handleFitModeChanged.bind(this)
-    this.handlePageLayoutModeChanged = this.handlePageLayoutModeChanged.bind(
-      this,
-    )
+    this.handlePageLayoutModeChanged = this.handlePageLayoutModeChanged.bind(this)
     this.handleBusyStateChanged = this.handleBusyStateChanged.bind(this)
     this.handlePageChanged = this.handlePageChanged.bind(this)
     this.handleError = this.handleError.bind(this)
@@ -195,10 +143,7 @@ export class PdfWebViewer {
     this.handleAnnotationSelected = this.handleAnnotationSelected.bind(this)
     this.handleAnnotationDeselected = this.handleAnnotationDeselected.bind(this)
 
-    const deviceType =
-      Math.min(window.screen.availHeight, window.screen.availWidth) < 570
-        ? 'mobile'
-        : 'desktop'
+    const deviceType = Math.min(window.screen.availHeight, window.screen.availWidth) < 570 ? 'mobile' : 'desktop'
     this.options = { ...pdfWebViewerDefaultOptions, ...options }
     if (options) {
       this.verifyOptions(options, this.options)
@@ -214,18 +159,12 @@ export class PdfWebViewer {
     const initialState = createState(this.options)
     initialState.layout.deviceType = deviceType
 
-    this.options.annotationBarPosition =
-      deviceType === 'mobile' ? 'top' : 'left'
+    this.options.annotationBarPosition = deviceType === 'mobile' ? 'top' : 'left'
 
     translationManager.setLanguage(this.options.language || 'en')
     translationManager.addTranslations(translations)
 
-    this.view = this.createView<RootState, PdfWebViewerActions>(app)(
-      initialState,
-      actions,
-      App,
-      this.element,
-    )
+    this.view = this.createView<RootState, PdfWebViewerActions>(app)(initialState, actions, App, this.element)
 
     this.layoutBreakPoint = ''
 
@@ -234,11 +173,7 @@ export class PdfWebViewer {
     this.resizeObserver.observe(this.element)
   }
 
-  public openFile(
-    file: File | string,
-    password?: string,
-    pdfAuthorization?: string,
-  ) {
+  public openFile(file: File | string, password?: string, pdfAuthorization?: string) {
     if (this.view) {
       if (file instanceof Blob) {
         this.view.api.openFile({ file, password })
@@ -248,13 +183,7 @@ export class PdfWebViewer {
     }
   }
 
-  public openFDF(
-    pdfFile: File | string,
-    fdfFile: File | string,
-    password?: string,
-    pdfAuthorization?: string,
-    fdfAuthorization?: string,
-  ) {
+  public openFDF(pdfFile: File | string, fdfFile: File | string, password?: string, pdfAuthorization?: string, fdfAuthorization?: string) {
     if (this.view) {
       if (pdfFile instanceof Blob && fdfFile instanceof Blob) {
         this.view.api.openFDF({ pdfFile, fdfFile, password })
@@ -267,9 +196,7 @@ export class PdfWebViewer {
           fdfAuthorization,
         })
       } else {
-        throw new Error(
-          'Both PDF and FDF have to either a blob or string. They cannot be mixed or have any other type',
-        )
+        throw new Error('Both PDF and FDF have to either a blob or string. They cannot be mixed or have any other type')
       }
     }
   }
@@ -340,30 +267,18 @@ export class PdfWebViewer {
     return __VERSION__
   }
 
-  public addEventListener<K extends keyof PdfWebViewerEventMap>(
-    type: K,
-    listener: (e: PdfWebViewerEventMap[K]) => void,
-  ) {
+  public addEventListener<K extends keyof PdfWebViewerEventMap>(type: K, listener: (e: PdfWebViewerEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
-      ;(this.eventListeners.get(type) as PdfWebViewerEventListener[]).push(
-        listener,
-      )
+      ;(this.eventListeners.get(type) as PdfWebViewerEventListener[]).push(listener)
     } else {
       this.eventListeners.set(type, [listener])
     }
   }
 
-  public removeEventListener<K extends keyof PdfWebViewerEventMap>(
-    type: K,
-    listener: (e: PdfWebViewerEventMap[K]) => void,
-  ) {
+  public removeEventListener<K extends keyof PdfWebViewerEventMap>(type: K, listener: (e: PdfWebViewerEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
-      let listeners = this.eventListeners.get(
-        type,
-      ) as PdfWebViewerEventListener[]
-      listeners = listeners.filter(
-        listenerInArray => listenerInArray !== listener,
-      )
+      let listeners = this.eventListeners.get(type) as PdfWebViewerEventListener[]
+      listeners = listeners.filter(listenerInArray => listenerInArray !== listener)
       if (listeners.length !== 0) {
         this.eventListeners.set(type, listeners)
       } else {
@@ -372,14 +287,9 @@ export class PdfWebViewer {
     }
   }
 
-  private dispatchEvent<K extends keyof PdfWebViewerEventMap>(
-    type: K,
-    args: PdfWebViewerEventMap[K],
-  ) {
+  private dispatchEvent<K extends keyof PdfWebViewerEventMap>(type: K, args: PdfWebViewerEventMap[K]) {
     if (this.eventListeners.has(type)) {
-      const listeners = this.eventListeners.get(
-        type,
-      ) as PdfWebViewerEventListener[]
+      const listeners = this.eventListeners.get(type) as PdfWebViewerEventListener[]
       listeners.forEach(listener => listener(args))
     }
   }
@@ -388,85 +298,33 @@ export class PdfWebViewer {
     return (state: any, a: any, view: any, element: any): A => {
       a.createCanvasView = (elm: HTMLElement) => {
         Promise.all([gwt]).then(() => {
-          this.viewerCanvas = new PdfViewerCanvas(
-            elm,
-            this.licenseKey,
-            this.options,
-          )
+          this.viewerCanvas = new PdfViewerCanvas(elm, this.licenseKey, this.options)
           this.viewerCanvas.addEventListener('appLoaded', this.handleAppLoaded)
-          this.viewerCanvas.addEventListener(
-            'firstVisiblePage',
-            this.handleFirstVisiblePageChanged,
-          )
-          this.viewerCanvas.addEventListener(
-            'lastVisiblePage',
-            this.handleLastVisiblePageChanged,
-          )
+          this.viewerCanvas.addEventListener('firstVisiblePage', this.handleFirstVisiblePageChanged)
+          this.viewerCanvas.addEventListener('lastVisiblePage', this.handleLastVisiblePageChanged)
           this.viewerCanvas.addEventListener('zoom', this.handleZoomChanged)
-          this.viewerCanvas.addEventListener(
-            'fitMode',
-            this.handleFitModeChanged,
-          )
-          this.viewerCanvas.addEventListener(
-            'pageLayoutMode',
-            this.handlePageLayoutModeChanged,
-          )
-          this.viewerCanvas.addEventListener(
-            'busyState',
-            this.handleBusyStateChanged,
-          )
-          this.viewerCanvas.addEventListener(
-            'pageChanged',
-            this.handlePageChanged,
-          )
+          this.viewerCanvas.addEventListener('fitMode', this.handleFitModeChanged)
+          this.viewerCanvas.addEventListener('pageLayoutMode', this.handlePageLayoutModeChanged)
+          this.viewerCanvas.addEventListener('busyState', this.handleBusyStateChanged)
+          this.viewerCanvas.addEventListener('pageChanged', this.handlePageChanged)
           this.viewerCanvas.addEventListener('error', this.handleError)
 
           /*** annotation events  */
-          this.viewerCanvas.addEventListener(
-            'itemCreated',
-            this.handleAnnotationCreated,
-          )
-          this.viewerCanvas.addEventListener(
-            'itemUpdated',
-            this.handleAnnotationUpdated,
-          )
-          this.viewerCanvas.addEventListener(
-            'itemDeleted',
-            this.handleAnnotationDeleted,
-          )
-          this.viewerCanvas.addEventListener(
-            'itemSelected',
-            this.handleAnnotationSelected,
-          )
-          this.viewerCanvas.addEventListener(
-            'itemDeselected',
-            this.handleAnnotationDeselected,
-          )
+          this.viewerCanvas.addEventListener('itemCreated', this.handleAnnotationCreated)
+          this.viewerCanvas.addEventListener('itemUpdated', this.handleAnnotationUpdated)
+          this.viewerCanvas.addEventListener('itemDeleted', this.handleAnnotationDeleted)
+          this.viewerCanvas.addEventListener('itemSelected', this.handleAnnotationSelected)
+          this.viewerCanvas.addEventListener('itemDeselected', this.handleAnnotationDeselected)
         })
       }
       a.removeCanvasView = (elm: HTMLElement) => {
         if (this.viewerCanvas) {
-          this.viewerCanvas.removeEventListener(
-            'firstVisiblePage',
-            this.handleFirstVisiblePageChanged,
-          )
-          this.viewerCanvas.removeEventListener(
-            'lastVisiblePage',
-            this.handleLastVisiblePageChanged,
-          )
+          this.viewerCanvas.removeEventListener('firstVisiblePage', this.handleFirstVisiblePageChanged)
+          this.viewerCanvas.removeEventListener('lastVisiblePage', this.handleLastVisiblePageChanged)
           this.viewerCanvas.removeEventListener('zoom', this.handleZoomChanged)
-          this.viewerCanvas.removeEventListener(
-            'fitMode',
-            this.handleFitModeChanged,
-          )
-          this.viewerCanvas.removeEventListener(
-            'pageLayoutMode',
-            this.handlePageLayoutModeChanged,
-          )
-          this.viewerCanvas.removeEventListener(
-            'busyState',
-            this.handleBusyStateChanged,
-          )
+          this.viewerCanvas.removeEventListener('fitMode', this.handleFitModeChanged)
+          this.viewerCanvas.removeEventListener('pageLayoutMode', this.handlePageLayoutModeChanged)
+          this.viewerCanvas.removeEventListener('busyState', this.handleBusyStateChanged)
           this.viewerCanvas.removeEventListener('error', this.handleError)
           this.viewerCanvas = undefined
         }
@@ -487,11 +345,7 @@ export class PdfWebViewer {
               })
           }
         },
-        openUri: (x: {
-          pdfUri: string
-          password?: string
-          pdfAuthorization?: string
-        }) => {
+        openUri: (x: { pdfUri: string; password?: string; pdfAuthorization?: string }) => {
           if (this.viewerCanvas) {
             if (!this.beforeOpen(x.pdfUri)) {
               return
@@ -523,25 +377,13 @@ export class PdfWebViewer {
               })
           }
         },
-        openFDFUri: (x: {
-          pdfUri: string
-          fdfUri: string
-          password?: string
-          pdfAuthorization?: string
-          fdfAuthorization?: string
-        }) => {
+        openFDFUri: (x: { pdfUri: string; fdfUri: string; password?: string; pdfAuthorization?: string; fdfAuthorization?: string }) => {
           if (this.viewerCanvas) {
             if (!this.beforeOpen(x.pdfUri, x.fdfUri)) {
               return
             }
             this.viewerCanvas
-              .openFDFUri(
-                x.pdfUri,
-                x.fdfUri,
-                x.password,
-                x.pdfAuthorization,
-                x.fdfAuthorization,
-              )
+              .openFDFUri(x.pdfUri, x.fdfUri, x.password, x.pdfAuthorization, x.fdfAuthorization)
               .then(() => {
                 this.openResolve(x.pdfUri)
               })
@@ -555,11 +397,7 @@ export class PdfWebViewer {
             if (this.viewerCanvas) {
               const currentState = this.view.getState()
               const hasChanges = this.viewerCanvas.hasChanges()
-              if (
-                !currentState.unsavedChangesDialogDontSave &&
-                currentState.hasDocument &&
-                hasChanges
-              ) {
+              if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
                 this.view.showConfirmUnsavedChangesDialog({ pdfFile: null })
                 return
               }
@@ -663,12 +501,7 @@ export class PdfWebViewer {
         startSearch: () => {
           if (this.viewerCanvas) {
             const s = this.view.getState().search
-            this.viewerCanvas.startSearch(
-              s.searchString,
-              s.caseSensitive,
-              s.wrapSearch,
-              s.useRegex,
-            )
+            this.viewerCanvas.startSearch(s.searchString, s.caseSensitive, s.wrapSearch, s.useRegex)
           }
         },
         nextSearchMatch: () => {
@@ -691,18 +524,19 @@ export class PdfWebViewer {
             this.viewerCanvas.goTo(pdfDestination)
           }
         },
-        goToAnnotation: (target: {
-          annotation: Annotation
-          action?: 'select' | 'edit' | 'popup' | 'history'
-        }) => {
+        goToAnnotation: (target: { annotation: Annotation; action?: 'select' | 'edit' | 'popup' | 'history' }) => {
           if (this.viewerCanvas) {
-            /////////////
-            console.log('goToAnnotation -> ' + target.action, target.annotation)
-            /////////////
-            try {
-              this.viewerCanvas.goToAnnotation(target.annotation, target.action)
-            } catch (err) {
-              console.error(err)
+            if (target.annotation.isHidden()) {
+              this.handleAnnotationSelected(target.annotation)
+            } else {
+              /////////////
+              console.log('goToAnnotation -> ' + target.action, target.annotation)
+              /////////////
+              try {
+                this.viewerCanvas.goToAnnotation(target.annotation, target.action)
+              } catch (err) {
+                console.error(err)
+              }
             }
           }
         },
@@ -719,10 +553,7 @@ export class PdfWebViewer {
             this.loadDocumentOutlines()
           }
         },
-        addPageRangeToThumbnailsQueue: (pageRange: {
-          from: number
-          to: number
-        }) => {
+        addPageRangeToThumbnailsQueue: (pageRange: { from: number; to: number }) => {
           this.addPagesToThumbnailsQueue(pageRange.from, pageRange.to)
         },
       }
@@ -730,10 +561,7 @@ export class PdfWebViewer {
     }
   }
 
-  private handleResize(
-    entries: ResizeObserverEntry[],
-    observer: ResizeObserver,
-  ) {
+  private handleResize(entries: ResizeObserverEntry[], observer: ResizeObserver) {
     const containerWidth = this.element.getBoundingClientRect().width
     const setBreakPoint = (className: string) => {
       if (this.layoutBreakPoint !== className) {
@@ -766,11 +594,7 @@ export class PdfWebViewer {
     if (this.viewerCanvas) {
       const currentState = this.view.getState()
       const hasChanges = this.viewerCanvas.hasChanges()
-      if (
-        !currentState.unsavedChangesDialogDontSave &&
-        currentState.hasDocument &&
-        hasChanges
-      ) {
+      if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
         this.view.showConfirmUnsavedChangesDialog({ pdfFile, fdfFile })
         return false
       }
@@ -794,11 +618,7 @@ export class PdfWebViewer {
     }
   }
 
-  private openReject(
-    pdfFile: File | string,
-    fdfFile: File | string | null,
-    error: Error,
-  ) {
+  private openReject(pdfFile: File | string, fdfFile: File | string | null, error: Error) {
     if (error.message === 'password required') {
       this.view.loadDocumentPasswordForm({ pdfFile, fdfFile })
     } else {
@@ -815,9 +635,7 @@ export class PdfWebViewer {
       if (viewerState.navigationPanel.showNavigation) {
         if (viewerState.navigationPanel.selectedNavigation === 'pages') {
           this.loadPageThumbnails()
-        } else if (
-          viewerState.navigationPanel.selectedNavigation === 'outline'
-        ) {
+        } else if (viewerState.navigationPanel.selectedNavigation === 'outline') {
           this.loadDocumentOutlines()
         } else {
           this.loadAnnotations()
@@ -829,9 +647,7 @@ export class PdfWebViewer {
   private loadDocumentOutlines() {
     if (this.viewerCanvas) {
       this.viewerCanvas.getDocumentOutline().then(outlines => {
-        this.view.navigationPanel.setOutlines(
-          outlines as OutlineNavigationItem[],
-        )
+        this.view.navigationPanel.setOutlines(outlines as OutlineNavigationItem[])
       })
     }
   }
@@ -861,17 +677,10 @@ export class PdfWebViewer {
       }
 
       const pagesToLoad = state.navigationPanel.pages
-        .filter(
-          p =>
-            p.pageNumber >= fromPage &&
-            p.pageNumber <= toPage &&
-            p.thumbnail === null,
-        )
+        .filter(p => p.pageNumber >= fromPage && p.pageNumber <= toPage && p.thumbnail === null)
         .map(p => p.pageNumber)
 
-      this.loadThumbnailsQueue = pagesToLoad.filter(
-        p => this.thumbnailsInQueue.indexOf(p) < 0,
-      )
+      this.loadThumbnailsQueue = pagesToLoad.filter(p => this.thumbnailsInQueue.indexOf(p) < 0)
 
       const getPageThumbnail = (pageNumber: number) => {
         this.updatePageThumbnail(pageNumber).then(() => {
@@ -927,27 +736,21 @@ export class PdfWebViewer {
       if (this.viewerCanvas) {
         const pageNumber = pages.shift()
         if (typeof pageNumber === 'number') {
-          this.viewerCanvas
-            .getAnnotationsFromPage(pageNumber)
-            .then((itemsOnPage: PdfItemsOnPage) => {
-              const selectableItems = itemsOnPage.items.filter(
-                item =>
-                  getAnnotationBehaviors((item as Annotation).itemType)
-                    .selectable,
-              )
+          this.viewerCanvas.getAnnotationsFromPage(pageNumber).then((itemsOnPage: PdfItemsOnPage) => {
+            const selectableItems = itemsOnPage.items.filter(item => getAnnotationBehaviors((item as Annotation).itemType).selectable)
 
-              this.view.navigationPanel.setPageAnnotations({
-                page: itemsOnPage.page,
-                itemCategory: PdfItemCategory.ANNOTATION,
-                items: selectableItems,
-              })
-              if (pages.length > 0) {
-                loadNext(pages)
-              } else {
-                this.view.navigationPanel.setAnnotationLoaded()
-                console.log(`load Annotations completed`)
-              }
+            this.view.navigationPanel.setPageAnnotations({
+              page: itemsOnPage.page,
+              itemCategory: PdfItemCategory.ANNOTATION,
+              items: selectableItems,
             })
+            if (pages.length > 0) {
+              loadNext(pages)
+            } else {
+              this.view.navigationPanel.setAnnotationLoaded()
+              console.log(`load Annotations completed`)
+            }
+          })
         }
       }
     }
@@ -984,10 +787,7 @@ export class PdfWebViewer {
 
   private updateVisiblePageRange() {
     const state = this.view.getState()
-    if (
-      state.navigationPanel.showNavigation &&
-      state.navigationPanel.selectedNavigation === 'pages'
-    ) {
+    if (state.navigationPanel.showNavigation && state.navigationPanel.selectedNavigation === 'pages') {
       if (this.loadPageThumbnailsTimer) {
         window.clearTimeout(this.loadPageThumbnailsTimer)
       }
@@ -1039,29 +839,18 @@ export class PdfWebViewer {
 
   private handlePageChanged(pageNumber: number) {
     // the list is 0 index based. E.g. page 1 is at index 0
-    const pageNavigationItem = this.view.getState().navigationPanel.pages[
-      pageNumber - 1
-    ]
+    const pageNavigationItem = this.view.getState().navigationPanel.pages[pageNumber - 1]
     if (pageNavigationItem && pageNavigationItem.thumbnail !== null) {
       this.updatePageThumbnail(pageNumber)
     }
   }
 
-  private verifyOptions(
-    clientOptions: Partial<PdfWebViewerOptions>,
-    defaultOptions: PdfViewerCanvasOptions,
-  ) {
+  private verifyOptions(clientOptions: Partial<PdfWebViewerOptions>, defaultOptions: PdfViewerCanvasOptions) {
     Object.keys(OptionsToVerify).forEach(k => {
       if (clientOptions[k]) {
-        if (
-          !this.isContainedInArray(
-            clientOptions[k],
-            defaultOptions[OptionsToVerify[k]],
-          )
-        ) {
+        if (!this.isContainedInArray(clientOptions[k], defaultOptions[OptionsToVerify[k]])) {
           throw new Error(
-            `Invalid ${k}: ${defaultOptions[k]} has not been found in ${OptionsToVerify[k]}.\n` +
-              `Valid values are: ${defaultOptions[OptionsToVerify[k]]}`,
+            `Invalid ${k}: ${defaultOptions[k]} has not been found in ${OptionsToVerify[k]}.\n` + `Valid values are: ${defaultOptions[OptionsToVerify[k]]}`,
           )
         }
       }
@@ -1069,9 +858,7 @@ export class PdfWebViewer {
 
     Object.keys(ColorPaletteMap).forEach(k => {
       if (clientOptions[k] && !clientOptions[ColorPaletteMap[k]]) {
-        throw new Error(
-          `Cannot set ${k} without setting ${ColorPaletteMap[k]}. Preset ${ColorPaletteMap[k]} might not be in ${k}`,
-        )
+        throw new Error(`Cannot set ${k} without setting ${ColorPaletteMap[k]}. Preset ${ColorPaletteMap[k]} might not be in ${k}`)
       }
     })
   }

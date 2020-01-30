@@ -170,6 +170,11 @@ export const translations = {
     de: 'Seite',
     fr: 'Page',
   },
+  'sideNavigation.annotation.history': {
+    en: 'History',
+    de: 'Verlauf',
+    fr: 'Historique',
+  },
   'navigation.of': {
     en: 'of',
     de: 'von',

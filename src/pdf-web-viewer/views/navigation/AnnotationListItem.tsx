@@ -1,5 +1,6 @@
 import { h, Component } from 'hyperapp'
 import { PdfWebViewerState, PdfWebViewerActions } from '../../PdfWebViewer'
+import { translationManager } from '../../../common/TranslationManager'
 import { Annotation } from '../../../pdf-viewer-api/types'
 import { PdfItemType } from '../../../pdf-viewer-api/enums'
 import { Icon, icons } from '../../../common/Icon'
@@ -39,10 +40,14 @@ const AnnotationIcon: Component<{ itemType: number; fill: string | null }, PdfWe
 const HistoryItem: Component<{ item: any }, PdfWebViewerState, PdfWebViewerActions> = ({ item }) => (state, actions) => {
   switch (item.Type) {
     case '/Create':
+      console.log('create', item)
       return (
         <li>
           <div>
-            <Icon icon={icons.pencil} />
+            <Icon icon={icons.addLayer} />
+            {/*
+            <Icon icon={icons.created} />
+            */}
             {item.T && <span class="pwv-author">{item.T}</span>}
             <time>{formatDate(item.D)}</time>
           </div>
@@ -60,7 +65,7 @@ const HistoryItem: Component<{ item: any }, PdfWebViewerState, PdfWebViewerActio
       return (
         <li>
           <div>
-            <Icon icon={icons.pencil} />
+            <Icon icon={icons.pen} />
             {item.T && <span class="pwv-author">{item.T}</span>}
             <time>{formatDate(item.D)}</time>
           </div>
@@ -117,6 +122,7 @@ export const AnnotationListItem: Component<{ annotation: Annotation; selected: b
     <li
       class={classNames('pwv-annotation-navigation-item', {
         'pwv-selected': selected,
+        'pwv-deleted': annotation.isHidden(),
       })}
       onclick={() => {
         if (dblClickTimer) {
@@ -124,9 +130,9 @@ export const AnnotationListItem: Component<{ annotation: Annotation; selected: b
           dblClickTimer = undefined
         } else {
           dblClickTimer = window.setTimeout(() => {
-            if (!annotation.isHidden()) {
-              actions.api.goToAnnotation({ annotation, action: 'select' })
-            }
+            // if (!annotation.isHidden()) {
+            // }
+            actions.api.goToAnnotation({ annotation, action: 'select' })
             dblClickTimer = undefined
           }, 250)
         }
@@ -144,11 +150,11 @@ export const AnnotationListItem: Component<{ annotation: Annotation; selected: b
       <div>
         <h5>{annotation.subject}</h5>
         <p>{annotation.content}</p>
+        {!!annotation.isLocked() && <Icon icon={icons.lock} className="pwv-locked-icon" />}
       </div>
-      {!!annotation.isLocked() && <Icon icon={icons.lock} className="pwv-locked-icon" />}
-      {annotation.custom && annotation.custom.length > 0 && (
+      {selected && annotation.custom && annotation.custom.length > 0 && (
         <div class="pwv-ms-custom-history-list">
-          <h5>History</h5>
+          <h5>{translationManager.getText('sideNavigation.annotation.history')}</h5>
           <ul>
             {annotation.custom.map(history => (
               <HistoryItem item={history} />
