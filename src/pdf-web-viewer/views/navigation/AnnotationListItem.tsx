@@ -57,8 +57,6 @@ const HistoryItem: Component<{ item: any }, PdfWebViewerState, PdfWebViewerActio
           params[key] = value
         }
       }
-      console.log('----')
-      console.log(params)
       return (
         <li>
           <div>
@@ -115,7 +113,6 @@ export const AnnotationListItem: Component<{ annotation: Annotation; selected: b
   annotation,
   selected,
 }) => (state, actions) => {
-  console.log(annotation)
   return (
     <li
       class={classNames('pwv-annotation-navigation-item', {
@@ -127,7 +124,9 @@ export const AnnotationListItem: Component<{ annotation: Annotation; selected: b
           dblClickTimer = undefined
         } else {
           dblClickTimer = window.setTimeout(() => {
-            actions.api.goToAnnotation({ annotation, action: 'select' })
+            if (!annotation.isHidden()) {
+              actions.api.goToAnnotation({ annotation, action: 'select' })
+            }
             dblClickTimer = undefined
           }, 250)
         }

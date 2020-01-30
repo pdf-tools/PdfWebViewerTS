@@ -434,7 +434,7 @@ export class PdfViewerCanvas {
     dest.page = annotation.pdfRect.page
     this.pdfViewerApi.goToViewerDestination(dest)
 
-    if (action === 'select' && !annotation.isHidden()) {
+    if (action === 'select') {
       this.dispatchEvent('itemSelected', annotation)
     }
   }
