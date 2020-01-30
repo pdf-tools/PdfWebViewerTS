@@ -136,7 +136,7 @@ export abstract class ViewLayerBase implements ViewLayer {
   }
 
   protected canEdit(author: string) {
-    if (this.options.author) {
+    if (this.options.author !== undefined) {
       return author === this.options.author
     }
     return true
