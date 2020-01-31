@@ -159,9 +159,8 @@ export class RichTextEditor {
         if (nodes) {
           console.log(nodes)
           if (nodes.nodeName.toLocaleLowerCase() === 'body') {
-            let text = (nodes as HTMLElement).innerHTML
-            text = text.replace(/\<p\>|\<\/p\>/ig, '')
-            text = text.replace(/\<br\>/ig, '\n')
+            const text = (nodes as HTMLElement).innerText
+            console.log(text)
             return text
           }
         } else {
