@@ -199,6 +199,7 @@ export const createAnnotationContextBar = (props: AnnotationContextBarProps, ele
                 <CommandbarButton
                 icon={icons.stickyNoteAdd}
                 onClick={$actions.addPopup}
+                disabled={$state.isLocked || !$state.canEdit}
                 tooltipPos={TooltipPosition.top}
                 tooltip={$state.isLocked ? translationManager.getText('lockedAnnotation') : ''}
                 />

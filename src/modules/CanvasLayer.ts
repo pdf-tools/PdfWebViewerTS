@@ -116,7 +116,7 @@ export abstract class CanvasLayer {
   }
 
   protected canEdit(author: string) {
-    if (this.options.ms_custom !== undefined) {
+    if (this.options.ms_custom) {
         return this.options.author === author
       }
     return true
