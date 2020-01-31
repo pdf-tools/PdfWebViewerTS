@@ -142,11 +142,8 @@ export class MobilePopupLayer extends CanvasLayer {
   }
 
   private toggleAnnotationLock() {
-    console.log('toggle1', this.pdfApi)
     if (this.pdfApi) {
-      console.log('toggle2')
       const annotation = this.updateSelectedPopupContent(false)
-      console.log('annotation', annotation)
       if (annotation) {
         if (this.options.ms_custom) {
           addHistoryEntry(annotation, 'lock', this.options.author)

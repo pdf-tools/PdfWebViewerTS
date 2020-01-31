@@ -157,11 +157,8 @@ export class RichTextEditor {
       while (true) {
         nodes = nodes.nextSibling
         if (nodes) {
-          console.log(nodes)
           if (nodes.nodeName.toLocaleLowerCase() === 'body') {
-            const text = (nodes as HTMLElement).innerText
-            console.log(text)
-            return text
+            return (nodes as HTMLElement).innerText
           }
         } else {
           break

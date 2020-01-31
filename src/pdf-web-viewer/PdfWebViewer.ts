@@ -529,9 +529,6 @@ export class PdfWebViewer {
             if (target.annotation.isHidden()) {
               this.handleAnnotationSelected(target.annotation)
             } else {
-              /////////////
-              console.log('goToAnnotation -> ' + target.action, target.annotation)
-              /////////////
               try {
                 this.viewerCanvas.goToAnnotation(target.annotation, target.action)
               } catch (err) {
@@ -748,7 +745,6 @@ export class PdfWebViewer {
               loadNext(pages)
             } else {
               this.view.navigationPanel.setAnnotationLoaded()
-              console.log(`load Annotations completed`)
             }
           })
         }
@@ -760,7 +756,6 @@ export class PdfWebViewer {
     for (let i = 1; i <= pageCount; i++) {
       pageNumbers.push(i)
     }
-    console.log(`start loading Annotations - ${pageCount} pages`)
     loadNext(pageNumbers)
   }
 

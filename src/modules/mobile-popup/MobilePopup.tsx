@@ -56,7 +56,6 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
   const actions: ActionsType<MobilePopupViewState, MobilePopupViewActions> = {
     getState: () => $state => $state,
     openPopup: (popup: MobilePopupViewState) => $state => {
-      console.log(popup)
       return {
         ...$state,
         id: popup.id,

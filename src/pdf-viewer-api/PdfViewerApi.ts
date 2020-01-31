@@ -655,7 +655,6 @@ export class PdfViewerApi {
    */
   public updateItem(item: PdfItem) {
     checkType(item, 'object', 'updateItem')
-    console.log(item)
     return new Promise<PdfItem>((resolve, reject) => {
       this.apiCallbackHandler.UpdateItemPromiseQueue.push({ resolve, reject })
       this.instance.updateItem(item)

@@ -40,7 +40,6 @@ const AnnotationIcon: Component<{ itemType: number; fill: string | null }, PdfWe
 const HistoryItem: Component<{ item: any }, PdfWebViewerState, PdfWebViewerActions> = ({ item }) => (state, actions) => {
   switch (item.Type) {
     case '/Create':
-      console.log('create', item)
       return (
         <li>
           <div>
