@@ -417,13 +417,14 @@ export class PdfViewerCanvas {
   }
 
   public getAnnotationsFromPage(page: number): Promise<PdfItemsOnPage> {
-    const promise = this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION)
-    if (this.store.getState().annotations.byPage[page] === undefined) {
-      promise.then( itemsOnPage => {
-        this.store.annotations.setPageAnnotations(itemsOnPage)
+    return new Promise<PdfItemsOnPage>( (resolve, reject) => {
+      this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION).then( items => {
+        this.store.annotations.setPageAnnotations(items)
+        resolve(items)
+      }).catch(err => {
+        reject(err)
       })
-    }
-    return promise
+    })
   }
 
   public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {

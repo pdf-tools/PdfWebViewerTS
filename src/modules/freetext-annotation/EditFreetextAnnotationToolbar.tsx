@@ -103,9 +103,10 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
       }
     },
     setSubject: (subject: string | null) => $state => {
+      $state.annotation.subject = subject
       return {
         ...$state,
-        newSubject: subject,
+        annotation: $state.annotation,
       }
     },
     hasRangeSelectionChanged: (hasRangeSelection: boolean) => $state => ({
@@ -198,7 +199,8 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
             id={'pwv-freetext-subject-' + $state.annotation.id}
             placeholder={translationManager.getText('annotation.subject')}
             onchange={(e: UIEvent) => {
-              $state.newSubject = (e.currentTarget as HTMLTextAreaElement).value
+              const newSubject = (e.currentTarget as HTMLTextAreaElement).value
+              $actions.setSubject(newSubject)
             }}
             value={$state.annotation.subject} />
         </div>

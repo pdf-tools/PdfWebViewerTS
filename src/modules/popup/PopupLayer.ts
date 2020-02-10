@@ -440,10 +440,10 @@ export class PopupLayer extends CanvasLayer {
             const content = state.activeContent
             const subject = state.activeSubject
             if (this.options.ms_custom) {
-              addHistoryEntry(annotation, 'edit', this.options.author, state.activeContent, state.activeSubject)
+              addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
             }
-            annotation.content = content
-            annotation.subject = subject
+            annotation.content = content !== undefined ? content : annotation.content
+            annotation.subject = subject !== undefined ? subject : annotation.subject
 
             if (syncronize) {
               this.pdfApi.updateItem(annotation)
