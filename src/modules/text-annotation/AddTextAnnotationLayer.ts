@@ -1,6 +1,6 @@
 import { CanvasLayer } from '../CanvasLayer'
 import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
-import { PdfItemType, Point, AnnotationArgs } from '../../pdf-viewer-api'
+import { PdfItemType, Point, AnnotationArgs, Annotation } from '../../pdf-viewer-api'
 import { CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { renderStickyNote } from '../../pdf-viewer-canvas/view-layers/canvasShapes'
 import { TextAnnotationModule } from './TextAnnotationModule'
@@ -130,6 +130,8 @@ export class AddTextAnnotationLayer extends CanvasLayer {
         page: pdfPoint.page,
       },
     }
-    this.pdfApi.createItem(annotation)
+    this.pdfApi.createItem(annotation).then( annot => {
+      this.onAnnotationCreated(annot as Annotation)
+    })
   }
 }

@@ -1,6 +1,6 @@
 import { CanvasLayer } from '../CanvasLayer'
 import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
-import { PdfItemType, Point, AnnotationArgs, InkAnnotationArgs, PdfPoint, AnnotationBorderStyle, PdfRect } from '../../pdf-viewer-api'
+import { PdfItemType, Point, AnnotationArgs, InkAnnotationArgs, PdfPoint, AnnotationBorderStyle, PdfRect, Annotation } from '../../pdf-viewer-api'
 import { CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { getPageOnPoint } from '../../pdf-viewer-canvas/state/document'
 import { createAddInkAnnotationToolbar, AddInkAnnotationToolbarActions } from './AddInkAnnotationToolbar'
@@ -299,7 +299,9 @@ export class AddInkAnnotationLayer extends CanvasLayer {
         this.toolbar.setLineCount(0)
       }
 
-      this.pdfApi.createItem(inkAnnotation)
+      this.pdfApi.createItem(inkAnnotation).then(item => {
+        this.onAnnotationCreated(item as Annotation)
+      })
     }
   }
 

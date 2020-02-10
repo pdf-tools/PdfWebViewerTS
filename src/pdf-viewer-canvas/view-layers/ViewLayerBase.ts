@@ -1,7 +1,8 @@
-import { PdfViewerApi } from '../../pdf-viewer-api'
-import { PdfViewerCanvas } from '../PdfViewerCanvas'
+import { PdfViewerApi, Annotation } from '../../pdf-viewer-api'
+import { PdfViewerCanvas, PdfViewerCanvasEventMap } from '../PdfViewerCanvas'
 import { PdfViewerCanvasOptions } from '../PdfViewerCanvasOptions'
 import { ViewerCanvasState, ViewerCanvasStore } from '../state/store'
+import { addHistoryEntry } from '../../custom/history'
 
 export interface ViewLayer {
   resize(width: number, height: number, devicePixelRatio: number): void
@@ -10,6 +11,7 @@ export interface ViewLayer {
 
 export abstract class ViewLayerBase implements ViewLayer {
   protected viewerCanvas: PdfViewerCanvas | undefined
+  protected dispatchEvent: any
   protected containerElement: HTMLElement | undefined
 
   private canvasContexts: CanvasRenderingContext2D[]
@@ -20,6 +22,7 @@ export abstract class ViewLayerBase implements ViewLayer {
   private pOptions: PdfViewerCanvasOptions | undefined
 
   constructor() {
+    this.canEdit = this.canEdit.bind(this)
     this.canvasContexts = []
     this.htmlLayers = []
   }
@@ -53,7 +56,6 @@ export abstract class ViewLayerBase implements ViewLayer {
     }
     return this.pOptions
   }
-
   public resize(width: number, height: number, pixelRatio: number): void {
 
     const tempCanvas = document.createElement('canvas')
@@ -71,8 +73,9 @@ export abstract class ViewLayerBase implements ViewLayer {
     })
   }
 
-  public register(viewerCanvas: PdfViewerCanvas): void {
+  public register(viewerCanvas: PdfViewerCanvas, dispatchEvent: <K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) => void) {
     this.viewerCanvas = viewerCanvas
+    this.dispatchEvent = dispatchEvent
     this.containerElement = this.viewerCanvas.viewLayersElement
     this.create()
   }
@@ -126,5 +129,16 @@ export abstract class ViewLayerBase implements ViewLayer {
       }
       this.canvasContexts = []
     }
+  }
+
+  protected addDeleteHistory(annotation: Annotation) {
+      addHistoryEntry(annotation, 'delete', this.options.author)
+  }
+
+  protected canEdit(author: string) {
+    if (this.options.ms_custom && this.options.author !== undefined) {
+      return author === this.options.author
+    }
+    return true
   }
 }

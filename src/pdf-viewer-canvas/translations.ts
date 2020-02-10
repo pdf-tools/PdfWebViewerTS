@@ -16,6 +16,11 @@ export const translations = {
     de: 'Abbrechen',
     fr: 'Annuler',
   },
+  'annotation.subject': {
+    en: 'Subject',
+    de: 'Betreff',
+    fr: 'TODO',
+  },
   'stamptext.approved' :
   {
     en: 'APPROVED',

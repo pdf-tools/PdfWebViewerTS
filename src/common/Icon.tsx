@@ -7,13 +7,21 @@ export * from './icons'
 export interface IconProps {
   icon: IconDefinition
   className?: string
+  fill?: string
+  bg?: string
 }
 
 /** @internal */
-export const Icon: Component<IconProps> = ({ icon, className }) => (
+export const Icon: Component<IconProps> = ({ icon, className, fill, bg }) => (
   <span class={classNames('pwv-icon', className)}>
     <svg viewBox={`0 0 ${icon.width} ${icon.height}`}>
-      <path d={icon.path} shape-rendering="optimizeQuality" stroke-width="1px" />
+      {icon.bg && bg && <path d={icon.bg} fill={bg} />}
+      <path
+        d={icon.path}
+        fill={fill}
+        shape-rendering="optimizeQuality"
+        stroke-width="1px"
+      />
     </svg>
   </span>
 )

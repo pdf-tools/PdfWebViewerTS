@@ -1,7 +1,7 @@
 import { createStore, ViewerCanvasStore } from './state/store'
 import {
   PdfViewerApi, PdfFitMode, PdfPageLayoutMode, Point, Annotation,
-  Rect, OutlineItem, PdfDestination, SearchResultType, PdfItemType, LinkAnnotation, PdfActionType, DeletedItem, PdfItemCategory, PdfItem,
+  Rect, OutlineItem, PdfDestination, SearchResultType, PdfItemType, LinkAnnotation, PdfActionType, DeletedItem, PdfItemCategory, PdfItem, PdfItemsOnPage,
 } from '../pdf-viewer-api'
 import ResizeObserver from 'resize-observer-polyfill'
 import { PdfViewerCanvasOptions, PdfViewerCanvasDefaultOptions } from './PdfViewerCanvasOptions'
@@ -16,7 +16,6 @@ import { AnnotationSelectionLayer } from './view-layers/AnnotationSelectionLayer
 import { TextSelectionLayer } from './view-layers/TextSelectionLayer'
 import { ViewerMode, CursorStyle, copyTextToClipboard } from './state/viewer'
 import { CanvasModuleClass, CanvasModule } from '../modules/CanvasModule'
-import { getAnnotationOnPoint } from './state/annotations'
 
 /** @internal */
 declare var __VERSION__: 'dev'
@@ -36,6 +35,11 @@ export interface PdfViewerCanvasEventMap {
   appLoaded: boolean
   pageChanged: number
   error: Error
+  itemSelected: PdfItem
+  itemDeselected: PdfItem
+  itemCreated: PdfItem
+  itemUpdated: PdfItem
+  itemDeleted: DeletedItem
 }
 
 export type PdfViewerCanvasEventListener = <K extends keyof PdfViewerCanvasEventMap>(e: PdfViewerCanvasEventMap[K]) => void
@@ -78,6 +82,7 @@ export class PdfViewerCanvas {
     this.updateViewLayerContext = this.updateViewLayerContext.bind(this)
     this.onKeyboardShortcuts = this.onKeyboardShortcuts.bind(this)
     this.externalLinkHandler = this.externalLinkHandler.bind(this)
+    this.dispatchEvent = this.dispatchEvent.bind(this)
 
     this.onCanvasPointerDown = this.onCanvasPointerDown.bind(this)
     this.onCanvasPointerMove = this.onCanvasPointerMove.bind(this)
@@ -411,6 +416,30 @@ export class PdfViewerCanvas {
     this.store.viewer.setDefaultMode()
   }
 
+  public getAnnotationsFromPage(page: number): Promise<PdfItemsOnPage> {
+    return new Promise<PdfItemsOnPage>( (resolve, reject) => {
+      this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION).then( items => {
+        this.store.annotations.setPageAnnotations(items)
+        resolve(items)
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  }
+
+  public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {
+    const dest: any = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
+    dest.destinationType = 8
+    dest.top = annotation.pdfRect.pdfY
+    dest.left = annotation.pdfRect.pdfX
+    dest.page = annotation.pdfRect.page
+    this.pdfViewerApi.goToViewerDestination(dest)
+
+    if (action === 'select') {
+      this.dispatchEvent('itemSelected', annotation)
+    }
+  }
+
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
       (this.eventListeners.get(type) as PdfViewerCanvasEventListener[]).push(listener)
@@ -522,9 +551,8 @@ export class PdfViewerCanvas {
     })
 
     this.startRenderLoop()
-    const document = this.store.getState().document;
+    const document = this.store.getState().document
     this.getAnnotations(document.firstVisiblePage, document.lastVisiblePage)
-
 
     window.setTimeout(() => {
       this.canvasEvents.resume()
@@ -576,7 +604,7 @@ export class PdfViewerCanvas {
   private registerViewLayers(viewLayers: ViewLayerBaseClass[]) {
     viewLayers.forEach(viewLayerBaseClass => {
       const viewLayer = new viewLayerBaseClass()
-      viewLayer.register(this)
+      viewLayer.register(this, this.dispatchEvent)
       this.viewLayers.push(viewLayer)
     })
   }
@@ -908,18 +936,21 @@ export class PdfViewerCanvas {
     if (item.itemCategory === PdfItemCategory.ANNOTATION) {
       this.store.annotations.addAnnotation(item as Annotation)
     }
+    this.dispatchEvent('itemCreated', item)
   }
 
   private onItemUpdated(item: PdfItem) {
     if (item.itemCategory === PdfItemCategory.ANNOTATION) {
       this.store.annotations.updateAnnotation(item as Annotation)
     }
+    this.dispatchEvent('itemUpdated', item)
   }
 
   private onItemDeleted(deletedItem: DeletedItem) {
     if (deletedItem.categoryType === PdfItemCategory.ANNOTATION) {
       this.store.annotations.deleteAnnotation(deletedItem.id)
     }
+    this.dispatchEvent('itemDeleted', deletedItem)
   }
 
   private onPageChanged(pageNumber: number) {

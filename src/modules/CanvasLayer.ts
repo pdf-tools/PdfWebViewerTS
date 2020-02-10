@@ -1,7 +1,9 @@
 import { ViewerCanvasState, ViewerCanvasStore } from '../pdf-viewer-canvas/state/store'
 import { PdfViewerApi } from '../pdf-viewer-api'
+import { Annotation, PdfItem } from '../pdf-viewer-api/types'
 import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { CanvasModule } from './CanvasModule'
+import { addHistoryEntry } from '../custom/history'
 
 export interface CanvasLayerClass {
   new(module: CanvasModule, name: string, containerElement: HTMLElement, store: ViewerCanvasStore,
@@ -29,6 +31,8 @@ export abstract class CanvasLayer {
     this.name = name
 
     this.remove = this.remove.bind(this)
+    this.canEdit = this.canEdit.bind(this)
+    this.onAnnotationCreated = this.onAnnotationCreated.bind(this)
   }
 
   public abstract onCreate(args?: any): void
@@ -102,5 +106,19 @@ export abstract class CanvasLayer {
       }
       this.canvasContexts = []
     }
+  }
+
+  protected onAnnotationCreated(annotation: Annotation): Promise<PdfItem> | undefined {
+    if (this.options.ms_custom) {
+      addHistoryEntry(annotation, 'create', this.options.author)
+      return this.pdfApi.updateItem(annotation)
+    }
+  }
+
+  protected canEdit(author: string) {
+    if (this.options.ms_custom) {
+        return this.options.author === author
+      }
+    return true
   }
 }

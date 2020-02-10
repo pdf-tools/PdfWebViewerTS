@@ -1,6 +1,6 @@
 import { CanvasLayer } from '../CanvasLayer'
 import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
-import { PdfItemType, PdfPoint, PdfRect, Rect, HighlightAnnotationArgs } from '../../pdf-viewer-api'
+import { PdfItemType, PdfPoint, PdfRect, Rect, HighlightAnnotationArgs, Annotation } from '../../pdf-viewer-api'
 import { CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { renderTextSelection } from '../../pdf-viewer-canvas/view-layers/canvasShapes'
 import { Color } from '../../common/Color'
@@ -173,7 +173,9 @@ export class AddHighlightAnnotationLayer extends CanvasLayer {
               originalAuthor: this.options.author,
               quadPointRects,
             }
-            this.pdfApi.createItem(args)
+            this.pdfApi.createItem(args).then(item => {
+              this.onAnnotationCreated(item as Annotation)
+            })
           }
         }
       }

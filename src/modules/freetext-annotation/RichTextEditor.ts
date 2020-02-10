@@ -10,6 +10,7 @@ export interface ExecCommandArgs {
 /** @internal */
 export interface RichTextEditorContent {
   richText: string
+  content: string
   backgroundColor: string | null
   borderColor: string | null
   fontName: string | null
@@ -61,7 +62,7 @@ export class RichTextEditor {
 
     /* tslint:disable:max-line-length */
     this.editorDocument.body.outerHTML = m && m.length > 1 ? m[1] :
-    '<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2"><p></p></body>'
+      '<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2"><p></p></body>'
     this.editorDocument.body.style.fontFamily = content.fontName
     this.editorDocument.body.style.color = content.fontColor
     this.editorDocument.body.style.fontSize = content.fontSizeCSS
@@ -84,14 +85,17 @@ export class RichTextEditor {
     this.editorElement.height = (this.element.clientHeight / zoom) + 'px'
   }
 
-  public getContent(): RichTextEditorContent {
+  public getEditorValues(): RichTextEditorContent {
+    const richText = '<?xml version="1.0"?>' + this.cleanupRichText(this.editorDocument.body.outerHTML)
+    const pureContent = this.getContent(richText)
     return {
       ...this.content,
+      content: pureContent ? pureContent : '',
       backgroundColor: this.editorDocument.body.style.backgroundColor,
       fontColor: this.editorDocument.body.style.color,
       fontName: this.editorDocument.body.style.fontFamily,
       fontSizeCSS: this.editorDocument.body.style.fontSize,
-      richText: '<?xml version="1.0"?>' + this.cleanupRichText(this.editorDocument.body.outerHTML),
+      richText,
     }
   }
 
@@ -143,6 +147,25 @@ export class RichTextEditor {
     return text.replace(/rgb\((.+?)\)/ig, rgb => {
       return new Color(rgb).toHexRgb()
     })
+  }
+
+  private getContent(richText: string) {
+    const parser = new DOMParser()
+    const node = parser.parseFromString(richText, 'text/html').documentElement
+    let nodes = node ? node.querySelector('*') as Node : null
+    if (nodes) {
+      while (true) {
+        nodes = nodes.nextSibling
+        if (nodes) {
+          if (nodes.nodeName.toLocaleLowerCase() === 'body') {
+            return (nodes as HTMLElement).innerText
+          }
+        } else {
+          break
+        }
+      }
+    }
+    return null
   }
 
   private handleOnPaste(e: Event) {

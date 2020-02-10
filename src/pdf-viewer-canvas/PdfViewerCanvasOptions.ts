@@ -58,6 +58,7 @@ export interface PdfViewerCanvasOptions extends PdfViewerCanvasCoreOptions {
   defaultBorderSize: number
   defaultStampWidth: number
   defaultStampText: string
+  ms_custom: boolean
 }
 
 export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
@@ -102,6 +103,7 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
     InkAnnotationModule,
     StampAnnotationModule,
   ],
+  ms_custom: false,
 }
 
 export interface OptionsToVerifyInterface {

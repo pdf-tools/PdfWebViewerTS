@@ -6,7 +6,9 @@ import { Annotation, PdfRect, PdfItemType, Point, Rect } from '../../pdf-viewer-
 import { renderPopupMarker } from '../../pdf-viewer-canvas/view-layers/canvasShapes'
 import { ViewerMode, CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { Color } from '../../common/Color'
-import { getColorPalette } from '../../common/Tools'
+import { getColorPalette, createPdfTime } from '../../common/Tools'
+import { formatDate } from '../../common/formatDate'
+import { addHistoryEntry } from '../../custom/history'
 
 export class PopupLayer extends CanvasLayer {
 
@@ -27,10 +29,12 @@ export class PopupLayer extends CanvasLayer {
     this.openPopup = this.openPopup.bind(this)
     this.closePopup = this.closePopup.bind(this)
     this.deletePopup = this.deletePopup.bind(this)
-    this.updatePopupContent = this.updatePopupContent.bind(this)
+    this.toggleAnnotationLock = this.toggleAnnotationLock.bind(this)
+    this.updateSelectedPopupContent = this.updateSelectedPopupContent.bind(this)
     this.updatePopupPosition = this.updatePopupPosition.bind(this)
     this.updatePopupSize = this.updatePopupSize.bind(this)
     this.updatePopupColor = this.updatePopupColor.bind(this)
+    this.canEdit = this.canEdit.bind(this)
 
     if (this.containerElement) {
       const maxWidth = this.containerElement.offsetWidth * .75
@@ -221,7 +225,8 @@ export class PopupLayer extends CanvasLayer {
           id: an.id,
           colorPalette: getColorPalette(an.itemType, this.options),
           content: an.content as string,
-          lastModified: this.formatDate(an.lastModified),
+          subject: an.subject ? an.subject : null,
+          lastModified: formatDate(an.lastModified),
           originalAuthor: an.originalAuthor,
           color: an.color,
           isLocked: an.isLocked(),
@@ -336,20 +341,24 @@ export class PopupLayer extends CanvasLayer {
       this.popupView = createPopupView({
         maxPopupWidth: this.maxPopupWidth,
         maxPopupHeight: this.maxPopupHeight,
+        currentUser: this.options.author ? this.options.author : '',
         onSelect: this.selectPopup,
-        onDeselect: this.deselectPopup,
         onClose: this.closePopup,
         onDelete: this.deletePopup,
-        onUpdateContent: this.updatePopupContent,
         onUpdatePosition: this.updatePopupPosition,
         onUpdateSize: this.updatePopupSize,
         onUpdateColor: this.updatePopupColor,
+        onLock: this.toggleAnnotationLock,
+        canEdit: this.canEdit,
       }, this.popupViewElement)
     }
   }
 
   private selectPopup(id: number) {
     if (this.popupView) {
+      if (this.popupView.getState().selectedPopup !== null) {
+        this.updateSelectedPopupContent(true)
+      }
       this.popupView.selectPopup(id)
       this.store.viewer.selectPopup(id)
     }
@@ -357,6 +366,7 @@ export class PopupLayer extends CanvasLayer {
 
   private deselectPopup() {
     if (this.popupView) {
+      this.updateSelectedPopupContent(true)
       this.popupView.deselectPopup()
       this.store.viewer.selectPopup(null)
     }
@@ -376,22 +386,25 @@ export class PopupLayer extends CanvasLayer {
     }
   }
 
-  private closePopup(id: number, content: string) {
+  private closePopup() {
+    const annot = this.updateSelectedPopupContent(false)
+    this.store.viewer.deselectPopup()
+
     if (this.pdfApi) {
-      this.deselectPopup()
-      const item = this.pdfApi.getItem(id) as Annotation
-      if (item) {
-        item.popup.isOpen = false
-        item.content = content
-        this.store.annotations.updateAnnotation(item)
-        this.pdfApi.updateItem(item)
+      if (annot) {
+        annot.popup.isOpen = false
+        this.store.annotations.updateAnnotation(annot)
+        this.pdfApi.updateItem(annot)
       }
     }
   }
 
   private deletePopup(id: number) {
     if (this.pdfApi) {
-      this.deselectPopup()
+      if (this.popupView) {
+        this.popupView.deselectPopup()
+      }
+      this.store.viewer.selectPopup(null)
       const annotation = this.pdfApi.getItem(id) as Annotation
       if (annotation) {
         annotation.content = null
@@ -402,12 +415,43 @@ export class PopupLayer extends CanvasLayer {
     }
   }
 
-  private updatePopupContent(id: number, content: string) {
+  private toggleAnnotationLock(id: number) {
     if (this.pdfApi) {
-      const annotation = this.pdfApi.getItem(id) as Annotation
+      const annotation = this.updateSelectedPopupContent(false)
       if (annotation) {
-        annotation.content = content
+        if (this.options.ms_custom) {
+          addHistoryEntry(annotation, 'lock', this.options.author)
+        }
+        annotation.setLock(!annotation.isLocked())
+        this.store.annotations.updateAnnotation(annotation)
         this.pdfApi.updateItem(annotation)
+      }
+    }
+  }
+
+  private updateSelectedPopupContent(syncronize: boolean) {
+    if (this.pdfApi) {
+      if (this.popupView) {
+        const state = this.popupView.getState()
+        const id = state.selectedPopup
+        if (id) {
+          const annotation = this.pdfApi.getItem(id) as Annotation
+          if (annotation) {
+            const content = state.activeContent
+            const subject = state.activeSubject
+            if (this.options.ms_custom) {
+              addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
+            }
+            annotation.content = content !== undefined ? content : annotation.content
+            annotation.subject = subject !== undefined ? subject : annotation.subject
+
+            if (syncronize) {
+              this.pdfApi.updateItem(annotation)
+            } else {
+              return annotation
+            }
+          }
+        }
       }
     }
   }
@@ -465,10 +509,6 @@ export class PopupLayer extends CanvasLayer {
         this.pdfApi.updateItem(annotation)
       }
     }
-  }
-
-  private formatDate(dateStr: string) {
-    return `${dateStr.substr(8, 2)}.${dateStr.substr(6, 2)}.${dateStr.substr(2, 4)} ${dateStr.substr(10, 2)}:${dateStr.substr(12, 2)}`
   }
 
 }

@@ -102,12 +102,17 @@ export interface Annotation extends PdfPositionalItem {
   itemType: PdfItemType
   lastModified: string
   borderWidth: number
+  custom: object[]
   page: number
   content: string | null
+  subject: string | null
   color: string | null
   originalAuthor: string
   popup: AnnotationPopup
+  setLock(isLocked: boolean): void
   isLocked(): boolean
+  isHidden(): boolean
+  setHidden(hidden: boolean): void
 }
 
 export interface LinkAnnotation extends PdfPositionalItem {
@@ -200,6 +205,7 @@ export interface OutlineItem extends PdfItem {
 
 export interface DeletedItem {
   id: number
+  page: number
   categoryType: PdfItemCategory
 }
 

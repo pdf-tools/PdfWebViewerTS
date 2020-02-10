@@ -28,7 +28,7 @@ export const translations = {
   'openFileError.description': {
     en: 'The document could not be opened',
     de: 'Die Datei konnte nicht geöffnet werden',
-    fr: 'Le fichier n\'a pas pu être ouvert',
+    fr: "Le fichier n'a pas pu être ouvert",
   },
   'openFileError.btnOk': {
     en: 'OK',
@@ -51,7 +51,7 @@ export const translations = {
     fr: 'Mot de passe requis',
   },
   'passwordForm.description': {
-      en: 'This document is protected. Please enter the password.',
+    en: 'This document is protected. Please enter the password.',
     de: 'Das Dokument ist geschützt. Bitte geben sie das Passwort ein.',
     fr: 'Ce document est protégé. Veuillez entrer votre mot de passe.',
   },
@@ -63,7 +63,7 @@ export const translations = {
   'passwordForm.invalidPasswordError': {
     en: 'Password is not valid',
     de: 'Passwort ist nicht gültig',
-    fr: 'Le mot de passe n\'est pas valide',
+    fr: "Le mot de passe n'est pas valide",
   },
   'passwordForm.btnOk': {
     en: 'OK',
@@ -93,7 +93,7 @@ export const translations = {
   'applicationError.defaultErrorMessage': {
     en: 'An error has occurred',
     de: 'Es ist ein Fehler aufgetreten',
-    fr: 'Une erreur s\'est produite',
+    fr: "Une erreur s'est produite",
   },
   'applicationError.invalidLicense': {
     en: 'Invalid license',
@@ -106,8 +106,8 @@ export const translations = {
     fr: 'Changements non sauvegardés',
   },
   'unsavedChanges.description': {
-      en: 'Do you want to save the changes made to the document?',
-      de: 'Möchten sie ihre Änderungen am Dokument speichern?',
+    en: 'Do you want to save the changes made to the document?',
+    de: 'Möchten sie ihre Änderungen am Dokument speichern?',
     fr: 'Changements non sauvegardés',
   },
   'unsavedChanges.btnSave': {
@@ -116,8 +116,8 @@ export const translations = {
     fr: 'Sauvegarder',
   },
   'unsavedChanges.btnDontSave': {
-      en: 'Don\'t save',
-      de: 'Nicht speichern',
+    en: "Don't save",
+    de: 'Nicht speichern',
     fr: 'Ne pas sauvegarder',
   },
   'unsavedChanges.btnCancel': {
@@ -160,6 +160,21 @@ export const translations = {
     de: 'Inhaltsverzeichnis',
     fr: 'Tables des matières',
   },
+  'sideNavigation.annotation': {
+    en: 'Annotations',
+    de: 'Annotationen',
+    fr: 'Annotation',
+  },
+  'sideNavigation.annotation.page': {
+    en: 'Page',
+    de: 'Seite',
+    fr: 'Page',
+  },
+  'sideNavigation.annotation.history': {
+    en: 'History',
+    de: 'Verlauf',
+    fr: 'Historique',
+  },
   'navigation.of': {
     en: 'of',
     de: 'von',
@@ -173,7 +188,7 @@ export const translations = {
   'pageLayoutMode.SINGLE_PAGE': {
     en: 'single page',
     de: 'Einzelseitenansicht',
-    fr: 'Affichage d\'une page',
+    fr: "Affichage d'une page",
   },
   'pageLayoutMode.TWO_COLUMN_LEFT': {
     en: 'two column left',
