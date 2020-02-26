@@ -16,7 +16,6 @@ import { AnnotationSelectionLayer } from './view-layers/AnnotationSelectionLayer
 import { TextSelectionLayer } from './view-layers/TextSelectionLayer'
 import { ViewerMode, CursorStyle, copyTextToClipboard } from './state/viewer'
 import { CanvasModuleClass, CanvasModule } from '../modules/CanvasModule'
-import { getAnnotationOnPoint } from './state/annotations'
 
 /** @internal */
 declare var __VERSION__: 'dev'
@@ -83,6 +82,7 @@ export class PdfViewerCanvas {
     this.updateViewLayerContext = this.updateViewLayerContext.bind(this)
     this.onKeyboardShortcuts = this.onKeyboardShortcuts.bind(this)
     this.externalLinkHandler = this.externalLinkHandler.bind(this)
+    this.dispatchEvent = this.dispatchEvent.bind(this)
 
     this.onCanvasPointerDown = this.onCanvasPointerDown.bind(this)
     this.onCanvasPointerMove = this.onCanvasPointerMove.bind(this)
@@ -417,15 +417,27 @@ export class PdfViewerCanvas {
   }
 
   public getAnnotationsFromPage(page: number): Promise<PdfItemsOnPage> {
-    return this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION)
+    return new Promise<PdfItemsOnPage>( (resolve, reject) => {
+      this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION).then( items => {
+        this.store.annotations.setPageAnnotations(items)
+        resolve(items)
+      }).catch(err => {
+        reject(err)
+      })
+    })
   }
 
   public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {
-    const dest: PdfDestination = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
+    const dest: any = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
     dest.destinationType = 8
     dest.top = annotation.pdfRect.pdfY
+    dest.left = annotation.pdfRect.pdfX
     dest.page = annotation.pdfRect.page
-    this.goTo(dest)
+    this.pdfViewerApi.goToViewerDestination(dest)
+
+    if (action === 'select') {
+      this.dispatchEvent('itemSelected', annotation)
+    }
   }
 
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
@@ -539,7 +551,7 @@ export class PdfViewerCanvas {
     })
 
     this.startRenderLoop()
-    const document = this.store.getState().document;
+    const document = this.store.getState().document
     this.getAnnotations(document.firstVisiblePage, document.lastVisiblePage)
 
     window.setTimeout(() => {
@@ -592,7 +604,7 @@ export class PdfViewerCanvas {
   private registerViewLayers(viewLayers: ViewLayerBaseClass[]) {
     viewLayers.forEach(viewLayerBaseClass => {
       const viewLayer = new viewLayerBaseClass()
-      viewLayer.register(this)
+      viewLayer.register(this, this.dispatchEvent)
       this.viewLayers.push(viewLayer)
     })
   }

@@ -299,7 +299,9 @@ export class AddInkAnnotationLayer extends CanvasLayer {
         this.toolbar.setLineCount(0)
       }
 
-      this.pdfApi.createItem(inkAnnotation).then(item => this.onAnnotationCreated(item as Annotation))
+      this.pdfApi.createItem(inkAnnotation).then(item => {
+        this.onAnnotationCreated(item as Annotation)
+      })
     }
   }
 

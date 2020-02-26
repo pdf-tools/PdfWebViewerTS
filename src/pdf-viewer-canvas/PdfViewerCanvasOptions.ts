@@ -103,7 +103,7 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
     InkAnnotationModule,
     StampAnnotationModule,
   ],
-  ms_custom: true, // TODO: set to false
+  ms_custom: false,
 }
 
 export interface OptionsToVerifyInterface {

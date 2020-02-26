@@ -201,7 +201,9 @@ export class AddStampAnnotationLayer extends CanvasLayer {
       stampText: this.translatedStampText != null ? this.translatedStampText : 'no stamptext',
       stampColor: stampColor != null ? stampColor : StampAnnotationColor.GREEN,
     }
-    this.pdfApi.createItem(annotation).then(annot => this.onAnnotationCreated(annot as Annotation))
+    this.pdfApi.createItem(annotation).then(annot => {
+      this.onAnnotationCreated(annot as Annotation)
+    })
   }
 
 }

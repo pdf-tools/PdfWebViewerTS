@@ -1,9 +1,10 @@
 import { ViewLayerBase } from './ViewLayerBase'
 import { ViewerCanvasState } from '../state/store'
-import { PdfPoint, PdfRect, PdfItemType, HighlightAnnotationArgs } from '../../pdf-viewer-api'
+import { PdfPoint, PdfRect, PdfItemType, HighlightAnnotationArgs, Annotation } from '../../pdf-viewer-api'
 import { createTextSelectionContextBar } from './views/TextSelectionContextBar'
 import { Color } from '../../common/Color'
 import { ViewerMode, CursorStyle, copyTextToClipboard } from '../state/viewer'
+import { addHistoryEntry } from '../../custom/history'
 
 /** @internal */
 export class TextSelectionLayer extends ViewLayerBase {
@@ -254,7 +255,12 @@ export class TextSelectionLayer extends ViewLayerBase {
               originalAuthor: this.options.author,
               quadPointRects,
             }
-            this.pdfViewerApi.createItem(args)
+            this.pdfViewerApi.createItem(args).then(annotation => {
+              if (this.options.ms_custom) {
+                addHistoryEntry(annotation as Annotation, 'create', this.options.author)
+                this.pdfViewerApi.updateItem(annotation)
+              }
+            })
             this.endSelection()
           }
         }

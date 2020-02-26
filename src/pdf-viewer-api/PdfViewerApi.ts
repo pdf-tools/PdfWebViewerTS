@@ -346,10 +346,18 @@ export class PdfViewerApi {
 
   /**
    * Jump to a given destination in the document.
-   * @param destination       The target destination.
+   * @param destination       The target destination in PDF coordinates (page origin bottom left)
    */
   public goTo(destination: PdfDestination) {
     this.instance.goTo(destination)
+  }
+
+  /**
+   * Jump ot a given viewer destination in the document
+   * @param destination       The target destination in viewer coordinates (page origin top left)
+   */
+  public goToViewerDestination(destination: PdfDestination) {
+    this.instance.goToViewerDestination(destination)
   }
 
   /**
@@ -647,7 +655,6 @@ export class PdfViewerApi {
    */
   public updateItem(item: PdfItem) {
     checkType(item, 'object', 'updateItem')
-    console.log(item)
     return new Promise<PdfItem>((resolve, reject) => {
       this.apiCallbackHandler.UpdateItemPromiseQueue.push({ resolve, reject })
       this.instance.updateItem(item)

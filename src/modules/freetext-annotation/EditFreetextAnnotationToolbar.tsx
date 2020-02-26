@@ -6,9 +6,12 @@ import { icons } from '../../common/icons'
 import { ExecCommandArgs } from './RichTextEditor'
 import { Commandbar } from '../../common/Commandbar'
 import { CommandbarSeparator } from '../../common/CommandbarSeparator'
+import { Annotation } from '../../pdf-viewer-api'
+import { translationManager } from '../../common/TranslationManager'
 
 /** @internal */
 export interface EditFreetextAnnotationToolbarProps {
+  annotation: Annotation
   backgroundColors: string[]
   fontColors: string[]
   fontFamilies: string[]
@@ -23,6 +26,8 @@ export interface EditFreetextAnnotationToolbarProps {
 
 /** @internal */
 export interface EditFreetextAnnotationToolbarState {
+  annotation: Annotation
+  newSubject: string | null
   backgroundColors: string[]
   fontColors: string[]
   fontFamilies: string[]
@@ -34,14 +39,15 @@ export interface EditFreetextAnnotationToolbarState {
   hasRangeSelection: boolean
 }
 
-/** @internal */
 export interface EditFreetextAnnotationToolbarActions {
+  getState(): EditFreetextAnnotationToolbarState
   executeCommand(cmd: ExecCommandArgs): EditFreetextAnnotationToolbarState
   setFontFamily(fontName: string): EditFreetextAnnotationToolbarState
   setFontSize(fontSize: number): EditFreetextAnnotationToolbarState
   setFontColor(color: string): EditFreetextAnnotationToolbarState
   setBackgroundColor(color: string): EditFreetextAnnotationToolbarState
   hasRangeSelectionChanged(hasRangeSelection: boolean): EditFreetextAnnotationToolbarState
+  setSubject(subject: string | null): EditFreetextAnnotationToolbarState
   close(): EditFreetextAnnotationToolbarState
 }
 
@@ -49,6 +55,8 @@ export interface EditFreetextAnnotationToolbarActions {
 export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotationToolbarProps, element: HTMLElement) => {
 
   const state: EditFreetextAnnotationToolbarState = {
+    annotation: props.annotation,
+    newSubject: null,
     backgroundColors: props.backgroundColors,
     fontColors: props.fontColors,
     fontFamilies: props.fontFamilies,
@@ -61,6 +69,7 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
   }
 
   const actions: ActionsType<EditFreetextAnnotationToolbarState, EditFreetextAnnotationToolbarActions> = {
+    getState: () => $state => $state,
     executeCommand: (cmd: ExecCommandArgs) => $state => {
       props.onCmd(cmd)
       return $state
@@ -91,6 +100,13 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
       return {
         ...$state,
         selectedBackgroundColor: color,
+      }
+    },
+    setSubject: (subject: string | null) => $state => {
+      $state.annotation.subject = subject
+      return {
+        ...$state,
+        annotation: $state.annotation,
       }
     },
     hasRangeSelectionChanged: (hasRangeSelection: boolean) => $state => ({
@@ -167,6 +183,27 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
           icon={icons.underline}
           onClick={() => { $actions.executeCommand({ cmd: 'underline' }) }}
         />
+        <CommandbarSeparator />
+      </Commandbar>
+      <Commandbar>
+        <CommandbarButton
+          icon={$state.annotation.isLocked() ? icons.lock : icons.unlock}
+          onClick={() => {
+            $state.annotation.setLock(!$state.annotation.isLocked())
+            $actions.close()
+          }}
+        />
+        <CommandbarSeparator />
+        <div class={'pwv-freetext-subject'}>
+          <input
+            id={'pwv-freetext-subject-' + $state.annotation.id}
+            placeholder={translationManager.getText('annotation.subject')}
+            onchange={(e: UIEvent) => {
+              const newSubject = (e.currentTarget as HTMLTextAreaElement).value
+              $actions.setSubject(newSubject)
+            }}
+            value={$state.annotation.subject} />
+        </div>
       </Commandbar>
       <Commandbar>
         <CommandbarButton

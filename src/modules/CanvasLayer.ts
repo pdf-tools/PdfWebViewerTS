@@ -1,8 +1,9 @@
 import { ViewerCanvasState, ViewerCanvasStore } from '../pdf-viewer-canvas/state/store'
 import { PdfViewerApi } from '../pdf-viewer-api'
-import { Annotation } from '../pdf-viewer-api/types'
+import { Annotation, PdfItem } from '../pdf-viewer-api/types'
 import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { CanvasModule } from './CanvasModule'
+import { addHistoryEntry } from '../custom/history'
 
 export interface CanvasLayerClass {
   new(module: CanvasModule, name: string, containerElement: HTMLElement, store: ViewerCanvasStore,
@@ -30,6 +31,8 @@ export abstract class CanvasLayer {
     this.name = name
 
     this.remove = this.remove.bind(this)
+    this.canEdit = this.canEdit.bind(this)
+    this.onAnnotationCreated = this.onAnnotationCreated.bind(this)
   }
 
   public abstract onCreate(args?: any): void
@@ -105,16 +108,17 @@ export abstract class CanvasLayer {
     }
   }
 
-  protected onAnnotationCreated(annotation: Annotation) {
+  protected onAnnotationCreated(annotation: Annotation): Promise<PdfItem> | undefined {
     if (this.options.ms_custom) {
-      let history = annotation.custom
-      if (history === undefined) {
-        history = []
-      }
-      history.push({Type: '/Create', D: `(${annotation.lastModified})`, T: `(${annotation.originalAuthor})`})
-      annotation.custom = history
-      this.pdfApi.updateItem(annotation)
+      addHistoryEntry(annotation, 'create', this.options.author)
+      return this.pdfApi.updateItem(annotation)
     }
   }
 
+  protected canEdit(author: string) {
+    if (this.options.ms_custom) {
+        return this.options.author === author
+      }
+    return true
+  }
 }

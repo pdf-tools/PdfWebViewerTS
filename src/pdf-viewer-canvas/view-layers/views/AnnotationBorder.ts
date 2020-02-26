@@ -1,6 +1,7 @@
 import { Rect, Point, Annotation } from '../../../pdf-viewer-api'
 import { DragMoveHandler, DragMoveEvent, DragMoveEndEvent } from '../../../common/DragMoveHandler'
 import { getAnnotationBehaviors } from '../../AnnotationBehaviors'
+import { PdfViewerCanvasOptions } from 'pdf-viewer-canvas/PdfViewerCanvasOptions'
 
 enum ResizeDir {
   NW = 1,
@@ -17,6 +18,7 @@ export class AnnotationBorder {
   private resizable: boolean = false
   private aspectRatio: number | null = null
   private pageRect: Rect | null = null
+  private options: PdfViewerCanvasOptions
 
   private element: HTMLElement
   private border: HTMLElement
@@ -45,7 +47,7 @@ export class AnnotationBorder {
   private minSize = 24
 
   constructor(element: HTMLElement, onMoved: (id: number, newPosition: Point) => void,
-              onResized: (id: number, newRect: Rect) => void, onDblClick: (id: number) => void) {
+              onResized: (id: number, newRect: Rect) => void, onDblClick: (id: number) => void, options: PdfViewerCanvasOptions) {
     this.startMove = this.startMove.bind(this)
     this.moving = this.moving.bind(this)
     this.endMove = this.endMove.bind(this)
@@ -71,6 +73,7 @@ export class AnnotationBorder {
     this.onResized = onResized
     this.onDblClick = onDblClick
     this.element = element
+    this.options = options
 
     this.element.appendChild(this.dragElement)
     this.dragElement.classList.add('pwv-annotation-border-draghandle')
@@ -110,8 +113,8 @@ export class AnnotationBorder {
   public setAnnotation(annotation: Annotation, pageRect: Rect) {
     const behaviors = getAnnotationBehaviors(annotation.itemType)
     this.annotationId = annotation.id
-    this.movable = behaviors.movable && !annotation.isLocked()
-    this.resizable = behaviors.resizable && !annotation.isLocked()
+    this.movable = behaviors.movable && !annotation.isLocked() && (this.options.ms_custom ? annotation.originalAuthor === this.options.author : true)
+    this.resizable = behaviors.resizable && !annotation.isLocked() && (this.options.ms_custom ? annotation.originalAuthor === this.options.author : true)
     this.aspectRatio = behaviors.aspectRatioChangeable ? null : annotation.pdfRect.pdfW / annotation.pdfRect.pdfH
     this.pageRect = pageRect
 

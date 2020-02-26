@@ -7,3 +7,18 @@
   left: 0;
 
 }
+
+.pwv-freetext-subject {
+  display: flex;
+  align-items: center;
+  input {
+    width: 220px;
+    height: 30px;
+    border: none;
+    padding: .3rem;
+    box-sizing: border-box;
+    resize: none;
+    font-size: .9rem !important;
+  }
+
+}

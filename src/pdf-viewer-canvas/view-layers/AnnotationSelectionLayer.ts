@@ -1,11 +1,12 @@
-import { Annotation, PdfItemType, Point, Rect } from '../../pdf-viewer-api'
+import { Annotation, PdfItemType, Point, Rect, PdfItem, PdfItemCategory } from '../../pdf-viewer-api'
 import { ViewLayerBase } from './ViewLayerBase'
 import { ViewerCanvasState } from '../state/store'
-import { getAnnotationOnPoint } from '../state/annotations'
+import { getAnnotationsOnPoint } from '../state/annotations'
 import { getAnnotationBehaviors } from '../AnnotationBehaviors'
 import { ViewerMode, copyTextToClipboard, CursorStyle } from '../state/viewer'
 import { createAnnotationContextBar, ContextBarActions } from './views/AnnotationContextBar'
 import { AnnotationBorder } from './views/AnnotationBorder'
+import { addHistoryEntry } from '../../custom/history'
 
 /** @internal */
 export class AnnotationSelectionLayer extends ViewLayerBase {
@@ -27,10 +28,15 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     this.openPopup = this.openPopup.bind(this)
     this.deletePopup = this.deletePopup.bind(this)
     this.moveAnnotation = this.moveAnnotation.bind(this)
+    this.toggleLock = this.toggleLock.bind(this)
     this.resizeAnnotation = this.resizeAnnotation.bind(this)
+    this.onItemSelected = this.onItemSelected.bind(this)
   }
 
   public create() {
+    if (this.viewerCanvas) {
+      this.viewerCanvas.addEventListener('itemSelected', this.onItemSelected)
+    }
     this.selectAnnotation = this.selectAnnotation.bind(this)
     this.deselectAnnotation = this.deselectAnnotation.bind(this)
     this.deleteAnnotation = this.deleteAnnotation.bind(this)
@@ -54,9 +60,11 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       onCreatePopup: this.createPopup,
       onOpenPopup: this.openPopup,
       onDeletePopup: this.deletePopup,
+      onToggleLock: this.toggleLock,
+      canEdit: this.canEdit,
     }, this.selectionElement)
 
-    this.annotationBorder = new AnnotationBorder(this.selectionElement, this.moveAnnotation, this.resizeAnnotation, this.openPopup)
+    this.annotationBorder = new AnnotationBorder(this.selectionElement, this.moveAnnotation, this.resizeAnnotation, this.openPopup, this.options)
   }
 
   public render(timestamp: number, state: ViewerCanvasState) {
@@ -82,23 +90,28 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       }
 
       const pointerPdfPos = this.pdfViewerApi.transformScreenPointToPdfPoint(pointerPos)
-      const annotationOnPoint = getAnnotationOnPoint(state.annotations, pointerPdfPos.pdfPoint, true)
+      const annotationsOnPoint = getAnnotationsOnPoint(state.annotations, pointerPdfPos.pdfPoint, true)
 
       let breakRenderLoop = false
 
-      if (annotationOnPoint) {
-        const behaviors = getAnnotationBehaviors(annotationOnPoint.itemType)
-        if (state.pointer.action === 'click') {
-          if (annotationOnPoint.id !== state.viewer.selectedAnnotationId) {
-            if (state.viewer.selectedAnnotationId) {
-              this.deselectAnnotation()
+      if (annotationsOnPoint && annotationsOnPoint.length) {
+        for (let i = 0; i < annotationsOnPoint.length; i++) {
+          const annotationOnPoint = annotationsOnPoint[i]
+          const behaviors = getAnnotationBehaviors(annotationOnPoint.itemType)
+          if (state.pointer.action === 'click') {
+            if (annotationOnPoint.id !== state.viewer.selectedAnnotationId) {
+              if (state.viewer.selectedAnnotationId) {
+                this.deselectAnnotation()
+              }
+              if (!annotationOnPoint.isHidden()) {
+                this.selectAnnotation(annotationOnPoint)
+                breakRenderLoop = true
+              }
             }
-            this.selectAnnotation(annotationOnPoint)
+          } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup && !annotationOnPoint.isHidden()) {
+            this.openPopup(annotationOnPoint.id)
             breakRenderLoop = true
           }
-        } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup) {
-          this.openPopup(annotationOnPoint.id)
-          breakRenderLoop = true
         }
       } else if (state.viewer.selectedAnnotationId) {
         this.deselectAnnotation()
@@ -198,10 +211,11 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
 
   }
 
-  private selectAnnotation(annotation: Annotation) {
+  private selectAnnotation(annotation: Annotation, preventEvent?: boolean) {
     if (this.selectionElement && this.context && this.annotationBorder && this.contextBar) {
       this.selectedAnnotation = annotation
       const pageRect = this.store.getState().document.pageRects[annotation.pdfRect.page]
+      this.annotationBorder.deselectAnnotation()
       this.annotationBorder.setAnnotation(annotation, pageRect)
 
       const state = this.store.getState()
@@ -217,17 +231,24 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
       this.updateSelectionElementPosition(annotation)
       this.store.viewer.selectAnnotation(annotation)
       this.store.viewer.setCursorStyle(CursorStyle.DEFAULT)
+      if (this.viewerCanvas && !preventEvent) {
+        this.dispatchEvent('itemSelected', annotation)
+      }
     }
   }
 
   private deselectAnnotation() {
     if (this.context && this.selectionElement && this.annotationBorder) {
+      const annot = this.selectedAnnotation
       this.selectedAnnotation = null
       this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height)
       this.annotationBorder.deselectAnnotation()
       this.context.canvas.style.display = 'none'
       this.selectionElement.style.display = 'none'
       this.store.viewer.deselectAnnotation()
+      if (this.viewerCanvas && annot !== null) {
+        this.dispatchEvent('itemDeselected', annot)
+      }
     }
   }
 
@@ -308,17 +329,41 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     }
   }
 
+  private toggleLock(id: number) {
+    if (this.pdfViewerApi) {
+      const annot = this.pdfViewerApi.getItem(id) as Annotation
+      if (this.options.ms_custom) {
+        addHistoryEntry(annot, annot.isLocked() ? 'unlock' : 'lock', this.options.author)
+      }
+      annot.setLock(!annot.isLocked())
+      if (this.annotationBorder) {
+        this.annotationBorder.deselectAnnotation()
+        const pageRect = this.store.getState().document.pageRects[annot.pdfRect.page]
+        this.annotationBorder.setAnnotation(annot, pageRect)
+      }
+      this.store.annotations.updateAnnotation(annot)
+      this.pdfViewerApi.updateItem(annot)
+    }
+  }
+
   private deleteAnnotation(id: number) {
     if (this.pdfViewerApi) {
       const item = this.pdfViewerApi.getItem(id) as Annotation
-
-      this.pdfViewerApi.deleteItem(item)
+      if (this.options.ms_custom) {
+        item.setHidden(true)
+        addHistoryEntry(item, 'delete', this.options.author)
+        this.store.annotations.updateAnnotation(item)
+        this.pdfViewerApi.updateItem(item)
+        this.deselectAnnotation()
+      } else {
+        this.pdfViewerApi.deleteItem(item)
         .then(() => {
-          this.deselectAnnotation()
-        })
-        .catch(error => {
-          console.error(error)
-        })
+            this.deselectAnnotation()
+          })
+          .catch(error => {
+            console.error(error)
+          })
+      }
     }
   }
 
@@ -370,6 +415,12 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
           this.store.viewer.selectPopup(item.id)
         })
       this.deselectAnnotation()
+    }
+  }
+
+  private onItemSelected(item: PdfItem) {
+    if (item.itemCategory === PdfItemCategory.ANNOTATION) {
+      this.selectAnnotation(item as Annotation, true)
     }
   }
 
