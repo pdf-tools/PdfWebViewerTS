@@ -36,7 +36,6 @@ const AnnotationIcon: Component<{ itemType: number; fill: string | null }, PdfWe
       return <Icon icon={icons.annotation} bg={bg} />
   }
 }
-
 const HistoryItem: Component<{ item: any }, PdfWebViewerState, PdfWebViewerActions> = ({ item }) => (state, actions) => {
   switch (item.Type) {
     case '/Create':
@@ -57,8 +56,9 @@ const HistoryItem: Component<{ item: any }, PdfWebViewerState, PdfWebViewerActio
       if (item.Parms) {
         for (let i = 0; i < item.Parms.length; i += 2) {
           const key = item.Parms[i] as string
-          const value = item.Parms[i + 1] as string
-          params[key] = value
+          let value = item.Parms[i + 1]
+          value = removeParentheses(value)
+          params[key] = value ? value : ''
         }
       }
       return (
@@ -163,4 +163,11 @@ export const AnnotationListItem: Component<{ annotation: Annotation; selected: b
       )}
     </li>
   )
+}
+
+function removeParentheses(value: string | null) {
+  if (value === null) {
+    return value
+  }
+  return value.slice(1, value.length - 1)
 }

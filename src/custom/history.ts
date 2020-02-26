@@ -15,11 +15,11 @@ export function addHistoryEntry(annotation: Annotation, type: 'create' | 'edit' 
     const params = []
     if (content !== null && annotation.content !== content) {
       params.push('/Contents')
-      params.push(content)
+      params.push(`(${content})`)
     }
     if (subject !== null && annotation.subject !== subject) {
       params.push('/Subj')
-      params.push(subject)
+      params.push(`(${subject})`)
     }
     if (params.length > 0) {
       params.push('/T')
@@ -29,7 +29,7 @@ export function addHistoryEntry(annotation: Annotation, type: 'create' | 'edit' 
   } else if (type === 'lock' || type === 'unlock') {
     annotation.custom.push({Type: type === 'lock' ? '/Lock' : '/Unlock', D: createPdfTime(), T: `(${author})` })
   } else if (type === 'delete') {
-    annotation.custom.push({Type: '/Delete', D: createPdfTime(), T: author})
+    annotation.custom.push({Type: '/Delete', D: createPdfTime(), T: `(${author})`})
     if (annotation.popup) {
       annotation.popup.isOpen = false
     }
