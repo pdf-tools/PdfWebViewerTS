@@ -60,6 +60,13 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     }, toolbarElement)
   }
 
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      resolve()
+    })
+    return promise
+  }
+
   public onRemove(): void {
     this.removeCanvasElements()
     this.context = null

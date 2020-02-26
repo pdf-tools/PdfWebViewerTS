@@ -30,18 +30,23 @@ export function getColorPalette(
 
 export function createPdfTime() {
   const time = new Date()
-  const year = time.getUTCFullYear()
-  let month = `${time.getUTCMonth() + 1}`
+  const year = time.getFullYear()
+  let month = `${time.getMonth() + 1}`
   month = padString(month, 2, '0')
-  let day = `${time.getUTCDate()}`
+  let day = `${time.getDate()}`
   day = padString(day, 2, '0')
-  let hour = `${time.getUTCHours()}`
+  let hour = `${time.getHours()}`
   hour = padString(hour, 2, '0')
-  let minutes = `${time.getUTCMinutes()}`
+  let minutes = `${time.getMinutes()}`
   minutes = padString(minutes, 2, '0')
-  let seconds = `${time.getUTCSeconds()}`
+  let seconds = `${time.getSeconds()}`
   seconds = padString(seconds, 2, '0')
-  const dateString = `(D:${year}${month}${day}${hour}${minutes}${seconds}Z)`
+  let offsetString = time.getTimezoneOffset() < 0 ? '+' : ''
+  const hourOffset = (-1) * Math.floor(time.getTimezoneOffset() / 60)
+  offsetString += padString(hourOffset.toString(), 2, '0') + `'`
+  const minuteOffset = (-1) * Math.floor(time.getTimezoneOffset() % 60)
+  offsetString += padString(minuteOffset.toString(), 2, '0') + `'`
+  const dateString = `(D:${year}${month}${day}${hour}${minutes}${seconds}${offsetString})`
   return dateString
 }
 

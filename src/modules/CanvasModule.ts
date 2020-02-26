@@ -62,6 +62,23 @@ export abstract class CanvasModule {
     }
   }
 
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      const keys = Object.keys(this.canvasLayers)
+      const promises = []
+      for (let i = 0; i < keys.length; i++) {
+        promises.push(this.canvasLayers[keys[i]].onSave())
+      }
+      Promise.all(promises).then( () => {
+        resolve()
+      }).catch( (error: any) => {
+        reject('OnSave failed on a canvas layer: ' + error)
+      })
+
+    })
+    return promise
+  }
+
   public createCanvasLayer(name: string, canvasLayer: CanvasLayerClass, args?: any) {
     if (this.containerElement && this.store && this.pdfApi && this.options) {
       if (this.canvasLayers[name]) {

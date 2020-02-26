@@ -6,6 +6,7 @@ import { createEditFreetextAnnotationToolbar, EditFreetextAnnotationToolbarActio
 import { RichTextEditor } from './RichTextEditor'
 import { convertPdfToCssPixel, convertCssToPdfPixel } from '../../common/Tools'
 import { addHistoryEntry } from '../../custom/history'
+import { Annotation } from '../../pdf-viewer-api'
 
 const moduleLayerName = 'AddFreetextAnnotation'
 
@@ -23,6 +24,8 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
   public onCreate(annotationId: number): void {
     this.store.viewer.beginModule(moduleLayerName)
     this.freetextAnnotation = this.pdfApi.getItem(annotationId) as any
+    this.updateFreeTextAnnotation = this.updateFreeTextAnnotation.bind(this)
+    this.close = this.close.bind(this)
 
     this.editorElement = this.createHtmlLayer()
     this.editorElement.style.position = 'absolute'
@@ -61,7 +64,6 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       this.fontName = this.freetextAnnotation.fontName
       this.fontSizeCSS = convertPdfToCssPixel(this.freetextAnnotation.fontSize)
     }
-
     this.richTextEditor = new RichTextEditor(this.editorElement, {
       content: this.freetextAnnotation.content,
       richText: this.freetextAnnotation.richText,
@@ -86,13 +88,27 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       selectedFontColor: this.color,
       selectedFontSize: this.fontSize,
       onCmd: this.richTextEditor.executeCommand,
-      onClose: this.remove,
+      onClose: this.close,
     }, toolbarElement)
 
   }
 
-  public onRemove(): void {
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      this.updateFreeTextAnnotation().then( () => {
+        this.onRemove()
+        resolve()
+      })
+    })
+    return promise
+  }
+
+  public close(): void {
     this.updateFreeTextAnnotation()
+    this.onRemove()
+  }
+
+  public onRemove(): void {
     this.removeHtmlElements()
     this.editorElement = null
     this.freetextAnnotation = null
@@ -130,24 +146,32 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
   }
 
   private updateFreeTextAnnotation() {
-    if (this.richTextEditor && this.freetextAnnotation) {
-      const richTextObj = this.richTextEditor.getEditorValues()
-      let subject = this.freetextAnnotation.subject
-      if (this.toolbarView && this.options.ms_custom) {
-        const tbState = this.toolbarView.getState()
-        subject = tbState.newSubject
-        addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, tbState.newSubject)
+    const promise = new Promise<void>( (resolve, reject) => {
+      if (this.richTextEditor && this.freetextAnnotation) {
+        const richTextObj = this.richTextEditor.getEditorValues()
+        let subject = this.freetextAnnotation.subject
+        if (this.toolbarView && this.options.ms_custom) {
+          const tbState = this.toolbarView.getState()
+          subject = tbState.newSubject
+          addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, tbState.newSubject)
+        }
+        const fontColor = new Color(richTextObj.fontColor as string)
+        const backgroundColor = richTextObj.backgroundColor === '' ? null : new Color(richTextObj.backgroundColor as string)
+        this.freetextAnnotation.content = richTextObj.content
+        this.freetextAnnotation.subject = subject
+        this.freetextAnnotation.richText = richTextObj.richText
+        this.freetextAnnotation.fontColor = fontColor.toHexRgb()
+        this.freetextAnnotation.fontName = richTextObj.fontName !== null ? richTextObj.fontName : 'Helvetica'
+        this.freetextAnnotation.fontSize = richTextObj.fontSizeCSS ? convertCssToPdfPixel(richTextObj.fontSizeCSS) : this.freetextAnnotation.fontSize
+        this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
+        this.pdfApi.updateItem(this.freetextAnnotation).then( item => {
+          this.store.annotations.updateAnnotation(item as Annotation)
+          resolve()
+        }).catch( () => {
+          reject()
+        })
       }
-      const fontColor = new Color(richTextObj.fontColor as string)
-      const backgroundColor = richTextObj.backgroundColor === '' ? null : new Color(richTextObj.backgroundColor as string)
-      this.freetextAnnotation.content = richTextObj.content
-      this.freetextAnnotation.subject = subject
-      this.freetextAnnotation.richText = richTextObj.richText
-      this.freetextAnnotation.fontColor = fontColor.toHexRgb()
-      this.freetextAnnotation.fontName = richTextObj.fontName !== null ? richTextObj.fontName : 'Helvetica'
-      this.freetextAnnotation.fontSize = richTextObj.fontSizeCSS ? convertCssToPdfPixel(richTextObj.fontSizeCSS) : this.freetextAnnotation.fontSize
-      this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
-      this.pdfApi.updateItem(this.freetextAnnotation)
-    }
+    })
+    return promise
   }
 }

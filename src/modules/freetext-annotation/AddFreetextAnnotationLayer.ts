@@ -42,6 +42,13 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     this.store.viewer.beginModule(moduleLayerName)
   }
 
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      resolve()
+    })
+    return promise
+  }
+
   public onRemove(): void {
     this.removeCanvasElements()
     this.context = null

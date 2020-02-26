@@ -65,8 +65,10 @@ export const actions: ActionsType<AnnotationsState, AnnotationsActions> = {
           if (!newState.openPopupsByPage[pageNumber]) {
             newState.openPopupsByPage[pageNumber] = []
           }
-          newState.openPopupsByPage[pageNumber].push(annotation.id)
-          newState.openPopupChanged = true
+          if (!newState.openPopupsByPage[pageNumber].find(id => id === annotation.id)) {
+            newState.openPopupsByPage[pageNumber].push(annotation.id)
+            newState.openPopupChanged = true
+          }
         }
       }
     })

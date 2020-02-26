@@ -246,7 +246,27 @@ export class PdfViewerCanvas {
   }
 
   public saveFile(asFdf: boolean) {
-    return this.pdfViewerApi.saveFile(asFdf)
+    const promises = new Array<Promise<void>>()
+    for (let i = 0; i < this.modules.length; i++) {
+      promises.push(this.modules[i].onSave())
+    }
+    const savePromise = new Promise<Uint8Array>( (resolve, reject) => {
+      Promise.all(promises).then( () => {
+        return this.pdfViewerApi.saveFile(asFdf).then( buffer => {
+          resolve(buffer)
+        }).catch( reason => {
+          reject(reason)
+        })
+      }).catch( () => {
+        console.warn('Some layers might have failed to save')
+        return this.pdfViewerApi.saveFile(asFdf).then( buffer => {
+          resolve(buffer)
+        }).catch( reason => {
+          reject(reason)
+        })
+      })
+    })
+    return savePromise
   }
 
   public close() {
