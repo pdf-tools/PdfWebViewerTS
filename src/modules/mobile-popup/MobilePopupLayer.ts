@@ -184,7 +184,6 @@ export class MobilePopupLayer extends CanvasLayer {
             if (this.options.ms_custom) {
               addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
             }
-            console.log(annotation)
             annotation.content = content !== null ? content : annotation.content
             annotation.subject = subject !== null ? subject : annotation.subject
 
