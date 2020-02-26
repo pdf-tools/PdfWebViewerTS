@@ -49,6 +49,7 @@ interface PopupViewState {
   currentUser: string
   activeContent: string | null
   activeSubject: string | null
+  stateChanged: boolean
 }
 
 export interface PopupViewActions {
@@ -57,6 +58,9 @@ export interface PopupViewActions {
   setPositionCalculated(id: number): PopupViewState
   selectPopup(id: number): PopupViewState
   deselectPopup(): PopupViewState
+  updateActiveSubject(subject: string): PopupViewState
+  updateActiveContent(content: string): PopupViewState
+  stateChanged(hasChanged: boolean): PopupViewState
 }
 
 export const createPopupView = (props: PopupViewProps, element: HTMLElement) => {
@@ -69,6 +73,7 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     currentUser: props.currentUser,
     activeContent: null,
     activeSubject: null,
+    stateChanged: false,
   }
 
   const actions: ActionsType<PopupViewState, PopupViewActions> = {
@@ -86,6 +91,12 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
         openPopups,
       }
     },
+    stateChanged: (hasChanged: boolean) => $state => {
+      return {
+        ...$state,
+        stateChanged: hasChanged,
+      }
+    },
     setPositionCalculated: (id: number) => $state => {
       const popup = $state.openPopups.find(p => p.id === id)
       if (popup) {
@@ -97,21 +108,27 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     },
     selectPopup: (id: number) => $state => {
       const openPopups = $state.openPopups.map(p => ({...p, selected: p.id === id }))
-      const selected = $state.openPopups.find(popup => popup.id === id)
-      let activeContent = $state.activeContent
-      let activeSubject = $state.activeSubject
-      if (selected) {
-        activeContent = selected.content
-        activeSubject = selected.subject
-      }
       return {
         ...$state,
         openPopups,
-        activeContent,
-        activeSubject,
+        activeContent: id === $state.selectedPopup ? $state.activeContent : null,
+        activeSubject: id === $state.selectedPopup ? $state.activeSubject : null,
         selectedPopup: id,
       }
     },
+    updateActiveSubject: (subject: string) => $state => {
+      return {
+        ...$state,
+        activeSubject: subject,
+      }
+    },
+    updateActiveContent: (content: string) => $state => {
+      return {
+        ...$state,
+        activeContent: content,
+      }
+    },
+
     deselectPopup: () => $state => {
       return {
         ...$state,
@@ -223,6 +240,9 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             select(popup.id)
           }
         }}
+        onchange={(e: Event) => {
+          $actions.stateChanged(true)
+        }}
       >
         <div class="pwv-popup-header">
           <div class="pwv-popup-header-info"
@@ -273,9 +293,9 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
               <CommandbarButton
                 onClick={(e: Event) => {
                   e.stopPropagation()
-                  $state.activeContent = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
-                  $state.activeSubject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value
-                  $state.selectedPopup = popup.id
+                  select(popup.id)
+                  $actions.updateActiveContent((document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value)
+                  $actions.updateActiveSubject((document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value)
                   close()
                 }}
                 icon={icons.close}
@@ -289,10 +309,10 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             id={'pwv-popup-subject-' + popup.id}
             placeholder={translationManager.getText('annotation.subject')}
             onchange={() => {
-              $state.activeSubject = (document.getElementById('pwv-popup-subject-' + popup.id) as HTMLInputElement).value
+              $actions.updateActiveSubject((document.getElementById('pwv-popup-subject-' + popup.id) as HTMLInputElement).value)
             }}
             disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
-            value={popup.subject} />
+            value={$state.selectedPopup === popup.id ? $state.activeSubject ? $state.activeSubject : popup.subject : popup.subject} />
             :
             <div
               id={'pwv-popup-subject-' + popup.id}>
@@ -305,10 +325,10 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             <textarea
               id={'pwv-popup-content-' + popup.id}
               onchange={() => {
-                $state.activeContent = (document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value
+                $actions.updateActiveContent((document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value)
               }}
             >
-              {popup.content}
+              {$state.selectedPopup === popup.id ? $state.activeContent ? $state.activeContent : popup.content : popup.content}
             </textarea>
             :
             <div

@@ -100,4 +100,11 @@ export class DebugLayer extends CanvasLayer {
     }
   }
 
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      resolve()
+    })
+    return promise
+  }
+
 }

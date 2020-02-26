@@ -13,14 +13,24 @@ export const MobileToolbar: Component<{}, PdfWebViewerState, PdfWebViewerActions
     {$state.mobile.showToolbar &&
       <div class="pwv-mobile-toolbar">
         <div class="pwv-commandbar">
-          <CommandbarFileButton
-            icon={icons.openFile}
-            onFileSelected={file => $actions.api.openFile({ file })}
-          />
-          <CommandbarButton
+          {($state.options.allowOpenFile && !$state.options.onOpenFileButtonClicked) &&
+            <CommandbarFileButton
+              icon={icons.openFile}
+              onFileSelected={file => $actions.api.openFile({ file })}
+            />
+          }
+          {($state.options.allowOpenFile && $state.options.onOpenFileButtonClicked) &&
+            <CommandbarButton
+              icon={icons.openFile}
+              onClick={$state.options.onOpenFileButtonClicked}
+            />
+          }
+          {$state.options.allowSaveFile &&
+            <CommandbarButton
             icon={icons.saveFile}
             onClick={$actions.api.downloadFile}
-          />
+            />
+          }
           <CommandbarSeparator />
           {$state.pdfDocument.fitMode === PdfFitMode.ACTUAL_SIZE &&
             <CommandbarButton

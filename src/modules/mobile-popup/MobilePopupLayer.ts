@@ -58,6 +58,17 @@ export class MobilePopupLayer extends CanvasLayer {
     }
   }
 
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      this.updateSelectedPopupContent(true).then( () => {
+        resolve()
+      }).catch( () => {
+        reject()
+      })
+    })
+    return promise
+  }
+
   public openPopup(id: number) {
     if (this.pdfApi && this.popupElement && this.popupView) {
       const annotation = this.pdfApi.getItem(id) as any
@@ -73,23 +84,22 @@ export class MobilePopupLayer extends CanvasLayer {
           color: annotation.color,
           colorPalette: getColorPalette(annotation.itemType, this.options),
           isLocked: annotation.isLocked(),
+          stateChanged: false,
         })
       }
     }
   }
 
-  private closePopup(id: number, content: string, subject: string) {
+  private closePopup() {
     if (this.pdfApi && this.popupElement && this.popupView) {
       this.popupElement.style.display = 'none'
       this.popupView.closePopup()
+      const state = this.popupView.getState()
+      const id = state.id
       const item = this.pdfApi.getItem(id) as Annotation
       if (item) {
-        addHistoryEntry(item, 'edit', this.options.author, content, subject)
         item.popup.isOpen = false
-        item.content = content
-        item.subject = subject
-        this.store.annotations.updateAnnotation(item)
-        this.pdfApi.updateItem(item)
+        this.updateSelectedPopupContent(true, item)
         this.store.viewer.selectPopup(null)
       }
     }
@@ -135,56 +145,69 @@ export class MobilePopupLayer extends CanvasLayer {
         }
         this.popupView.setColor(color)
         annotation.popup.color = color
+        this.updateSelectedPopupContent(true, annotation)
         this.store.annotations.updateAnnotation(annotation)
-        this.pdfApi.updateItem(annotation)
       }
     }
   }
 
   private toggleAnnotationLock() {
     if (this.pdfApi) {
-      const annotation = this.updateSelectedPopupContent(false)
-      if (annotation) {
-        if (this.options.ms_custom) {
-          addHistoryEntry(annotation, 'lock', this.options.author)
+      this.updateSelectedPopupContent(false).then( annotation => {
+        if (annotation) {
+          if (this.options.ms_custom) {
+            addHistoryEntry(annotation, 'lock', this.options.author)
+          }
+          if (this.popupView) {
+            this.popupView.setLock(!annotation.isLocked())
+          }
+          annotation.setLock(!annotation.isLocked())
+          this.store.annotations.updateAnnotation(annotation)
+          this.pdfApi.updateItem(annotation)
         }
-        if (this.popupView) {
-          this.popupView.setLock(!annotation.isLocked())
-        }
-        annotation.setLock(!annotation.isLocked())
-        this.store.annotations.updateAnnotation(annotation)
-        this.pdfApi.updateItem(annotation)
-      }
+      })
     }
   }
 
-  private updateSelectedPopupContent(syncronize: boolean) {
-    if (this.pdfApi) {
-      if (this.popupView) {
-        const state = this.popupView.getState()
-        const id = state.id
-        if (id) {
-          const annotation = this.pdfApi.getItem(id) as Annotation
-          if (annotation) {
+  private updateSelectedPopupContent(syncronize: boolean, annotation?: Annotation) {
+    const promise = new Promise<void | Annotation | null>( (resolve, reject) => {
+      if (this.pdfApi) {
+        if (this.popupView) {
+          const state = this.popupView.getState()
+          const id = state.id
+          if (id) {
+            if (!annotation) {
+              annotation = this.pdfApi.getItem(id) as Annotation
+            }
             const content = state.content
             const subject = state.subject
             if (this.options.ms_custom) {
               addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
             }
-            annotation.content = content
-            if (subject) {
-              annotation.subject = subject
-            }
+            console.log(annotation)
+            annotation.content = content !== null ? content : annotation.content
+            annotation.subject = subject !== null ? subject : annotation.subject
+
             if (syncronize) {
-              this.pdfApi.updateItem(annotation)
+              this.pdfApi.updateItem(annotation).then( () => {
+                if (this.popupView) {
+                  this.popupView.stateChanged(false)
+                }
+                resolve()
+              }).catch( () => {
+                reject()
+              })
             } else {
-              return annotation
+              resolve(annotation)
             }
           }
         }
       }
-    }
+      resolve(null)
+    })
+    return promise
   }
+
   private formatDate(dateStr: string) {
     return `${dateStr.substr(8, 2)}.${dateStr.substr(6, 2)}.${dateStr.substr(2, 4)} ${dateStr.substr(10, 2)}:${dateStr.substr(12, 2)}`
   }

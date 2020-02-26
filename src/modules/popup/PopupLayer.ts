@@ -50,6 +50,22 @@ export class PopupLayer extends CanvasLayer {
   public onRemove(): void {
   }
 
+  public onSave() {
+    const promise = new Promise<void>( (resolve, reject) => {
+      if (this.popupView) {
+        const state = this.popupView.getState()
+        if (state.stateChanged) {
+          this.updateSelectedPopupContent(true).then( () => {
+            resolve()
+          })
+        } else {
+          resolve()
+        }
+      }
+    })
+    return promise
+  }
+
   public render(timestamp: number, state: ViewerCanvasState) {
 
     if (this.pdfApi && this.popupView && this.popupViewElement) {
@@ -387,16 +403,17 @@ export class PopupLayer extends CanvasLayer {
   }
 
   private closePopup() {
-    const annot = this.updateSelectedPopupContent(false)
-    this.store.viewer.deselectPopup()
+    this.updateSelectedPopupContent(false).then( annot => {
+      this.store.viewer.deselectPopup()
 
-    if (this.pdfApi) {
-      if (annot) {
-        annot.popup.isOpen = false
-        this.store.annotations.updateAnnotation(annot)
-        this.pdfApi.updateItem(annot)
+      if (this.pdfApi) {
+        if (annot) {
+          annot.popup.isOpen = false
+          this.store.annotations.updateAnnotation(annot)
+          this.pdfApi.updateItem(annot)
+        }
       }
-    }
+    })
   }
 
   private deletePopup(id: number) {
@@ -417,43 +434,55 @@ export class PopupLayer extends CanvasLayer {
 
   private toggleAnnotationLock(id: number) {
     if (this.pdfApi) {
-      const annotation = this.updateSelectedPopupContent(false)
-      if (annotation) {
-        if (this.options.ms_custom) {
-          addHistoryEntry(annotation, 'lock', this.options.author)
+      this.updateSelectedPopupContent(false).then(annotation => {
+        if (annotation) {
+          if (this.options.ms_custom) {
+            addHistoryEntry(annotation, 'lock', this.options.author)
+          }
+          annotation.setLock(!annotation.isLocked())
+          this.store.annotations.updateAnnotation(annotation)
+          this.pdfApi.updateItem(annotation)
         }
-        annotation.setLock(!annotation.isLocked())
-        this.store.annotations.updateAnnotation(annotation)
-        this.pdfApi.updateItem(annotation)
-      }
+      })
     }
   }
 
-  private updateSelectedPopupContent(syncronize: boolean) {
-    if (this.pdfApi) {
-      if (this.popupView) {
-        const state = this.popupView.getState()
-        const id = state.selectedPopup
-        if (id) {
-          const annotation = this.pdfApi.getItem(id) as Annotation
-          if (annotation) {
+  private updateSelectedPopupContent(syncronize: boolean, annotation?: Annotation) {
+    const promise = new Promise<void | Annotation | null>( (resolve, reject) => {
+      if (this.pdfApi) {
+        if (this.popupView) {
+          const state = this.popupView.getState()
+          const id = state.selectedPopup
+          if (id) {
+            if (!annotation) {
+              annotation = this.pdfApi.getItem(id) as Annotation
+            }
             const content = state.activeContent
             const subject = state.activeSubject
             if (this.options.ms_custom) {
               addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
             }
-            annotation.content = content !== undefined ? content : annotation.content
-            annotation.subject = subject !== undefined ? subject : annotation.subject
+            annotation.content = content !== null ? content : annotation.content
+            annotation.subject = subject !== null ? subject : annotation.subject
 
             if (syncronize) {
-              this.pdfApi.updateItem(annotation)
+              this.pdfApi.updateItem(annotation).then( () => {
+                if (this.popupView) {
+                  this.popupView.stateChanged(false)
+                }
+                resolve()
+              }).catch( () => {
+                reject()
+              })
             } else {
-              return annotation
+              resolve(annotation)
             }
           }
         }
       }
-    }
+      resolve(null)
+    })
+    return promise
   }
 
   private updatePopupPosition(id: number, x: number, y: number) {
@@ -468,7 +497,7 @@ export class PopupLayer extends CanvasLayer {
           annotation.popup.pdfRect.pdfX = newPdfPos.pdfX
           annotation.popup.pdfRect.pdfY = newPdfPos.pdfY
           this.store.annotations.updateAnnotation(annotation)
-          this.pdfApi.updateItem(annotation)
+          this.updateSelectedPopupContent(true, annotation)
         }
       }
     }
@@ -484,7 +513,7 @@ export class PopupLayer extends CanvasLayer {
           annotation.popup.pdfRect.pdfW = newWidth
           annotation.popup.pdfRect.pdfH = newHeight
           this.store.annotations.updateAnnotation(annotation)
-          this.pdfApi.updateItem(annotation)
+          this.updateSelectedPopupContent(true, annotation)
         }
       }
     }
@@ -506,7 +535,7 @@ export class PopupLayer extends CanvasLayer {
         }
         annotation.popup.color = color
         this.store.annotations.updateAnnotation(annotation)
-        this.pdfApi.updateItem(annotation)
+        this.updateSelectedPopupContent(true, annotation)
       }
     }
   }

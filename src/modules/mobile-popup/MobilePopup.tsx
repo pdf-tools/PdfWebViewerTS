@@ -9,7 +9,7 @@ import { Annotation } from 'pdf-viewer-api';
 /** @internal */
 export interface MobilePopupViewProps {
   fallbackColors: string[]
-  onClose: (id: number, content: string, subject: string) => void
+  onClose: () => void
   onDelete: (id: number) => void
   onUpdateContent: (id: number, content: string) => void
   onUpdateColor: (id: number, color: string) => void
@@ -19,7 +19,7 @@ export interface MobilePopupViewProps {
 
 /** @internal */
 interface MobilePopupViewState {
-  id: number | null
+  id: number
   content: string | null
   subject: string | null
   color: string | null
@@ -28,6 +28,7 @@ interface MobilePopupViewState {
   originalAuthor: string | null
   isLocked: boolean
   timer?: number
+  stateChanged: boolean
 }
 
 /** @internal */
@@ -37,6 +38,9 @@ export interface MobilePopupViewActions {
   setColor(color: string): MobilePopupViewProps
   closePopup(): MobilePopupViewProps
   setLock(isLocked: boolean): MobilePopupViewProps
+  stateChanged(hasChanged: boolean): MobilePopupViewState
+  setContent(content: string): MobilePopupViewState
+  setSubject(contnet: string): MobilePopupViewState
 }
 
 /** @internal */
@@ -51,6 +55,7 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
     colorPalette: props.fallbackColors,
     isLocked: false,
     timer: 0,
+    stateChanged: false,
   }
 
   const actions: ActionsType<MobilePopupViewState, MobilePopupViewActions> = {
@@ -82,6 +87,24 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
       return {
         ...$state,
         isLocked,
+      }
+    },
+    stateChanged: (hasChanged: boolean) => $state => {
+      return {
+        ...$state,
+        stateChanged: hasChanged,
+      }
+    },
+    setContent: (content: string) => $state => {
+      return {
+        ...$state,
+        content,
+      }
+    },
+    setSubject: (subject: string) => $state => {
+      return {
+        ...$state,
+        subject,
       }
     },
   }
@@ -119,7 +142,10 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
           element.addEventListener('touchend', (e: Event) => { e.cancelBubble = true}, false)
         }}
       >
-        <div>
+        <div
+          onchange={(e: Event) => {
+            $actions.stateChanged(true)
+          }}>
           <div class="pwv-popup-header">
             <div class="pwv-popup-header-info"
             style = {headerStyles}>
@@ -153,8 +179,8 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
                 color={$state.color || 'transparent'}
                 onChange={color => {
                   if ($state.id) {
-                    $state.content = (document.getElementById('pwv-popup-content-' + $state.id) as HTMLTextAreaElement).value
-                    $state.color = color
+                    $actions.setContent((document.getElementById('pwv-popup-content-' + $state.id) as HTMLTextAreaElement).value)
+                    $actions.setColor(color)
                     props.onUpdateColor($state.id, color)
                   }
                 }}
@@ -164,12 +190,9 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
                 <CommandbarButton
                   onClick={() => {
                     if ($state.id) {
-                      if ($state.timer) {
-                        window.clearTimeout($state.timer)
-                      }
-                      const content = (document.getElementById('pwv-popup-content-' + $state.id) as HTMLTextAreaElement).value
-                      const subject = (document.getElementById('pwv-popup-subject-' + $state.id) as HTMLTextAreaElement).value
-                      props.onClose($state.id, content, subject)
+                      $actions.setContent((document.getElementById('pwv-popup-content-' + $state.id) as HTMLTextAreaElement).value)
+                      $actions.setSubject((document.getElementById('pwv-popup-subject-' + $state.id) as HTMLTextAreaElement).value)
+                      props.onClose()
                     }
                   }}
                   icon={icons.close}
@@ -181,8 +204,8 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
             <input
               id={'pwv-popup-subject-' + $state.id}
               placeholder={translationManager.getText('annotation.subject')}
-              onchange={() => {
-                $state.subject = (document.getElementById('pwv-popup-subject-' + $state.id) as HTMLInputElement).value
+              onchange={(e: UIEvent) => {
+                $actions.setSubject((e.currentTarget as HTMLInputElement).value)
               }}
               disabled={!props.canEdit($state.originalAuthor ? $state.originalAuthor : '') || $state.isLocked}
               value={$state.subject} />
@@ -191,13 +214,7 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
             <textarea
               id={'pwv-popup-content-' + $state.id}
               onchange={(e: UIEvent) => {
-                if ($state.id) {
-                  const id = $state.id
-                  const content = (e.currentTarget as HTMLTextAreaElement).value
-                  $state.timer = window.setTimeout(() => {
-                    props.onUpdateContent(id, content)
-                  }, 20)
-                }
+                $actions.setContent((e.currentTarget as HTMLTextAreaElement).value)
               }}
               value={$state.content}
               disabled={!props.canEdit($state.originalAuthor ? $state.originalAuthor : '') || $state.isLocked}

@@ -6,7 +6,6 @@ export function addHistoryEntry(annotation: Annotation, type: 'create' | 'edit' 
   if (!annotation.custom) {
     annotation.custom = []
   }
-
   if (type === 'create') {
     let history = annotation.custom
     history = []
@@ -14,11 +13,11 @@ export function addHistoryEntry(annotation: Annotation, type: 'create' | 'edit' 
     annotation.custom = history
   } else if (type === 'edit') {
     const params = []
-    if (content !== undefined && annotation.content !== content) {
+    if (content !== null && annotation.content !== content) {
       params.push('/Contents')
       params.push(content)
     }
-    if (subject !== undefined && annotation.subject !== subject) {
+    if (subject !== null && annotation.subject !== subject) {
       params.push('/Subj')
       params.push(subject)
     }

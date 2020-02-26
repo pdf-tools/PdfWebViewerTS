@@ -38,6 +38,7 @@ export abstract class CanvasLayer {
   public abstract onCreate(args?: any): void
   public abstract onRemove(): void
   public abstract render(timestamp: number, state: ViewerCanvasState): void
+  public abstract onSave(): Promise<void>
 
   public resize(width: number, height: number): void {
 
