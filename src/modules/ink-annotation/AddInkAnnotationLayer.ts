@@ -62,7 +62,12 @@ export class AddInkAnnotationLayer extends CanvasLayer {
 
   public onSave() {
     const promise = new Promise<void>( (resolve, reject) => {
-      resolve()
+      this.createInkAnnotation().then( () => {
+        this.remove()
+        resolve()
+      }).catch( () => {
+        reject()
+      })
     })
     return promise
   }
@@ -250,66 +255,72 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   private createInkAnnotation() {
-    if (this.pdfApi && this.page && this.lines && this.lines.length > 0) {
-      const inkList: number[][] = []
+    const promise = new Promise<void>( (resolve, reject) => {
+      if (this.pdfApi && this.page && this.lines && this.lines.length > 0) {
+        const inkList: number[][] = []
 
-      let x1 = 1000000000
-      let x2 = 0
-      let y1 = 1000000000
-      let y2 = 0
+        let x1 = 1000000000
+        let x2 = 0
+        let y1 = 1000000000
+        let y2 = 0
 
-      this.lines.forEach(pointList => {
-        const line: number[] = []
-        for (let i = 0; i < pointList.length; i++) {
-          const p = pointList[i]
-          if (p.pdfX < x1) {
-            x1 = p.pdfX
+        this.lines.forEach(pointList => {
+          const line: number[] = []
+          for (let i = 0; i < pointList.length; i++) {
+            const p = pointList[i]
+            if (p.pdfX < x1) {
+              x1 = p.pdfX
+            }
+            if (p.pdfX > x2) {
+              x2 = p.pdfX
+            }
+            if (p.pdfY < y1) {
+              y1 = p.pdfY
+            }
+            if (p.pdfY > y2) {
+              y2 = p.pdfY
+            }
+            line.push(p.pdfX)
+            line.push(p.pdfY)
           }
-          if (p.pdfX > x2) {
-            x2 = p.pdfX
-          }
-          if (p.pdfY < y1) {
-            y1 = p.pdfY
-          }
-          if (p.pdfY > y2) {
-            y2 = p.pdfY
-          }
-          line.push(p.pdfX)
-          line.push(p.pdfY)
-        }
-        inkList.push(line)
-      })
+          inkList.push(line)
+        })
 
-      const inkAnnotation: InkAnnotationArgs = {
-        itemType: PdfItemType.INK,
-        page: this.page,
-        pdfRect: {
-          pdfX: x1,
-          pdfY: y1,
-          pdfW: x2 - x1,
-          pdfH: y2 - y1,
+        const inkAnnotation: InkAnnotationArgs = {
+          itemType: PdfItemType.INK,
           page: this.page,
-        },
-        color: this.penRgbaColor,
-        originalAuthor: this.options.author,
-        border: {
-          style: AnnotationBorderStyle.SOLID,
-          width: this.selectedPenSize,
-        },
-        inkList,
-      }
+          pdfRect: {
+            pdfX: x1,
+            pdfY: y1,
+            pdfW: x2 - x1,
+            pdfH: y2 - y1,
+            page: this.page,
+          },
+          color: this.penRgbaColor,
+          originalAuthor: this.options.author,
+          border: {
+            style: AnnotationBorderStyle.SOLID,
+            width: this.selectedPenSize,
+          },
+          inkList,
+        }
 
-      this.lines = []
-      this.page = null
-      this.boundingBox = null
-      if (this.toolbar) {
-        this.toolbar.setLineCount(0)
-      }
+        this.lines = []
+        this.page = null
+        this.boundingBox = null
+        if (this.toolbar) {
+          this.toolbar.setLineCount(0)
+        }
 
-      this.pdfApi.createItem(inkAnnotation).then(item => {
-        this.onAnnotationCreated(item as Annotation)
-      })
-    }
+        this.pdfApi.createItem(inkAnnotation).then(item => {
+          this.onAnnotationCreated(item as Annotation)
+          resolve()
+        })
+      } else {
+        reject()
+      }
+    })
+    return promise
   }
 
   private getBoundingBox() {
