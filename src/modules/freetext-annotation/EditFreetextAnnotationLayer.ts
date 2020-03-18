@@ -127,6 +127,19 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       return
     }
 
+    if (this.editorElement && state.pointer.action === 'click') {
+      const insideHorizontal = state.pointer.x.cssPixels > this.editorElement.offsetLeft
+                            && state.pointer.x.cssPixels < (this.editorElement.offsetLeft + this.editorElement.offsetWidth)
+      const insideVertical   = state.pointer.y.cssPixels > this.editorElement.offsetTop
+                            && state.pointer.y.cssPixels < (this.editorElement.offsetTop + this.editorElement.offsetHeight)
+
+      if (!insideHorizontal || !insideVertical) {
+        this.updateFreeTextAnnotation()
+        this.remove()
+        return
+      }
+    }
+
     if (this.editorElement && this.freetextAnnotation && this.richTextEditor) {
 
       const updatePosition = state.canvas.canvasInvalidated || state.viewer.modeChanged
@@ -149,11 +162,9 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     const promise = new Promise<void>( (resolve, reject) => {
       if (this.richTextEditor && this.freetextAnnotation) {
         const richTextObj = this.richTextEditor.getEditorValues()
-        let subject = this.freetextAnnotation.subject
-        if (this.toolbarView && this.options.ms_custom) {
-          const tbState = this.toolbarView.getState()
-          subject = tbState.newSubject
-          addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, tbState.newSubject)
+        const subject = this.toolbarView ? this.toolbarView.getState().newSubject : this.freetextAnnotation.subject
+        if (this.options.ms_custom) {
+          addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, subject)
         }
         const fontColor = new Color(richTextObj.fontColor as string)
         const backgroundColor = richTextObj.backgroundColor === '' ? null : new Color(richTextObj.backgroundColor as string)

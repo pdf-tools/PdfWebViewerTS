@@ -18,7 +18,7 @@ const plugins = [
 
 export default [
   {
-    input: './build/dist/es/pdf-web-viewer/PdfWebViewer.js',
+    input: './build/dist/es/index.js',
     output: {
       file: './build/dist/browser/pdf-web-viewer.js',
       format: 'umd',

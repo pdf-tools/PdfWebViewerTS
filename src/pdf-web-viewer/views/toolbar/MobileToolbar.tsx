@@ -6,6 +6,7 @@ import { CommandbarFileButton } from '../../../common/CommandbarFileButton'
 import { CommandbarSeparator } from '../../../common/CommandbarSeparator'
 import { SearchBar } from './SearchBar'
 import { PdfFitMode } from '../../../pdf-viewer-api'
+import { translationManager } from '../../../common/TranslationManager'
 
 /** @internal */
 export const MobileToolbar: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({ }) => ($state, $actions) => (
@@ -31,6 +32,28 @@ export const MobileToolbar: Component<{}, PdfWebViewerState, PdfWebViewerActions
             onClick={$actions.api.downloadFile}
             />
           }
+          <CommandbarSeparator />
+          <CommandbarButton
+            icon={icons.previousPage}
+            onClick={() => $actions.api.previousPage()}
+            disabled={$state.pdfDocument.firstVisiblePage <= 1}
+          />
+          <div class="pwv-commandbar-item pwv-navigation-toolbar-pageinput-mobile">
+            <label class="pwv-left-label">
+              {$state.pdfDocument.firstVisiblePage}
+            </label>
+            <span>
+              {translationManager.getText('navigation.of')}
+            </span>
+            <label>
+              {$state.pdfDocument.pageCount}
+            </label>
+          </div>
+          <CommandbarButton
+            icon={icons.nextPage}
+            onClick={() => $actions.api.nextPage()}
+            disabled={$state.pdfDocument.firstVisiblePage === $state.pdfDocument.pageCount}
+          />
           <CommandbarSeparator />
           {$state.pdfDocument.fitMode === PdfFitMode.ACTUAL_SIZE &&
             <CommandbarButton
