@@ -1,5 +1,5 @@
 import { CanvasModule, CanvasModuleRegistration } from '../CanvasModule'
-import { createAnnotationbar, AnnotationbarActions } from './AnnotationbarItem'
+import { createAnnotationbar, AnnotationbarActions } from './AnnotationBarItem'
 import { AddStampAnnotationLayer } from './AddStampAnnotationLayer'
 
 export class StampAnnotationModule extends CanvasModule {

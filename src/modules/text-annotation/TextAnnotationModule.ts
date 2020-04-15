@@ -1,5 +1,5 @@
 import { CanvasModule, CanvasModuleRegistration } from '../CanvasModule'
-import { createAnnotationbar, AnnotationbarActions } from './Annotationbar'
+import { createAnnotationbar, AnnotationbarActions } from '../text-annotation/AnnotationBar'
 import { AddTextAnnotationLayer } from './AddTextAnnotationLayer'
 
 export class TextAnnotationModule extends CanvasModule {
