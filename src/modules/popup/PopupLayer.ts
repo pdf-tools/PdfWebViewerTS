@@ -17,6 +17,8 @@ export class PopupLayer extends CanvasLayer {
   private context: CanvasRenderingContext2D | null = null
   private maxPopupWidth: number = 480
   private maxPopupHeight: number = 320
+  private minPopupWidth: number = 260
+  private minPopupHeight: number = 200
   private zoom = 0
   private screenToPdfScale = 0
 
@@ -36,12 +38,6 @@ export class PopupLayer extends CanvasLayer {
     this.updatePopupColor = this.updatePopupColor.bind(this)
     this.canEdit = this.canEdit.bind(this)
 
-    if (this.containerElement) {
-      const maxWidth = this.containerElement.offsetWidth * .75
-      const maxHeight = this.containerElement.offsetHeight * .75
-      this.maxPopupWidth = maxWidth < this.maxPopupWidth ? maxWidth : this.maxPopupWidth
-      this.maxPopupHeight = maxHeight < this.maxPopupHeight ? maxHeight : this.maxPopupHeight
-    }
     this.context = this.createCanvas()
     this.createPopupView()
     window.addEventListener('pdfwebviewer.PopupMoved', this.popupMoved, false)
@@ -357,6 +353,8 @@ export class PopupLayer extends CanvasLayer {
       this.popupView = createPopupView({
         maxPopupWidth: this.maxPopupWidth,
         maxPopupHeight: this.maxPopupHeight,
+        minPopupWidth: this.minPopupWidth,
+        minPopupHeight: this.minPopupHeight,
         currentUser: this.options.author ? this.options.author : '',
         onSelect: this.selectPopup,
         onClose: this.closePopup,
@@ -424,7 +422,8 @@ export class PopupLayer extends CanvasLayer {
       this.store.viewer.selectPopup(null)
       const annotation = this.pdfApi.getItem(id) as Annotation
       if (annotation) {
-        annotation.content = null
+        annotation.content = ''
+        annotation.subject = ''
         annotation.popup.isOpen = false
         this.store.annotations.updateAnnotation(annotation)
         this.pdfApi.updateItem(annotation)

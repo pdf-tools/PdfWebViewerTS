@@ -13,6 +13,8 @@ import { Color } from '../../common/Color'
 export interface PopupViewProps {
   maxPopupWidth: number
   maxPopupHeight: number
+  minPopupWidth: number
+  minPopupHeight: number
   currentUser: string
   onSelect: (id: number) => void
   onClose: () => void
@@ -46,6 +48,8 @@ interface PopupViewState {
   openPopups: Popup[]
   maxPopupWidth: number
   maxPopupHeight: number
+  minPopupWidth: number
+  minPopupHeight: number
   currentUser: string
   activeContent: string | null
   activeSubject: string | null
@@ -58,8 +62,7 @@ export interface PopupViewActions {
   setPositionCalculated(id: number): PopupViewState
   selectPopup(id: number): PopupViewState
   deselectPopup(): PopupViewState
-  updateActiveSubject(subject: string): PopupViewState
-  updateActiveContent(content: string): PopupViewState
+  updateSubjectAndContent(id: number): PopupViewState
   stateChanged(hasChanged: boolean): PopupViewState
 }
 
@@ -70,6 +73,8 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     openPopups: [],
     maxPopupWidth: props.maxPopupWidth,
     maxPopupHeight: props.maxPopupHeight,
+    minPopupWidth: 260,
+    minPopupHeight: 200,
     currentUser: props.currentUser,
     activeContent: null,
     activeSubject: null,
@@ -116,19 +121,15 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
         selectedPopup: id,
       }
     },
-    updateActiveSubject: (subject: string) => $state => {
-      return {
-        ...$state,
-        activeSubject: subject,
-      }
-    },
-    updateActiveContent: (content: string) => $state => {
+    updateSubjectAndContent: (id: number) => $state => {
+      const subject = (document.getElementById('pwv-popup-subject-' + id) as HTMLTextAreaElement).value
+      const content = (document.getElementById('pwv-popup-content-' + id) as HTMLTextAreaElement).value
       return {
         ...$state,
         activeContent: content,
-      }
+        activeSubject: subject,
+      }    
     },
-
     deselectPopup: () => $state => {
       return {
         ...$state,
@@ -204,8 +205,8 @@ interface PopupProps {
 const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup, colorPalette, updateColor, close, select, remove, toggleLock, updatePosition, updateSize, canEdit}) => ($state, $actions) => {
   const styles: any = {
     backgroundColor: popup.color,
-    width: popup.cssWidth + 'px',
-    height: popup.cssHeight + 'px',
+    width: popup.cssWidth < $state.minPopupWidth ? $state.minPopupWidth + 'px' : popup.cssWidth + 'px',
+    height: popup.cssHeight < $state.minPopupHeight ? $state.minPopupHeight + 'px' : popup.cssHeight + 'px',
   }
 
   let colorString
@@ -293,9 +294,12 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
               <CommandbarButton
                 onClick={(e: Event) => {
                   e.stopPropagation()
-                  select(popup.id)
-                  $actions.updateActiveContent((document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value)
-                  $actions.updateActiveSubject((document.getElementById('pwv-popup-subject-' + popup.id) as HTMLTextAreaElement).value)
+                  if (!popup.selected) {
+                    select(popup.id)
+                  }
+                  if (canEdit(popup.originalAuthor) && !popup.isLocked) {
+                    $actions.updateSubjectAndContent(popup.id)
+                  }
                   close()
                 }}
                 icon={icons.close}
@@ -309,7 +313,7 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             id={'pwv-popup-subject-' + popup.id}
             placeholder={translationManager.getText('annotation.subject')}
             onchange={() => {
-              $actions.updateActiveSubject((document.getElementById('pwv-popup-subject-' + popup.id) as HTMLInputElement).value)
+              $actions.updateSubjectAndContent(popup.id)
             }}
             disabled={!canEdit(popup.originalAuthor) || popup.isLocked}
             value={$state.selectedPopup === popup.id ? $state.activeSubject ? $state.activeSubject : popup.subject : popup.subject} />
@@ -325,7 +329,7 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
             <textarea
               id={'pwv-popup-content-' + popup.id}
               onchange={() => {
-                $actions.updateActiveContent((document.getElementById('pwv-popup-content-' + popup.id) as HTMLTextAreaElement).value)
+                $actions.updateSubjectAndContent(popup.id)
               }}
             >
               {$state.selectedPopup === popup.id ? $state.activeContent ? $state.activeContent : popup.content : popup.content}
@@ -346,7 +350,7 @@ const Popup: Component<PopupProps, PopupViewState, PopupViewActions> = ({ popup,
         <div
           class="pwv-popup-resizer"
           /* tslint:disable-next-line:max-line-length */
-          oncreate={(element: HTMLElement) => { PopupComponent.create(popup.id, element, $state.maxPopupWidth, $state.maxPopupHeight, updatePosition, updateSize, select) }}
+          oncreate={(element: HTMLElement) => { PopupComponent.create(popup.id, element, $state.minPopupWidth, $state.minPopupHeight, $state.maxPopupWidth, $state.maxPopupHeight, updatePosition, updateSize, select) }}
           onremove={(element: HTMLElement, done: () => void) => { PopupComponent.remove(element); done() }}
         >
         </div>
@@ -360,10 +364,10 @@ type UpdateSizeCallback = (payload: UpdatePopupSizePayload) => void
 type SelectCallback = (id: number) => void
 
 class PopupComponent {
-  public static create(id: number, resizeHandle: HTMLElement, maxPopupWidth: number, maxPopupHeight: number,
+  public static create(id: number, resizeHandle: HTMLElement, minPopupWidth: number, minPopupHeight: number, maxPopupWidth: number, maxPopupHeight: number,
                        updatePosition: UpdatePositionCallback, updateSize: UpdateSizeCallback, select: SelectCallback) {
     /* tslint:disable-next-line:max-line-length */
-    (resizeHandle.parentElement as any).popup = new PopupComponent(id, resizeHandle, maxPopupWidth, maxPopupHeight, updatePosition, updateSize, select)
+    (resizeHandle.parentElement as any).popup = new PopupComponent(id, resizeHandle, minPopupWidth, minPopupHeight, maxPopupWidth, maxPopupHeight, updatePosition, updateSize, select)
   }
 
   public static remove(resizeHandle: any) {
@@ -388,7 +392,7 @@ class PopupComponent {
   private maxPopupWidth: number
   private maxPopupHeight: number
 
-  constructor(id: number, resizeHandle: HTMLElement, maxPopupWidth: number, maxPopupHeight: number,
+  constructor(id: number, resizeHandle: HTMLElement, minPopupWidth: number, minPopupHeight: number, maxPopupWidth: number, maxPopupHeight: number,
               updatePosition: UpdatePositionCallback, updateSize: UpdateSizeCallback, select: SelectCallback) {
     this.id = id
     this.resizeHandle = resizeHandle
@@ -396,8 +400,8 @@ class PopupComponent {
     this.dragHandle = parent.children.item(0) as HTMLElement
     this.element = parent.parentElement as HTMLElement
 
-    this.minPopupWidth = 180
-    this.minPopupHeight = 120
+    this.minPopupWidth = 260
+    this.minPopupHeight = 200
     this.maxPopupWidth = maxPopupWidth > this.minPopupWidth ? maxPopupWidth : this.minPopupWidth
     this.maxPopupHeight = maxPopupHeight > this.minPopupHeight ? maxPopupHeight : this.minPopupHeight
 

@@ -93,10 +93,10 @@ export class MobilePopupLayer extends CanvasLayer {
   private closePopup() {
     if (this.pdfApi && this.popupElement && this.popupView) {
       this.popupElement.style.display = 'none'
-      this.popupView.closePopup()
       const state = this.popupView.getState()
       const id = state.id
       const item = this.pdfApi.getItem(id) as Annotation
+      this.popupView.closePopup()
       if (item) {
         item.popup.isOpen = false
         this.updateSelectedPopupContent(true, item)
@@ -174,31 +174,34 @@ export class MobilePopupLayer extends CanvasLayer {
       if (this.pdfApi) {
         if (this.popupView) {
           const state = this.popupView.getState()
-          const id = state.id
-          if (id) {
-            if (!annotation) {
+          if (!annotation) {
+            const id = state.id
+            if (id !== 0) {
               annotation = this.pdfApi.getItem(id) as Annotation
-            }
-            const content = state.content
-            const subject = state.subject
-            if (this.options.ms_custom) {
-              addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
-            }
-            annotation.content = content !== null ? content : annotation.content
-            annotation.subject = subject !== null ? subject : annotation.subject
-
-            if (syncronize) {
-              this.pdfApi.updateItem(annotation).then( () => {
-                if (this.popupView) {
-                  this.popupView.stateChanged(false)
-                }
-                resolve()
-              }).catch( () => {
-                reject()
-              })
             } else {
-              resolve(annotation)
+              resolve()
+              return
             }
+          }
+          const content = state.content
+          const subject = state.subject
+          if (this.options.ms_custom) {
+            addHistoryEntry(annotation, 'edit', this.options.author, content, subject)
+          }
+          annotation.content = content !== null ? content : annotation.content
+          annotation.subject = subject !== null ? subject : annotation.subject
+
+          if (syncronize) {
+            this.pdfApi.updateItem(annotation).then( () => {
+              if (this.popupView) {
+                this.popupView.stateChanged(false)
+              }
+              resolve()
+            }).catch( () => {
+              reject()
+            })
+          } else {
+            resolve(annotation)
           }
         }
       }

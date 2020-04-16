@@ -79,10 +79,12 @@ export const createMobilePopupView = (props: MobilePopupViewProps, element: HTML
         color,
       }
     },
-    closePopup: () => $state => ({
-      ...$state,
-      id: 0,
-    }),
+    closePopup: () => $state => {
+      return {
+        ...$state,
+        id: 0,
+      }
+    },
     setLock: (isLocked: boolean) => $state => {
       return {
         ...$state,

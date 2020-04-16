@@ -102,3 +102,10 @@
     padding-left: .2rem;
   }
 }
+
+@media screen and (max-width: 454px) {
+  .pwv-navigation-toolbar-pageinput-mobile {
+    display: none;
+  }
+}
+
