@@ -2,6 +2,7 @@ export interface SupportedLanguages {
   en: string,
   de: string,
   fr: string,
+  it: string,
 }
 
 /** @internal */
