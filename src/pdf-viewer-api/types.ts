@@ -135,6 +135,7 @@ export interface FreetextAnnotation extends Annotation {
   fontName: string
   fontColor: string
   richText: string | null
+  border: AnnotationBorder
 }
 
 export interface StampInfoArgs {
