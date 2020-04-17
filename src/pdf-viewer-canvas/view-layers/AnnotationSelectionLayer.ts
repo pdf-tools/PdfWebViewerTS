@@ -256,7 +256,13 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     if (this.pdfViewerApi) {
       const item = this.pdfViewerApi.getItem(id) as any
       item.rotation = (item.rotation - 90) % 360
-      this.pdfViewerApi.updateItem(item)
+      this.pdfViewerApi.updateItem(item).then( item => {
+        if (this.annotationBorder) {
+          const annotation = item as Annotation
+          const pageRect = this.store.getState().document.pageRects[annotation.pdfRect.page]
+          this.annotationBorder.setAnnotation(annotation, pageRect)
+        }
+      })
     }
   }
 
