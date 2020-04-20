@@ -36,24 +36,16 @@ const options: Partial<PdfWebViewerOptions> = {
   annotationBarPosition: 'left',
   highlightColors: ['#2ADB1A', '#FFEA02', '#FF7F1F', '#FF2882', '#008AD1'],
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
-  backgroundColors: ['#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
+  backgroundColors: ['#ffffff00', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
   defaultHighlightColor: '#FFEA02',
   defaultBackgroundColor: '#FCF5E2',
   defaultForegroundColor: '#323232',
-  highlightOpacity: .5,
+  highlightOpacity: 0.5,
   textSelectionColor: '#006395',
   searchMatchColor: '#3ABCFF',
   defaultStampWidth: 120,
   defaultStampText: 'stamptext.approved',
-  modules: [
-    DebugModule,
-    PopupModule,
-    TextAnnotationModule,
-    InkAnnotationModule,
-    FreetextAnnotationModule,
-    HighlightAnnotationModule,
-    StampAnnotationModule,
-  ],
+  modules: [DebugModule, PopupModule, TextAnnotationModule, InkAnnotationModule, FreetextAnnotationModule, HighlightAnnotationModule, StampAnnotationModule],
 
   /*****
    * EXAMPLE: Custom event handlers for open and save.
@@ -96,7 +88,7 @@ viewer.addEventListener('appLoaded', () => {
   // viewer.openFile('http://url/to/cors/accessible/file.pdf')
 })
 
-viewer.addEventListener('documentLoaded', file => {
+viewer.addEventListener('documentLoaded', (file) => {
   if (file instanceof Blob) {
     console.log('*** document loaded ***')
     console.log('name          : ' + file.name)
