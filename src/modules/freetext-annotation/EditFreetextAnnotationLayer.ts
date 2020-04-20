@@ -173,14 +173,12 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
 
         this.freetextAnnotation.content = richTextObj.content
         this.freetextAnnotation.subject = subject
-        // this.freetextAnnotation.richText = richTextObj.richText
+        this.freetextAnnotation.richText = richTextObj.richText
         this.freetextAnnotation.fontColor = fontColor.toHexRgb()
         this.freetextAnnotation.fontName = richTextObj.fontName !== null ? richTextObj.fontName : 'Helvetica'
         this.freetextAnnotation.fontSize = richTextObj.fontSizeCSS ? convertCssToPdfPixel(richTextObj.fontSizeCSS) : this.freetextAnnotation.fontSize
         this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
         this.freetextAnnotation.borderWidth = richTextObj.borderWidth
-
-        console.log(this.freetextAnnotation)
 
         this.pdfApi
           .updateItem(this.freetextAnnotation)
@@ -189,9 +187,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
             resolve()
           })
           .catch((err) => {
-            console.log('*******************')
             console.log(err)
-            console.log('*******************')
             reject()
           })
       }
