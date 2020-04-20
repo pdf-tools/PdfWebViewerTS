@@ -1,0 +1,26 @@
+.pwv-stroke-width-picker {
+  width: 110px;
+
+  button {
+    .pwv-stroke-width {
+      width: 18px;
+    }
+  }
+}
+.pwv-stroke-width-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  &:hover {
+    .pwv-stroke-width {
+      background-color: $blue;
+    }
+  }
+}
+.pwv-stroke-width {
+  display: block;
+  width: 40px;
+  margin-top: 2px;
+  background-color: $icon-color;
+  margin-left: 8px;
+}

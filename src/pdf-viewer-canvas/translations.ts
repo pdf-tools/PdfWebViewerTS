@@ -1,4 +1,3 @@
-
 /** @internal */
 export const translations = {
   'errors.invalidLicense': {
@@ -25,8 +24,7 @@ export const translations = {
     fr: 'Sujet',
     it: 'Oggetto',
   },
-  'stamptext.approved' :
-  {
+  'stamptext.approved': {
     en: 'APPROVED',
     de: 'GENEHMIGT',
     fr: 'APPROUVÉ',
@@ -98,16 +96,22 @@ export const translations = {
     fr: 'POUR INFORMATION',
     it: 'SOLO INFORMAZIONI',
   },
-  'chooseStamp': {
+  chooseStamp: {
     en: 'CHOOSE STAMP',
     de: 'STEMPEL WÄHLEN',
     fr: 'SÉLECTIONNEZ LE TIMBRE',
     it: 'SCEGLIERE TIMBRO',
   },
-  'lockedAnnotation': {
+  lockedAnnotation: {
     en: 'Locked Annotation',
     de: 'Geschützte Annotation',
     fr: 'Annotation Protégée',
     it: 'Annotazione protetta',
+  },
+  borderNone: {
+    en: 'No Border',
+    de: 'Kein Rahmen',
+    fr: 'No Border',
+    it: 'No Border',
   },
 }

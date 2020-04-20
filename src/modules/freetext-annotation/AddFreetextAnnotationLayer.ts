@@ -9,41 +9,50 @@ import { createAddFreetextAnnotationToolbar } from './AddFreetextAnnotationToolb
 const moduleLayerName = 'AddFreetextAnnotation'
 
 export class AddFreetextAnnotationLayer extends CanvasLayer {
-
   private context: CanvasRenderingContext2D | null = null
 
   private colors: string[] = []
   private selectedColor: string = ''
+  private borderWidths: number[] = []
+  private selectedBorderWidth = 1
   private pointerDown: boolean = false
   private startPoint: Point | null = null
   private page: number = 0
 
   public onCreate(): void {
-
     this.setColor = this.setColor.bind(this)
+    this.setBorderWidth = this.setBorderWidth.bind(this)
     this.close = this.close.bind(this)
 
     this.context = this.createCanvas()
     this.colors = this.options.backgroundColors
-    this.selectedColor = this.options.defaultFreetextBgColor ?
-                         this.options.defaultFreetextBgColor :
-                         this.options.defaultBackgroundColor
+    this.selectedColor = this.options.defaultFreetextBgColor ? this.options.defaultFreetextBgColor : this.options.defaultBackgroundColor
+
+    // todo: get values from options
+    this.borderWidths = [0, 1, 2, 3, 4]
+    this.selectedBorderWidth = this.options.defaultFreetextBorderSize ? this.options.defaultFreetextBorderSize : this.options.defaultBorderSize
 
     /* tslint:disable-next-line:align */
-    ; const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
+    const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
 
-    createAddFreetextAnnotationToolbar({
-      colors: this.colors,
-      selectedColor: this.selectedColor,
-      onColorChanged: this.setColor,
-      onClose: this.close,
-    }, toolbarElement)
+    createAddFreetextAnnotationToolbar(
+      {
+        colors: this.colors,
+        selectedColor: this.selectedColor,
+        borderWidths: this.borderWidths,
+        selectedBorderWidth: this.selectedBorderWidth,
+        onColorChanged: this.setColor,
+        onBorderWidthChanged: this.setBorderWidth,
+        onClose: this.close,
+      },
+      toolbarElement,
+    )
 
     this.store.viewer.beginModule(moduleLayerName)
   }
 
   public onSave() {
-    const promise = new Promise<void>( (resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       resolve()
     })
     return promise
@@ -54,7 +63,7 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     this.context = null
 
     /* tslint:disable-next-line:align */
-    ; const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
+    const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
     toolbarElement.innerHTML = ''
 
     this.store.viewer.setCursorStyle(CursorStyle.DEFAULT)
@@ -62,17 +71,13 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
   }
 
   public render(timestamp: number, state: ViewerCanvasState): void {
-
     if (state.viewer.modeChanged && state.viewer.selectedModuleName !== moduleLayerName) {
       this.remove()
       return
     }
 
     if (this.context) {
-      const update = state.viewer.modeChanged ||
-        state.pointer.positionChanged ||
-        state.pointer.action ||
-        state.document.zoomChanged
+      const update = state.viewer.modeChanged || state.pointer.positionChanged || state.pointer.action || state.document.zoomChanged
 
       if (update) {
         const ctx = this.context
@@ -89,7 +94,6 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
         }
 
         if (state.pointer.isDown) {
-
           if (!this.pointerDown) {
             this.startPoint = pointerPos
             this.pointerDown = true
@@ -100,13 +104,18 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
           }
 
           if (this.startPoint) {
-            const rect = getRectFromSelection(state.document, {
-              x: this.startPoint.x,
-              y: this.startPoint.y,
-            }, {
-              x: pointerPos.x,
-              y: pointerPos.y,
-            }, this.page)
+            const rect = getRectFromSelection(
+              state.document,
+              {
+                x: this.startPoint.x,
+                y: this.startPoint.y,
+              },
+              {
+                x: pointerPos.x,
+                y: pointerPos.y,
+              },
+              this.page,
+            )
 
             if (rect) {
               const lineWidth = 2 * devicePixelRatio
@@ -116,21 +125,24 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
               ctx.lineWidth = lineWidth
               ctx.setLineDash([lineWidth, lineWidth])
               ctx.strokeRect(rect.x, rect.y, rect.w, rect.h)
-              ctx.globalAlpha = .33
+              ctx.globalAlpha = 0.33
               ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
               ctx.restore()
             }
           }
-
         } else if (this.pointerDown && this.startPoint) {
-
-          const rect = getRectFromSelection(state.document, {
-            x: this.startPoint.x,
-            y: this.startPoint.y,
-          }, {
-            x: pointerPos.x,
-            y: pointerPos.y,
-          }, this.page)
+          const rect = getRectFromSelection(
+            state.document,
+            {
+              x: this.startPoint.x,
+              y: this.startPoint.y,
+            },
+            {
+              x: pointerPos.x,
+              y: pointerPos.y,
+            },
+            this.page,
+          )
 
           if (rect) {
             this.createFreeTextAnnotation(rect)
@@ -147,6 +159,10 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     this.selectedColor = color
   }
 
+  private setBorderWidth(borderWidth: number) {
+    this.selectedBorderWidth = borderWidth
+  }
+
   private close() {
     this.remove()
   }
@@ -160,30 +176,26 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
       page: pdfRect.page,
       pdfRect,
       border: {
-        width: this.options.defaultFreetextBorderSize ?
-               this.options.defaultFreetextBorderSize :
-               this.options.defaultBorderSize,
+        width: this.selectedBorderWidth,
         style: AnnotationBorderStyle.SOLID,
       },
       /* tslint:disable-next-line: max-line-length */
-      richtext: `<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2" style="color:${this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor};"></body>`,
+      richtext: `<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2" style="color:${
+        this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor
+      };"></body>`,
       fontName: 'Arial',
-      fontColor: this.options.defaultFreetextFontColor ?
-                 this.options.defaultFreetextFontColor :
-                 this.options.defaultForegroundColor,
-      fontSize: this.options.defaultFreetextFontSize ?
-                this.options.defaultFreetextFontSize :
-                this.options.defaultFontSize,
+      fontColor: this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor,
+      fontSize: this.options.defaultFreetextFontSize ? this.options.defaultFreetextFontSize : this.options.defaultFontSize,
     }
-    this.pdfApi.createItem(annotation).then(item => {
+
+    this.pdfApi.createItem(annotation).then((item) => {
       const promise = this.onAnnotationCreated(item as Annotation)
 
       if (promise) {
-        promise.then( it => {
-          (this.module as FreetextAnnotationModule).onEdit((it as Annotation).id)
+        promise.then((it) => {
+          ;(this.module as FreetextAnnotationModule).onEdit((it as Annotation).id)
         })
       }
     })
   }
-
 }

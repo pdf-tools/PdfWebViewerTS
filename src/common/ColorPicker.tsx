@@ -17,62 +17,43 @@ export interface ColorPickerProps {
 }
 
 /** @internal */
-export const ColorPicker: Component<ColorPickerProps> = props => {
+export const ColorPicker: Component<ColorPickerProps> = (props) => {
   if (props.mode === 'buttons' && window.innerWidth > 580) {
-    return (<ColorPickerButtons {...props} />)
+    return <ColorPickerButtons {...props} />
   } else {
-    return (<ColorPickerDropdown {...props} />)
+    return <ColorPickerDropdown {...props} />
   }
-
 }
 
 const ColorPickerDropdown: Component<ColorPickerProps> = ({ icon, tooltip, tooltipPos, disabled, colors, color, onChange }) => {
   if (disabled) {
-     return (
+    return (
       <div class="pwv-colorpicker pwv-commandbar-item pwv-disabled">
-        <button
-          class=""
-          oncreate={DropdownComponent.create}
-          onremove={DropdownComponent.remove}
-        >
+        <button class="" oncreate={DropdownComponent.create} onremove={DropdownComponent.remove}>
           <Icon icon={icon} />
-          <div
-            class={classNames('pwv-colorpicker-currentcolor')}
-            style={{ backgroundColor: color }}
-          ></div>
-          {tooltip && tooltipPos &&
-            <Tooltip position={tooltipPos}>{tooltip}</Tooltip>
-          }
+          <div class={classNames('pwv-colorpicker-currentcolor')} style={{ backgroundColor: color }}></div>
+          {tooltip && tooltipPos && <Tooltip position={tooltipPos}>{tooltip}</Tooltip>}
         </button>
       </div>
     )
   } else {
     return (
       <div class="pwv-colorpicker pwv-commandbar-item">
-        <button
-          class=""
-          oncreate={DropdownComponent.create}
-          onremove={DropdownComponent.remove}
-        >
+        <button class="" oncreate={DropdownComponent.create} onremove={DropdownComponent.remove}>
           <Icon icon={icon} />
-          <div
-            class={classNames('pwv-colorpicker-currentcolor')}
-            style={{ backgroundColor: color }}
-          ></div>
-          {tooltip && tooltipPos &&
-            <Tooltip position={tooltipPos}>{tooltip}</Tooltip>
-          }
+          <div class={classNames('pwv-colorpicker-currentcolor')} style={{ backgroundColor: color }}></div>
+          {tooltip && tooltipPos && <Tooltip position={tooltipPos}>{tooltip}</Tooltip>}
         </button>
         <div class="pwv-dropdown-panel">
-          {colors.map(c => (
+          {colors.map((c) => (
             <button
               disabled={c === color}
-              style={{ backgroundColor: c }}
               class={classNames('pwv-colorpicker-btn', { 'pwv-selected': c === color })}
               onclick={(e: MouseEvent) => {
                 onChange && onChange(c)
               }}
             >
+              <div style={{ backgroundColor: c }} />
             </button>
           ))}
         </div>
@@ -84,15 +65,15 @@ const ColorPickerDropdown: Component<ColorPickerProps> = ({ icon, tooltip, toolt
 const ColorPickerButtons: Component<ColorPickerProps> = ({ icon, colors, color, onChange }) => {
   return (
     <div class="pwv-colorpicker-buttons pwv-commandbar-item">
-      {colors.map(c => (
+      {colors.map((c) => (
         <button
           disabled={c === color}
-          style={{ backgroundColor: c }}
           class={classNames('pwv-colorpicker-btn', { 'pwv-selected': c === color })}
           onclick={(e: MouseEvent) => {
             onChange && onChange(c)
           }}
         >
+          <div style={{ backgroundColor: c }} />
         </button>
       ))}
     </div>
