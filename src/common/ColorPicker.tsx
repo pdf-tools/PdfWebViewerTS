@@ -44,7 +44,7 @@ const ColorPickerDropdown: Component<ColorPickerProps> = ({ icon, tooltip, toolt
           <div class={classNames('pwv-colorpicker-currentcolor')} style={{ backgroundColor: color }}></div>
           {tooltip && tooltipPos && <Tooltip position={tooltipPos}>{tooltip}</Tooltip>}
         </button>
-        <div class="pwv-dropdown-panel">
+        <div class={classNames('pwv-dropdown-panel', { 'pwv-dropdown-panel-wide': colors.length > 6 })}>
           {colors.map((c) => (
             <button
               disabled={c === color}

@@ -29,6 +29,9 @@
     left: 0;
     right: auto;
     width: 120px;
+    &.pwv-dropdown-panel-wide {
+      width: 160px;
+    }
   }
 }
 .pwv-colorpicker-opacity {
