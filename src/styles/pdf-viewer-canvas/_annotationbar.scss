@@ -3,7 +3,7 @@
   align-content: flex-start;
   background-color: $gray-lighter;
   flex-shrink: 0;
-  
+
   .pwv-annotationbar-left & {
     border-right: 2px solid $gray-light;
     flex-direction: column;
@@ -12,13 +12,24 @@
     .pwv-commandbar-btn {
       height: 55px;
     }
-    .pwv-dropdown-panel{
-      top: 0;
-      left: $toolbar-btn-width;
-      width: 200px;
+
+    .pwv-annotationbar-tool-picker {
+      height: 55px;
+      .pwv-dropdown-panel {
+        top: 6px;
+        left: $toolbar-btn-width;
+        width: fit-content;
+        ul {
+          display: flex;
+          padding: 0 10px;
+        }
+        .pwv-commandbar-btn {
+          height: 40px;
+        }
+      }
     }
   }
-  
+
   .pwv-annotationbar-right & {
     border-left: 2px solid $gray-light;
     flex-direction: column;
@@ -27,27 +38,52 @@
     .pwv-commandbar-btn {
       height: 55px;
     }
+
+    .pwv-annotationbar-tool-picker {
+      height: 55px;
+      .pwv-dropdown-panel {
+        top: 6px;
+        right: $toolbar-btn-width;
+        width: fit-content;
+        ul {
+          display: flex;
+          padding: 0 10px;
+        }
+        .pwv-commandbar-btn {
+          height: 40px;
+        }
+      }
+    }
   }
 
   .pwv-annotationbar-top & {
     border-bottom: 2px solid $gray-light;
     height: $toolbar-btn-width;
   }
-  
+
   .pwv-annotationbar-bottom & {
     border-top: 2px solid $gray-light;
     height: $toolbar-btn-width;
   }
-  
+
   .pwv-commandbar-group {
     width: $toolbar-btn-width;
   }
-  .pwv-dropdown, .pwv-commandbar-item {
+  .pwv-dropdown,
+  .pwv-commandbar-item {
     height: $toolbar-btn-width;
     width: $toolbar-btn-width;
   }
 
   .pwv-annotation-border {
-    border: solid 2px $blue
+    border: solid 2px $blue;
+  }
+}
+
+.pwv-annotationbar-tool-picker {
+  .pwv-dropdown-panel {
+    li {
+      padding: 0;
+    }
   }
 }
