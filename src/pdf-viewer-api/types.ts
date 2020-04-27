@@ -122,6 +122,10 @@ export interface LinkAnnotation extends PdfPositionalItem {
   quadPointRects: PdfRect[] | null
 }
 
+export interface InkAnnotation extends Annotation {
+  inkList: number[][]
+}
+
 export interface StampAnnotation extends PdfPositionalItem {
   rotation: number
 }
