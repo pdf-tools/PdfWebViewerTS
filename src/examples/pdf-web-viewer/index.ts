@@ -10,6 +10,7 @@ import { FreetextAnnotationModule } from '../../modules/freetext-annotation/Free
 import { HighlightAnnotationModule } from '../../modules/highlight-annotation/HighlightAnnotationModule'
 import { StampAnnotationModule } from '../../modules/stamp-annotation/StampAnnotationModule'
 import { PopupModule } from '../../modules/popup/PopupModule'
+import { ShapeAnnotationModule } from '../../modules/shape-annotations/ShapeAnnotationModule'
 
 import '../styles/examples.scss'
 import '../../styles/themes/pdf-web-viewer.scss'
@@ -33,7 +34,6 @@ const options: Partial<PdfWebViewerOptions> = {
     PdfPageLayoutMode.TWO_PAGE_RIGHT,
   ],
   language: 'en',
-  annotationBarPosition: 'left',
   highlightColors: ['#2ADB1A', '#FFEA02', '#FF7F1F', '#FF2882', '#008AD1'],
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
   backgroundColors: ['#ffffff00', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
@@ -45,7 +45,16 @@ const options: Partial<PdfWebViewerOptions> = {
   searchMatchColor: '#3ABCFF',
   defaultStampWidth: 120,
   defaultStampText: 'stamptext.approved',
-  modules: [DebugModule, PopupModule, TextAnnotationModule, InkAnnotationModule, FreetextAnnotationModule, HighlightAnnotationModule, StampAnnotationModule],
+  modules: [
+    DebugModule,
+    PopupModule,
+    TextAnnotationModule,
+    InkAnnotationModule,
+    FreetextAnnotationModule,
+    HighlightAnnotationModule,
+    StampAnnotationModule,
+    ShapeAnnotationModule,
+  ],
 
   /*****
    * EXAMPLE: Custom event handlers for open and save.

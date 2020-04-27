@@ -20,7 +20,7 @@ export interface DropdownProps {
   items: DropdownItem[]
   disabled?: boolean
   width?: number
-  align?: 'left' | 'right'
+  align?: 'left' | 'right' | 'center'
   className?: string
   hideCaret?: boolean
   renderButton?(value: string | number, text?: string): any
@@ -42,14 +42,15 @@ export const Dropdown: Component<DropdownProps> = ({
   renderButton,
   onChange,
 }) => {
-
-  const selectedItem = items.find(item => item.value === value)
+  const selectedItem = items.find((item) => item.value === value)
   if (!text && selectedItem) {
     text = selectedItem.text
   }
-  const style = width ? {
-    width: width + 'px',
-  } : {}
+  const style = width
+    ? {
+        width: width + 'px',
+      }
+    : {}
 
   if (disabled) {
     return (
@@ -57,27 +58,24 @@ export const Dropdown: Component<DropdownProps> = ({
         class={classNames(
           'pwv-dropdown',
           'pwv-disabled',
-          {'pwv-dropdown-align-left': !align || align === 'left'},
-          {'pwv-dropdown-align-right': align === 'right'},
+          { 'pwv-dropdown-align-left': !align || align === 'left' },
+          { 'pwv-dropdown-align-right': align === 'right' },
+          { 'pwv-dropdown-align-center': align === 'center' },
           className,
         )}
         style={style}
       >
         <button disabled={true}>
           <span class="pwv-dropdown-text">
-            {icon &&
-              <Icon icon={icon} />
-            }
+            {icon && <Icon icon={icon} />}
             {text}
           </span>
-          {!hideCaret &&
+          {!hideCaret && (
             <span class="pwv-dropdown-caret">
               <Icon icon={icons.dropdownCaret} />
             </span>
-          }
-          {tooltip && tooltipPos &&
-            <Tooltip position={tooltipPos}>{tooltip}</Tooltip>
-          }
+          )}
+          {tooltip && tooltipPos && <Tooltip position={tooltipPos}>{tooltip}</Tooltip>}
         </button>
       </div>
     )
@@ -86,44 +84,34 @@ export const Dropdown: Component<DropdownProps> = ({
     <div
       class={classNames(
         'pwv-dropdown',
-        {'pwv-dropdown-align-left': !align || align === 'left'},
-        {'pwv-dropdown-align-right': align === 'right'},
+        { 'pwv-dropdown-align-left': !align || align === 'left' },
+        { 'pwv-dropdown-align-right': align === 'right' },
+        { 'pwv-dropdown-align-center': align === 'center' },
         className,
       )}
       style={style}
     >
-      <button
-        oncreate={DropdownComponent.create}
-        onremove={DropdownComponent.remove}
-      >
-        {renderButton ?
-          renderButton(value, text) :
+      <button oncreate={DropdownComponent.create} onremove={DropdownComponent.remove}>
+        {renderButton ? (
+          renderButton(value, text)
+        ) : (
           <span class="pwv-dropdown-text">
-            {icon &&
-              <Icon icon={icon} />
-            }
+            {icon && <Icon icon={icon} />}
             {text}
           </span>
-        }
-        {!hideCaret &&
+        )}
+        {!hideCaret && (
           <span class="pwv-dropdown-caret">
             <Icon icon={icons.dropdownCaret} />
           </span>
-        }
-        {tooltip && tooltipPos &&
-          <Tooltip position={tooltipPos}>{tooltip}</Tooltip>
-        }
+        )}
+        {tooltip && tooltipPos && <Tooltip position={tooltipPos}>{tooltip}</Tooltip>}
       </button>
       <div class="pwv-dropdown-panel">
         <ul>
-          {items.map(item => (
-            <li
-              onclick={() => onChange && onChange(item.value)}
-            >
-              {item.renderItem ?
-                item.renderItem(item) :
-                <span class="pwv-dropdown-item-text">{item.text}</span>
-              }
+          {items.map((item) => (
+            <li onclick={() => onChange && onChange(item.value)}>
+              {item.renderItem ? item.renderItem(item) : <span class="pwv-dropdown-item-text">{item.text}</span>}
             </li>
           ))}
         </ul>
@@ -134,11 +122,11 @@ export const Dropdown: Component<DropdownProps> = ({
 
 export class DropdownComponent {
   public static create(btnElement: HTMLElement) {
-    (btnElement.parentElement as any).dropdown = new DropdownComponent(btnElement)
+    ;(btnElement.parentElement as any).dropdown = new DropdownComponent(btnElement)
   }
 
   public static remove(btnElement: HTMLElement) {
-    (btnElement.parentElement as any).dropdown.unmount()
+    ;(btnElement.parentElement as any).dropdown.unmount()
   }
 
   private element: HTMLElement
@@ -160,8 +148,8 @@ export class DropdownComponent {
   private handleOnClick(e: MouseEvent) {
     if (!this.element.classList.contains('pwv-dropdown-open')) {
       this.element.classList.add('pwv-dropdown-open')
-      const t = Date.now();
-      (e as any).openDropdown = t
+      const t = Date.now()
+      ;(e as any).openDropdown = t
       const closeDropdownPanel = (ev: any) => {
         if (ev.openDropdown !== t) {
           window.removeEventListener('click', closeDropdownPanel)
@@ -171,5 +159,4 @@ export class DropdownComponent {
       window.addEventListener('click', closeDropdownPanel, false)
     }
   }
-
 }

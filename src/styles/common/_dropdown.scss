@@ -24,7 +24,6 @@
       padding-left: 8px;
       display: inline-block;
       .pwv-icon {
-        
         width: 1.2rem;
         text-align: right;
         svg {
@@ -46,7 +45,7 @@
   min-width: 100%;
   background-color: $gray-lighter;
   border: 1px solid $gray-light;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 100;
   ul {
     list-style: none;
@@ -69,7 +68,7 @@
 
 .pwv-dropdown-align-left {
   text-align: left;
-  button {
+  > button {
     justify-content: space-between;
   }
   .pwv-dropdown-panel {
@@ -78,7 +77,7 @@
 }
 .pwv-dropdown-align-right {
   text-align: right;
-  button {
+  > button {
     justify-content: flex-end;
   }
   .pwv-dropdown-panel {
@@ -86,8 +85,18 @@
   }
 }
 
+.pwv-dropdown-align-center {
+  text-align: center;
+  > button {
+    justify-content: center;
+    padding: 0;
+  }
+  .pwv-dropdown-panel {
+    right: 0;
+  }
+}
+
 .pwv-dropdown-open {
-  
   .pwv-icon {
     svg {
       fill: $blue;
