@@ -65,7 +65,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       content: this.freetextAnnotation.content,
       richText: this.freetextAnnotation.richText,
       backgroundColor: this.freetextAnnotation.color,
-      borderWidth: this.freetextAnnotation.borderWidth,
+      borderWidth: this.freetextAnnotation.border.width,
       fontName: this.fontName,
       fontColor: this.color,
       fontSizeCSS: this.fontSizeCSS,
@@ -178,7 +178,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
         this.freetextAnnotation.fontName = richTextObj.fontName !== null ? richTextObj.fontName : 'Helvetica'
         this.freetextAnnotation.fontSize = richTextObj.fontSizeCSS ? convertCssToPdfPixel(richTextObj.fontSizeCSS) : this.freetextAnnotation.fontSize
         this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
-        this.freetextAnnotation.borderWidth = richTextObj.borderWidth
+        this.freetextAnnotation.border.width = richTextObj.borderWidth
 
         this.pdfApi
           .updateItem(this.freetextAnnotation)
