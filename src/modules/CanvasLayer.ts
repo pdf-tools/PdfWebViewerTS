@@ -2,30 +2,46 @@ import { ViewerCanvasState, ViewerCanvasStore } from '../pdf-viewer-canvas/state
 import { PdfViewerApi } from '../pdf-viewer-api'
 import { Annotation, PdfItem } from '../pdf-viewer-api/types'
 import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
+import { PdfViewerCanvas } from '../pdf-viewer-canvas/PdfViewerCanvas'
 import { CanvasModule } from './CanvasModule'
 import { addHistoryEntry } from '../custom/history'
 
 export interface CanvasLayerClass {
-  new(module: CanvasModule, name: string, containerElement: HTMLElement, store: ViewerCanvasStore,
-      pdfApi: PdfViewerApi, options: PdfViewerCanvasOptions): CanvasLayer
+  new (
+    module: CanvasModule,
+    name: string,
+    containerElement: HTMLElement,
+    store: ViewerCanvasStore,
+    pdfApi: PdfViewerApi,
+    pdfViewerCanvas: PdfViewerCanvas,
+    options: PdfViewerCanvasOptions,
+  ): CanvasLayer
 }
 
 export abstract class CanvasLayer {
-
   protected containerElement: HTMLElement
   protected store: ViewerCanvasStore
   protected pdfApi: PdfViewerApi
+  protected pdfViewerCanvas: PdfViewerCanvas
   protected options: PdfViewerCanvasOptions
   protected module: CanvasModule
   private canvasContexts: CanvasRenderingContext2D[] = []
   private htmlLayers: HTMLElement[] = []
   private name: string
 
-  constructor(module: CanvasModule, name: string, containerElement: HTMLElement,
-              store: ViewerCanvasStore, pdfApi: PdfViewerApi, options: PdfViewerCanvasOptions) {
+  constructor(
+    module: CanvasModule,
+    name: string,
+    containerElement: HTMLElement,
+    store: ViewerCanvasStore,
+    pdfApi: PdfViewerApi,
+    pdfViewerCanvas: PdfViewerCanvas,
+    options: PdfViewerCanvasOptions,
+  ) {
     this.containerElement = containerElement
     this.store = store
     this.pdfApi = pdfApi
+    this.pdfViewerCanvas = pdfViewerCanvas
     this.options = options
     this.module = module
     this.name = name
@@ -41,13 +57,12 @@ export abstract class CanvasLayer {
   public abstract onSave(): Promise<void>
 
   public resize(width: number, height: number): void {
-
     const tempCanvas = document.createElement('canvas')
     tempCanvas.width = width * devicePixelRatio
     tempCanvas.height = height * devicePixelRatio
     const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D
 
-    this.canvasContexts.forEach(ctx => {
+    this.canvasContexts.forEach((ctx) => {
       tempContext.drawImage(ctx.canvas, 0, 0)
       ctx.canvas.style.width = width + 'px'
       ctx.canvas.style.height = height + 'px'
@@ -109,17 +124,18 @@ export abstract class CanvasLayer {
     }
   }
 
-  protected onAnnotationCreated(annotation: Annotation): Promise<PdfItem> | undefined {
+  protected onAnnotationCreated(annotation: Annotation): Promise<PdfItem> {
     if (this.options.ms_custom) {
       addHistoryEntry(annotation, 'create', this.options.author)
       return this.pdfApi.updateItem(annotation)
     }
+    return new Promise<PdfItem>((resolve) => resolve(annotation))
   }
 
   protected canEdit(author: string) {
     if (this.options.ms_custom) {
-        return this.options.author === author
-      }
+      return this.options.author === author
+    }
     return true
   }
 }

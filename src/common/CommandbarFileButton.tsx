@@ -6,6 +6,7 @@ import { Tooltip, TooltipPosition } from './Tooltip'
 export interface CommandbarFileButtonProps {
   icon: IconDefinition
   tooltip?: string
+  accept?: string
   tooltipPos?: TooltipPosition
   disabled?: boolean
   active?: boolean
@@ -13,25 +14,22 @@ export interface CommandbarFileButtonProps {
 }
 
 /** @internal */
-export const CommandbarFileButton: Component<CommandbarFileButtonProps> = ({ icon, tooltip, tooltipPos, disabled, onFileSelected }) => {
+export const CommandbarFileButton: Component<CommandbarFileButtonProps> = ({ icon, accept, tooltip, tooltipPos, disabled, onFileSelected }) => {
   if (disabled) {
     return (
-      <div class="pwv-commandbar-item pwv-commandbar-btn pwv-disabled" >
+      <div class="pwv-commandbar-item pwv-commandbar-btn pwv-disabled">
         <Icon icon={icon} />
-        {tooltip && tooltipPos &&
-          <Tooltip position={TooltipPosition.bottom}>{tooltip}</Tooltip>
-        }
+        {tooltip && tooltipPos && <Tooltip position={TooltipPosition.bottom}>{tooltip}</Tooltip>}
       </div>
     )
   } else {
     return (
-      <label
-        class="pwv-commandbar-item pwv-commandbar-btn"
-      >
+      <label class="pwv-commandbar-item pwv-commandbar-btn">
         <Icon icon={icon} />
         <input
-          style={{display: 'none'}}
+          style={{ display: 'none' }}
           type="file"
+          accept={accept}
           onchange={(e: any) => {
             if (onFileSelected && e.currentTarget.files && e.currentTarget.files.length) {
               const file = e.currentTarget.files[0]
@@ -45,9 +43,7 @@ export const CommandbarFileButton: Component<CommandbarFileButtonProps> = ({ ico
             label.setAttribute('for', id)
           }}
         />
-        {tooltip && tooltipPos &&
-          <Tooltip position={TooltipPosition.bottom}>{tooltip}</Tooltip>
-        }
+        {tooltip && tooltipPos && <Tooltip position={TooltipPosition.bottom}>{tooltip}</Tooltip>}
       </label>
     )
   }

@@ -189,13 +189,10 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     }
 
     this.pdfApi.createItem(annotation).then((item) => {
-      const promise = this.onAnnotationCreated(item as Annotation)
-
-      if (promise) {
-        promise.then((it) => {
-          ;(this.module as FreetextAnnotationModule).onEdit((it as Annotation).id)
-        })
-      }
+      this.onAnnotationCreated(item as Annotation).then((item) => {
+        const module = this.module as FreetextAnnotationModule
+        module.onEdit(item.id)
+      })
     })
   }
 }

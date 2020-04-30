@@ -10,7 +10,6 @@ import { Color } from '../../common/Color'
 const moduleLayerName = 'AddInkAnnotation'
 
 export class AddInkAnnotationLayer extends CanvasLayer {
-
   private context: CanvasRenderingContext2D | null = null
   private drawing: boolean = false
   private lines: PdfPoint[][] | null = []
@@ -35,39 +34,42 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     this.context = this.createCanvas()
     this.penColors = this.options.foregroundColors
     this.penWidths = [1, 2, 3, 5, 8, 13, 21]
-    this.selectedPenColor = this.options.defaultInkColor ?
-                            this.options.defaultInkColor :
-                            this.options.defaultForegroundColor
+    this.selectedPenColor = this.options.defaultInkColor ? this.options.defaultInkColor : this.options.defaultForegroundColor
     this.selectedPenSize = this.options.defaultBorderSize
     this.penRgbaColor = this.selectedPenColor
     this.store.viewer.beginModule(moduleLayerName)
 
     /* tslint:disable-next-line:align */
-    ; const toolbarElement = (this.module as InkAnnotationModule).toolbarElement as HTMLElement
-    this.toolbar = createAddInkAnnotationToolbar({
-      penColors: this.penColors,
-      penWidths: this.penWidths,
-      selectedPenColor: this.selectedPenColor,
-      selectedPenSize: this.selectedPenSize,
-      penOpacity: this.penOpacity,
-      onPenColorChanged: this.setPenColor,
-      onPenSizeChanged: this.setPenSize,
-      onPenOpacityChanged: this.setPenOpacity,
-      onSave: this.save,
-      onUndo: this.undo,
-      onAdd: this.add,
-      onCancel: this.remove,
-    }, toolbarElement)
+    const toolbarElement = (this.module as InkAnnotationModule).toolbarElement as HTMLElement
+    this.toolbar = createAddInkAnnotationToolbar(
+      {
+        penColors: this.penColors,
+        penWidths: this.penWidths,
+        selectedPenColor: this.selectedPenColor,
+        selectedPenSize: this.selectedPenSize,
+        penOpacity: this.penOpacity,
+        onPenColorChanged: this.setPenColor,
+        onPenSizeChanged: this.setPenSize,
+        onPenOpacityChanged: this.setPenOpacity,
+        onSave: this.save,
+        onUndo: this.undo,
+        onAdd: this.add,
+        onCancel: this.remove,
+      },
+      toolbarElement,
+    )
   }
 
   public onSave() {
-    const promise = new Promise<void>( (resolve, reject) => {
-      this.createInkAnnotation().then( () => {
-        this.remove()
-        resolve()
-      }).catch( () => {
-        reject()
-      })
+    const promise = new Promise<void>((resolve, reject) => {
+      this.createInkAnnotation()
+        .then(() => {
+          this.remove()
+          resolve()
+        })
+        .catch(() => {
+          reject()
+        })
     })
     return promise
   }
@@ -76,26 +78,23 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     this.removeCanvasElements()
     this.context = null
     /* tslint:disable-next-line:align */
-    ; const toolbarElement = (this.module as InkAnnotationModule).toolbarElement as HTMLElement
+    const toolbarElement = (this.module as InkAnnotationModule).toolbarElement as HTMLElement
     toolbarElement.innerHTML = ''
 
     this.store.viewer.endModule(moduleLayerName)
   }
 
   public render(timestamp: number, state: ViewerCanvasState): void {
-
     if (state.viewer.modeChanged && state.viewer.selectedModuleName !== moduleLayerName) {
       this.remove()
       return
     }
 
     if (this.context && this.lines) {
-
       let drawPath = state.canvas.canvasInvalidated
 
       if (state.pointer.stateChanged) {
         if (state.pointer.isDown) {
-
           const page = getPageOnPoint(state.document, {
             x: state.pointer.x.devicePixels,
             y: state.pointer.y.devicePixels,
@@ -127,7 +126,6 @@ export class AddInkAnnotationLayer extends CanvasLayer {
 
       // capture mouse move
       if (this.drawing && state.pointer.positionChanged && this.page) {
-
         const pos = {
           x: state.pointer.x.devicePixels,
           y: state.pointer.y.devicePixels,
@@ -167,19 +165,18 @@ export class AddInkAnnotationLayer extends CanvasLayer {
 
         const pageRect = state.document.pageRects[this.page as number]
         if (pageRect) {
-
           const ox = pageRect.x
           const oy = pageRect.y
           const s = this.pdfApi.transformPdfLengthToDeviceLength(1000) / 1000
           ctx.strokeStyle = this.penRgbaColor
           ctx.lineWidth = this.selectedPenSize * devicePixelRatio * state.document.zoom
-          this.lines.forEach(pointList => {
+          this.lines.forEach((pointList) => {
             ctx.beginPath()
             const p1 = pointList[0]
-            ctx.moveTo(ox + (p1.pdfX * s), oy + (p1.pdfY * s))
+            ctx.moveTo(ox + p1.pdfX * s, oy + p1.pdfY * s)
             for (let i = 0; i < pointList.length; i++) {
               const p = pointList[i]
-              ctx.lineTo(ox + (p.pdfX * s), oy + (p.pdfY * s))
+              ctx.lineTo(ox + p.pdfX * s, oy + p.pdfY * s)
             }
             ctx.stroke()
           })
@@ -195,12 +192,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
             ctx.setLineDash([2 * devicePixelRatio, 3 * devicePixelRatio])
             const p = this.selectedPenSize * devicePixelRatio
             const p2 = p * 2
-            ctx.strokeRect(
-              rect.x - p,
-              rect.y - p,
-              rect.w + p2,
-              rect.h + p2,
-            )
+            ctx.strokeRect(rect.x - p, rect.y - p, rect.w + p2, rect.h + p2)
             ctx.restore()
           }
         }
@@ -255,7 +247,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   private createInkAnnotation() {
-    const promise = new Promise<void>( (resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       if (this.pdfApi && this.page && this.lines && this.lines.length > 0) {
         const inkList: number[][] = []
 
@@ -264,7 +256,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
         let y1 = 1000000000
         let y2 = 0
 
-        this.lines.forEach(pointList => {
+        this.lines.forEach((pointList) => {
           const line: number[] = []
           for (let i = 0; i < pointList.length; i++) {
             const p = pointList[i]
@@ -312,9 +304,10 @@ export class AddInkAnnotationLayer extends CanvasLayer {
           this.toolbar.setLineCount(0)
         }
 
-        this.pdfApi.createItem(inkAnnotation).then(item => {
-          this.onAnnotationCreated(item as Annotation)
-          resolve()
+        this.pdfApi.createItem(inkAnnotation).then((item) => {
+          this.onAnnotationCreated(item as Annotation).then(() => {
+            resolve()
+          })
         })
       } else {
         reject()
@@ -333,13 +326,12 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     }
 
     if (this.lines && this.lines.length > 0) {
-
       let x1 = 1000000000
       let x2 = 0
       let y1 = 1000000000
       let y2 = 0
 
-      this.lines.forEach(pointList => {
+      this.lines.forEach((pointList) => {
         const line: number[] = []
         for (let i = 0; i < pointList.length; i++) {
           const p = pointList[i]
