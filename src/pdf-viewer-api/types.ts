@@ -109,6 +109,7 @@ export interface Annotation extends PdfPositionalItem {
   color: string | null
   originalAuthor: string
   popup: AnnotationPopup
+  identifier: string | null
   setLock(isLocked: boolean): void
   isLocked(): boolean
   isHidden(): boolean
@@ -194,7 +195,7 @@ export interface TextStampAnnotationArgs extends AnnotationArgs {
 }
 
 export interface ImageStampAnnotationArgs extends AnnotationArgs {
-  stampImage: Uint8Array
+  imageId: number
 }
 
 export interface HighlightAnnotationArgs extends AnnotationArgs {
