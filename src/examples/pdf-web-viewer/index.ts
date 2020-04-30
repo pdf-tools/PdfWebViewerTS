@@ -11,12 +11,14 @@ import { HighlightAnnotationModule } from '../../modules/highlight-annotation/Hi
 import { StampAnnotationModule } from '../../modules/stamp-annotation/StampAnnotationModule'
 import { PopupModule } from '../../modules/popup/PopupModule'
 import { ShapeAnnotationModule } from '../../modules/shape-annotations/ShapeAnnotationModule'
+import { ImageAnnotationModule } from '../../modules/image-annotations/ImageAnnotationModule'
 
 import '../styles/examples.scss'
 import '../../styles/themes/pdf-web-viewer.scss'
 
 const viewerContainer = document.getElementById('viewer') as HTMLElement
 const license = '1-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+
 const options: Partial<PdfWebViewerOptions> = {
   author: 'Hans Muster',
   allowFileDrop: true,
@@ -54,6 +56,7 @@ const options: Partial<PdfWebViewerOptions> = {
     HighlightAnnotationModule,
     StampAnnotationModule,
     ShapeAnnotationModule,
+    ImageAnnotationModule,
   ],
 
   /*****
