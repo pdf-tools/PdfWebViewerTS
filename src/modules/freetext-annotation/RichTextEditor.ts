@@ -73,6 +73,8 @@ export class RichTextEditor {
     this.editorDocument.body.style.borderWidth = `${content.borderWidth}px`
     this.editorDocument.body.style.padding = '4px'
     this.editorDocument.body.style.margin = '0'
+    this.editorDocument.body.style.height = '100%'
+    this.editorDocument.body.style.boxSizing = 'border-box'
 
     this.editorDocument.designMode = 'on'
     this.editorDocument.execCommand('defaultParagraphSeparator', false, 'div')
