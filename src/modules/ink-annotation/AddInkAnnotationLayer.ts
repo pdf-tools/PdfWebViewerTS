@@ -73,13 +73,15 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   public onRemove(): void {
-    this.removeCanvasElements()
-    this.context = null
-    /* tslint:disable-next-line:align */
-    ; const toolbarElement = (this.module as InkAnnotationModule).toolbarElement as HTMLElement
-    toolbarElement.innerHTML = ''
-
-    this.store.viewer.endModule(moduleLayerName)
+    this.createInkAnnotation().finally( () => {
+      this.removeCanvasElements()
+      this.context = null
+      /* tslint:disable-next-line:align */
+      ; const toolbarElement = (this.module as InkAnnotationModule).toolbarElement as HTMLElement
+      toolbarElement.innerHTML = ''
+  
+      this.store.viewer.endModule(moduleLayerName)
+    })
   }
 
   public render(timestamp: number, state: ViewerCanvasState): void {
