@@ -73,7 +73,11 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   public onRemove(): void {
-    this.createInkAnnotation().finally( () => {
+    if (this.lines && this.lines.length > 0) {
+      this.createInkAnnotation().then( () => {
+        this.onRemove()
+      })
+    } else {
       this.removeCanvasElements()
       this.context = null
       /* tslint:disable-next-line:align */
@@ -81,7 +85,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
       toolbarElement.innerHTML = ''
   
       this.store.viewer.endModule(moduleLayerName)
-    })
+    }
   }
 
   public render(timestamp: number, state: ViewerCanvasState): void {
@@ -317,6 +321,8 @@ export class AddInkAnnotationLayer extends CanvasLayer {
         this.pdfApi.createItem(inkAnnotation).then(item => {
           this.onAnnotationCreated(item as Annotation)
           resolve()
+        }).catch( () => {
+          reject()
         })
       } else {
         reject()
