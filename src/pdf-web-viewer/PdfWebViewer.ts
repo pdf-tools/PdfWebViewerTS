@@ -335,14 +335,24 @@ export class PdfWebViewer {
             if (!this.beforeOpen(x.file)) {
               return
             }
-            this.viewerCanvas
-              .openBlob(x.file, x.password)
-              .then(() => {
-                this.openResolve(x.file)
-              })
-              .catch((error: Error) => {
-                this.openReject(x.file, null, error)
-              })
+            const reader = new FileReader()
+            reader.onload = (e: any) => {
+              if (this.viewerCanvas) {
+                this.viewerCanvas
+                  .openBlob(new Blob([e.target.result]), x.password)
+                  .then(() => {
+                    this.openResolve(x.file)
+                  })
+                  .catch((error: Error) => {
+                    this.openReject(x.file, null, error)
+                  })
+              }
+            }
+
+            reader.onerror = (e: any) => {
+              console.log(e)
+            }
+            reader.readAsArrayBuffer(x.file)
           }
         },
         openUri: (x: { pdfUri: string; password?: string; pdfAuthorization?: string }) => {
