@@ -75,7 +75,7 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
   backgroundColors: ['#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
   strokeColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
-  fillColors: ['#FFFFFF00', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
+  fillColors: ['transparent', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
   defaultStrokeColor: '#323232',
   strokeWidths: [0, 1, 2, 3, 5, 8, 13, 21],
   defaultStrokeWidth: 1,

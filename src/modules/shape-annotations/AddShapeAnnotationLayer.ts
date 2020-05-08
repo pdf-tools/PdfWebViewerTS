@@ -1,6 +1,6 @@
 import { CanvasLayer } from '../CanvasLayer'
 import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
-import { PdfItemType, Point, ShapeAnnotationArgs, AnnotationBorderStyle, Rect } from '../../pdf-viewer-api'
+import { PdfItemType, Point, ShapeDrawingAnnotationArgs, AnnotationBorderStyle, Rect } from '../../pdf-viewer-api'
 import { CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { getPageOnPoint, getRectFromSelection } from '../../pdf-viewer-canvas/state/document'
 import { createShapeAnnotationToolbar, ShapeAnnotationToolbarActions } from './ShapeAnnotationToolbar'
@@ -136,8 +136,7 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
               ctx.save()
               ctx.strokeStyle = this.selectedStrokeColor
               ctx.fillStyle = this.selectedFillColor
-              ctx.lineWidth = this.selectedStrokeWidth * devicePixelRatio * state.document.zoom
-              // ctx.lineWidth = this.pdfApi.transformPdfLengthToDeviceLength(this.selectedStrokeWidth) * 2
+              ctx.lineWidth = this.pdfApi.transformPdfLengthToDeviceLength(this.selectedStrokeWidth) * 2
 
               if (this.selectedStrokeStyle === AnnotationBorderStyle.DASHED) {
                 ctx.setLineDash([ctx.lineWidth])
@@ -202,13 +201,13 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
   private createRectangleAnnotation(rect: Rect) {
     const pdfRect = this.pdfApi.transformScreenRectToPdfRect(rect, this.page)
 
-    const annotation: ShapeAnnotationArgs = {
+    const annotation: ShapeDrawingAnnotationArgs = {
       itemType: this.itemType as PdfItemType,
       color: this.selectedStrokeColor,
       pdfRect,
       page: this.page,
       originalAuthor: this.options.author,
-      fillColor: this.selectedFillColor,
+      fillColor: this.selectedFillColor === 'transparent' ? null : this.selectedFillColor,
       border: {
         width: this.selectedStrokeWidth,
         style: this.selectedStrokeStyle,

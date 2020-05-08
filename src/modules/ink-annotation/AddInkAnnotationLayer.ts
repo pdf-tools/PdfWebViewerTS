@@ -169,7 +169,9 @@ export class AddInkAnnotationLayer extends CanvasLayer {
           const oy = pageRect.y
           const s = this.pdfApi.transformPdfLengthToDeviceLength(1000) / 1000
           ctx.strokeStyle = this.penRgbaColor
-          ctx.lineWidth = this.selectedPenSize * devicePixelRatio * state.document.zoom
+          ctx.lineWidth = this.pdfApi.transformPdfLengthToDeviceLength(this.selectedPenSize) * 2
+          // ctx.lineWidth = this.selectedPenSize * devicePixelRatio * state.document.zoom
+
           this.lines.forEach((pointList) => {
             ctx.beginPath()
             const p1 = pointList[0]
