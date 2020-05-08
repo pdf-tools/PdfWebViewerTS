@@ -202,6 +202,15 @@ export interface HighlightAnnotationArgs extends AnnotationArgs {
   quadPointRects: PdfRect[]
 }
 
+export interface ShapeAnnotationArgs extends AnnotationArgs {
+  border: AnnotationBorder
+  fillColor: string | null
+}
+
+export interface CircleAnnotationArgs extends ShapeAnnotationArgs {}
+
+export interface SquareAnnotationArgs extends ShapeAnnotationArgs {}
+
 export interface OutlineItem extends PdfItem {
   destination: PdfDestination
   hasDescendants: boolean

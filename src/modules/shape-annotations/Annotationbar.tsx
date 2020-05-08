@@ -4,7 +4,8 @@ import { Dropdown } from '../../common/Dropdown'
 import { icons } from '../../common/icons'
 
 export interface AnnotationbarProps {
-  onBtnAddClicked(): void
+  onBtnAddRectangleClicked(): void
+  onBtnAddCircleClicked(): void
 }
 
 interface AnnotationbarState {}
@@ -20,8 +21,8 @@ export const createAnnotationbar = (props: AnnotationbarProps, element: HTMLElem
 
   const Annotationbar: Component<{}, AnnotationbarState, AnnotationbarActions> = ({}) => ($state, $actions) => {
     const items = [
-      { value: 'R', renderItem: () => <CommandbarButton icon={icons.rectangle} onClick={props.onBtnAddClicked}></CommandbarButton> },
-      { value: 'C', renderItem: () => <CommandbarButton icon={icons.circle} onClick={props.onBtnAddClicked}></CommandbarButton> },
+      { value: 'R', renderItem: () => <CommandbarButton icon={icons.rectangle} onClick={props.onBtnAddRectangleClicked}></CommandbarButton> },
+      { value: 'C', renderItem: () => <CommandbarButton icon={icons.circle} onClick={props.onBtnAddCircleClicked}></CommandbarButton> },
     ]
     return (
       <div>

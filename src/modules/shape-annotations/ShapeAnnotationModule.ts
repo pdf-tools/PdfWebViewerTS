@@ -1,6 +1,7 @@
+import { PdfItemType } from '../../pdf-viewer-api'
 import { CanvasModule, CanvasModuleRegistration } from '../CanvasModule'
 import { createAnnotationbar } from './Annotationbar'
-import { AddRectangleAnnotationLayer } from './AddRectangleAnnotationLayer'
+import { AddShapeAnnotationLayer } from './AddShapeAnnotationLayer'
 
 export class ShapeAnnotationModule extends CanvasModule {
   public annotationbarElement: HTMLElement | null = null
@@ -9,6 +10,7 @@ export class ShapeAnnotationModule extends CanvasModule {
   constructor() {
     super()
     this.onBtnAddRectangleClicked = this.onBtnAddRectangleClicked.bind(this)
+    this.onBtnAddCircleClicked = this.onBtnAddCircleClicked.bind(this)
   }
 
   public onRegister() {
@@ -16,7 +18,8 @@ export class ShapeAnnotationModule extends CanvasModule {
     this.annotationbarElement.classList.add('pwv-commandbar-group')
     createAnnotationbar(
       {
-        onBtnAddClicked: this.onBtnAddRectangleClicked,
+        onBtnAddRectangleClicked: this.onBtnAddRectangleClicked,
+        onBtnAddCircleClicked: this.onBtnAddCircleClicked,
       },
       this.annotationbarElement,
     )
@@ -31,7 +34,16 @@ export class ShapeAnnotationModule extends CanvasModule {
   private onBtnAddRectangleClicked() {
     /* tslint:disable-next-line:no-string-literal */
     if (!this.canvasLayers['add']) {
-      this.createCanvasLayer('add', AddRectangleAnnotationLayer)
+      this.createCanvasLayer('add', AddShapeAnnotationLayer, PdfItemType.SQUARE)
+    } else {
+      this.removeCanvasLayer('add')
+    }
+  }
+
+  private onBtnAddCircleClicked() {
+    /* tslint:disable-next-line:no-string-literal */
+    if (!this.canvasLayers['add']) {
+      this.createCanvasLayer('add', AddShapeAnnotationLayer, PdfItemType.CIRCLE)
     } else {
       this.removeCanvasLayer('add')
     }

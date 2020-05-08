@@ -1,10 +1,12 @@
 import { app, h, Component, ActionsType } from 'hyperapp'
+import { AnnotationBorderStyle } from '../../pdf-viewer-api'
 import { CommandbarButton } from '../../common/CommandbarButton'
 import { icons } from '../../common/icons'
 import { Commandbar } from '../../common/Commandbar'
 import { CommandbarSeparator } from '../../common/CommandbarSeparator'
 import { DropdownItem, Dropdown } from '../../common/Dropdown'
 import { StrokeWidthPicker } from '../../common/StrokeWidthPicker'
+import { StrokeStylePicker } from '../../common/StrokeStylePicker'
 import { RangeSlider } from '../../common/RangeSlider'
 import { ColorPicker } from '../../common/ColorPicker'
 import { TooltipPosition } from '../../common/Tooltip'
@@ -15,12 +17,13 @@ export interface ShapeAnnotationToolbarProps {
   fillColors: string[]
   selectedStrokeColor: string
   selectedStrokeWidth: number
+  selectedStrokeStyle: AnnotationBorderStyle
   selectedFillColor: string
   onStrokeColorChanged(color: string): void
   onStrokeWidthChanged(width: number): void
+  onStrokeStyleChanged(style: AnnotationBorderStyle): void
   onFillColorChanged(color: string): void
   onCancel(): void
-  onSave(): void
 }
 
 interface ShapeAnnotationToolbarState {
@@ -29,15 +32,16 @@ interface ShapeAnnotationToolbarState {
   fillColors: string[]
   selectedStrokeColor: string
   selectedStrokeWidth: number
+  selectedStrokeStyle: AnnotationBorderStyle
   selectedFillColor: string
 }
 
 export interface ShapeAnnotationToolbarActions {
   setStrokeColor(color: string): void
   setStrokeWidth(width: number): void
+  setStrokeStyle(style: AnnotationBorderStyle): void
   setFillColor(width: string): void
   setCancel(): void
-  setSave(): void
 }
 
 export const createShapeAnnotationToolbar = (props: ShapeAnnotationToolbarProps, element: HTMLElement) => {
@@ -47,6 +51,7 @@ export const createShapeAnnotationToolbar = (props: ShapeAnnotationToolbarProps,
     fillColors: props.fillColors,
     selectedStrokeColor: props.selectedStrokeColor,
     selectedStrokeWidth: props.selectedStrokeWidth,
+    selectedStrokeStyle: props.selectedStrokeStyle,
     selectedFillColor: props.selectedFillColor,
   }
 
@@ -59,14 +64,15 @@ export const createShapeAnnotationToolbar = (props: ShapeAnnotationToolbarProps,
       props.onStrokeWidthChanged(width)
       return { ...$state, selectedStrokeWidth: width }
     },
+    setStrokeStyle: (style: AnnotationBorderStyle) => ($state) => {
+      props.onStrokeStyleChanged(style)
+      return { ...$state, selectedStrokeStyle: style }
+    },
     setFillColor: (color: string) => ($state) => {
       props.onFillColorChanged(color)
       return { ...$state, selectedFillColor: color }
     },
     setCancel: () => ($state) => {
-      return { ...$state }
-    },
-    setSave: () => ($state) => {
       return { ...$state }
     },
   }
@@ -76,9 +82,9 @@ export const createShapeAnnotationToolbar = (props: ShapeAnnotationToolbarProps,
   const ShapeAnnotationToolbar: Component<{}, ShapeAnnotationToolbarState, ShapeAnnotationToolbarActions> = ({}) => ($state, $actions) => (
     <div class="pwv-toolbar">
       <Commandbar>
-        <ColorPicker colors={$state.strokeColors} color={$state.selectedStrokeColor} icon={icons.fillColor} onChange={$actions.setStrokeColor}></ColorPicker>
-
+        <ColorPicker colors={$state.strokeColors} color={$state.selectedStrokeColor} icon={icons.pencil} onChange={$actions.setStrokeColor}></ColorPicker>
         <StrokeWidthPicker noneStrokeText={''} strokeWidths={$state.strokeWidths} value={$state.selectedStrokeWidth} onChange={$actions.setStrokeWidth} />
+        <StrokeStylePicker value={$state.selectedStrokeStyle} onChange={$actions.setStrokeStyle} />
       </Commandbar>
 
       <Commandbar>
@@ -87,7 +93,6 @@ export const createShapeAnnotationToolbar = (props: ShapeAnnotationToolbarProps,
       </Commandbar>
       <Commandbar>
         <CommandbarSeparator />
-        <CommandbarButton icon={icons.ok} onClick={props.onSave}></CommandbarButton>
         <CommandbarButton icon={icons.close} onClick={props.onCancel}></CommandbarButton>
       </Commandbar>
     </div>

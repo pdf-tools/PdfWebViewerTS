@@ -32,7 +32,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     this.editorElement.style.zIndex = '4'
 
     this.color = this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor
-    this.borderWidth = this.freetextAnnotation.borderWidth
+    this.borderWidth = this.freetextAnnotation.border.width
 
     this.fontName = this.options.defaultFreetextFontFamily ? this.options.defaultFreetextFontFamily : this.options.defaultFontFamiliy
 
@@ -79,7 +79,6 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
         annotation: this.freetextAnnotation,
         backgroundColors: [...this.options.backgroundColors],
         borderWidths: [0, 1, 2, 3, 4],
-        selectedBorderWidth: this.borderWidth,
         fontColors: [...this.options.foregroundColors],
         fontFamilies: this.options.fontFamilies,
         fontSizes: this.options.fontSizes,
@@ -87,6 +86,7 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
         selectedBackgroundColor: this.freetextAnnotation.color,
         selectedFontColor: this.color,
         selectedFontSize: this.fontSize,
+        selectedBorderWidth: this.borderWidth,
         onCmd: this.richTextEditor.executeCommand,
         onClose: this.close,
       },
@@ -162,8 +162,6 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
       if (this.richTextEditor && this.freetextAnnotation) {
         const richTextObj = this.richTextEditor.getEditorValues()
 
-        console.log(richTextObj)
-
         const subject = this.toolbarView ? this.toolbarView.getState().newSubject : this.freetextAnnotation.subject
         if (this.options.ms_custom) {
           addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, subject)
@@ -179,6 +177,9 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
         this.freetextAnnotation.fontSize = richTextObj.fontSizeCSS ? convertCssToPdfPixel(richTextObj.fontSizeCSS) : this.freetextAnnotation.fontSize
         this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
         this.freetextAnnotation.border.width = richTextObj.borderWidth
+
+        // console.log('+++++++++++ this.freetextAnnotation ++++++++++++++')
+        // console.log(this.freetextAnnotation)
 
         this.pdfApi
           .updateItem(this.freetextAnnotation)

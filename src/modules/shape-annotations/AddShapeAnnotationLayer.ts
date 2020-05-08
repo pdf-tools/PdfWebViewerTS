@@ -1,43 +1,44 @@
 import { CanvasLayer } from '../CanvasLayer'
 import { ViewerCanvasState } from '../../pdf-viewer-canvas/state/store'
-import { PdfItemType, Point, AnnotationArgs, InkAnnotationArgs, PdfPoint, AnnotationBorderStyle, PdfRect, Annotation, Rect } from '../../pdf-viewer-api'
+import { PdfItemType, Point, ShapeAnnotationArgs, AnnotationBorderStyle, Rect } from '../../pdf-viewer-api'
 import { CursorStyle } from '../../pdf-viewer-canvas/state/viewer'
 import { getPageOnPoint, getRectFromSelection } from '../../pdf-viewer-canvas/state/document'
 import { createShapeAnnotationToolbar, ShapeAnnotationToolbarActions } from './ShapeAnnotationToolbar'
 import { ShapeAnnotationModule } from './ShapeAnnotationModule'
 import { Color } from '../../common/Color'
 
-const moduleLayerName = 'AddRectangleAnnotation'
+const moduleLayerName = 'AddShapeAnnotation'
 
-export class AddRectangleAnnotationLayer extends CanvasLayer {
+export class AddShapeAnnotationLayer extends CanvasLayer {
   private context: CanvasRenderingContext2D | null = null
   private toolbar: ShapeAnnotationToolbarActions | null = null
   private page: number = 0
   private pointerDown: boolean = false
   private startPoint: Point | null = null
+  private itemType: PdfItemType | null = null
 
   private strokeColors: string[] = []
   private strokeWidths: number[] = []
   private fillColors: string[] = []
   private selectedStrokeColor: string = ''
   private selectedStrokeWidth: number = 1
+  private selectedStrokeStyle: AnnotationBorderStyle = AnnotationBorderStyle.SOLID
   private selectedFillColor: string = ''
 
-  public onCreate(): void {
+  public onCreate(itemType: PdfItemType): void {
     this.setStrokeColor = this.setStrokeColor.bind(this)
     this.setStrokeWidth = this.setStrokeWidth.bind(this)
+    this.setStrokeStyle = this.setStrokeStyle.bind(this)
     this.setFillColor = this.setFillColor.bind(this)
     this.cancel = this.cancel.bind(this)
-    this.save = this.save.bind(this)
-
     this.context = this.createCanvas()
-
+    this.itemType = itemType
     this.strokeColors = this.options.strokeColors
     this.strokeWidths = this.options.strokeWidths
     this.fillColors = this.options.fillColors
     this.selectedStrokeColor = this.options.defaultStrokeColor ? this.options.defaultStrokeColor : this.options.defaultForegroundColor
     this.selectedStrokeWidth = this.options.defaultStrokeWidth
-    this.selectedFillColor = this.options.defaultFillColor ? this.options.defaultFillColor : this.options.defaultBackgroundColor
+    this.selectedFillColor = this.options.defaultFillColor ? this.options.defaultFillColor : this.options.fillColors[0]
 
     this.store.viewer.beginModule(moduleLayerName)
 
@@ -50,15 +51,20 @@ export class AddRectangleAnnotationLayer extends CanvasLayer {
         fillColors: this.fillColors,
         selectedStrokeColor: this.selectedStrokeColor,
         selectedStrokeWidth: this.selectedStrokeWidth,
+        selectedStrokeStyle: this.selectedStrokeStyle,
         selectedFillColor: this.selectedFillColor,
         onStrokeColorChanged: this.setStrokeColor,
         onStrokeWidthChanged: this.setStrokeWidth,
+        onStrokeStyleChanged: this.setStrokeStyle,
         onFillColorChanged: this.setFillColor,
         onCancel: this.cancel,
-        onSave: this.save,
       },
       toolbarElement,
     )
+  }
+
+  public cancel() {
+    this.onRemove()
   }
 
   public onSave() {
@@ -131,8 +137,25 @@ export class AddRectangleAnnotationLayer extends CanvasLayer {
               ctx.strokeStyle = this.selectedStrokeColor
               ctx.fillStyle = this.selectedFillColor
               ctx.lineWidth = this.selectedStrokeWidth * devicePixelRatio * state.document.zoom
-              ctx.strokeRect(rect.x, rect.y, rect.w, rect.h)
-              ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+              // ctx.lineWidth = this.pdfApi.transformPdfLengthToDeviceLength(this.selectedStrokeWidth) * 2
+
+              if (this.selectedStrokeStyle === AnnotationBorderStyle.DASHED) {
+                ctx.setLineDash([ctx.lineWidth])
+              }
+
+              if (this.itemType === PdfItemType.CIRCLE) {
+                console.log('draw circle')
+                const cX = rect.x + rect.w / 2
+                const cY = rect.y + rect.h / 2
+                ctx.beginPath()
+                ctx.ellipse(cX, cY, rect.w / 2, rect.h / 2, 0, 0, Math.PI * 2)
+                ctx.fill()
+                ctx.stroke()
+              } else {
+                ctx.strokeRect(rect.x, rect.y, rect.w, rect.h)
+                ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+              }
+
               ctx.restore()
             }
           }
@@ -151,10 +174,9 @@ export class AddRectangleAnnotationLayer extends CanvasLayer {
             this.page,
           )
           if (rect) {
-            this.createRectangleAnnotation(rect)
             this.pointerDown = false
             this.startPoint = null
-            // this.remove()
+            this.createRectangleAnnotation(rect)
           }
         }
       }
@@ -169,15 +191,40 @@ export class AddRectangleAnnotationLayer extends CanvasLayer {
     this.selectedStrokeWidth = width
   }
 
+  private setStrokeStyle(style: AnnotationBorderStyle) {
+    this.selectedStrokeStyle = style
+  }
+
   private setFillColor(color: string) {
     this.selectedFillColor = color
   }
 
-  private save() {}
+  private createRectangleAnnotation(rect: Rect) {
+    const pdfRect = this.pdfApi.transformScreenRectToPdfRect(rect, this.page)
 
-  private cancel() {
-    this.remove()
+    const annotation: ShapeAnnotationArgs = {
+      itemType: this.itemType as PdfItemType,
+      color: this.selectedStrokeColor,
+      pdfRect,
+      page: this.page,
+      originalAuthor: this.options.author,
+      fillColor: this.selectedFillColor,
+      border: {
+        width: this.selectedStrokeWidth,
+        style: this.selectedStrokeStyle,
+      },
+    }
+
+    this.pdfApi
+      .createItem(annotation)
+      .then((annot) => {
+        this.remove()
+        // select new annotation
+        // const pdfViewerCanvasApi = this.pdfViewerCanvas as any
+        // pdfViewerCanvasApi.dispatchEvent('itemSelected', annot)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
-
-  private createRectangleAnnotation(rect: Rect) {}
 }
