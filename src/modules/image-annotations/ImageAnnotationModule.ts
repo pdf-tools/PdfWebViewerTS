@@ -52,8 +52,6 @@ export class ImageAnnotationModule extends CanvasModule {
 
   private createImageStampAnnotation(imageInfo: { width: number; height: number; stampImage: Uint8Array }) {
     if (this.pdfApi !== null && this.store !== null && this.options !== null) {
-      const imageRegister = this.pdfApi.registerStampImage(imageInfo.stampImage)
-
       const state = this.store.getState()
       const document = state.document
       const canvasRect = this.getCanvasSize()
@@ -100,8 +98,7 @@ export class ImageAnnotationModule extends CanvasModule {
 
       imagepPdfRect.pdfX = (pageBoundingBox.pdfW - imagepPdfRect.pdfW) / 2
       imagepPdfRect.pdfY = (pageBoundingBox.pdfH - imagepPdfRect.pdfH) / 2
-
-      imageRegister.then((imageId) => {
+      this.pdfApi.registerStampImage(imageInfo.stampImage).then((imageId) => {
         if (this.pdfApi !== null && this.options !== null) {
           const annotation: ImageStampAnnotationArgs = {
             itemType: PdfItemType.STAMP,

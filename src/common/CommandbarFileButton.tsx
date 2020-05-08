@@ -34,6 +34,7 @@ export const CommandbarFileButton: Component<CommandbarFileButtonProps> = ({ ico
             if (onFileSelected && e.currentTarget.files && e.currentTarget.files.length) {
               const file = e.currentTarget.files[0]
               onFileSelected(file)
+              e.currentTarget.value = ''
             }
           }}
           oncreate={(input: HTMLElement) => {
