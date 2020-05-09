@@ -178,9 +178,6 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
         this.freetextAnnotation.color = backgroundColor !== null ? backgroundColor.toRgba() : null
         this.freetextAnnotation.border.width = richTextObj.borderWidth
 
-        // console.log('+++++++++++ this.freetextAnnotation ++++++++++++++')
-        // console.log(this.freetextAnnotation)
-
         this.pdfApi
           .updateItem(this.freetextAnnotation)
           .then((item) => {

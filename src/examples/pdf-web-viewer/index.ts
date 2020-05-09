@@ -13,6 +13,8 @@ import { PopupModule } from '../../modules/popup/PopupModule'
 import { ShapeAnnotationModule } from '../../modules/shape-annotations/ShapeAnnotationModule'
 import { ImageAnnotationModule } from '../../modules/image-annotations/ImageAnnotationModule'
 
+import { ApprovedImageStamp } from './sampleImageStamps'
+
 import '../styles/examples.scss'
 import '../../styles/themes/pdf-web-viewer.scss'
 
@@ -57,6 +59,26 @@ const options: Partial<PdfWebViewerOptions> = {
     StampAnnotationModule,
     ShapeAnnotationModule,
     ImageAnnotationModule,
+  ],
+  stamps: [
+    {
+      name: 'stamptext.approved',
+      color: '#009900',
+      thumbnail: ApprovedImageStamp.thumbnail,
+      image: ApprovedImageStamp.image,
+    },
+    { name: 'stamptext.approved', color: StampAnnotationColor.GREEN, pdfStampName: 'SBApproved' },
+    { name: 'stamptext.notApproved', color: StampAnnotationColor.RED, pdfStampName: 'SBNotApproved' },
+    { name: 'stamptext.draft', color: StampAnnotationColor.BLUE, pdfStampName: 'SBDraft' },
+    { name: 'stamptext.final', color: StampAnnotationColor.GREEN, pdfStampName: 'SBFinal' },
+    { name: 'stamptext.completed', color: StampAnnotationColor.GREEN, pdfStampName: 'SBCompleted' },
+    { name: 'stamptext.confidential', color: StampAnnotationColor.BLUE, pdfStampName: 'SBConfidential' },
+    { name: 'stamptext.forPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForPublicRelease' },
+    { name: 'stamptext.notForPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBNotForPublicRelease' },
+    { name: 'stamptext.void', color: StampAnnotationColor.RED, pdfStampName: 'SBVoid' },
+    { name: 'stamptext.forComment', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForComment' },
+    { name: 'stamptext.preliminaryResults', color: StampAnnotationColor.BLUE, pdfStampName: 'SBPreliminaryResults' },
+    { name: 'stamptext.informationOnly', color: StampAnnotationColor.BLUE, pdfStampName: 'SBInformationOnly' },
   ],
 
   /*****

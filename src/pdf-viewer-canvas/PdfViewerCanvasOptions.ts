@@ -9,10 +9,18 @@ import { StampAnnotationModule } from '../modules/stamp-annotation/StampAnnotati
 import { PopupModule } from '../modules/popup/PopupModule'
 import { ShapeAnnotationModule } from '../modules/shape-annotations/ShapeAnnotationModule'
 
-export interface StampSetting {
+export interface TextStampSetting {
   name: string
+  thumbnail?: string
   color: StampAnnotationColor
   pdfStampName?: string
+}
+
+export interface ImageStampSetting {
+  name: string
+  color: string
+  thumbnail?: string
+  image: string
 }
 
 interface Fonts {
@@ -39,7 +47,7 @@ export interface PdfViewerCanvasCoreOptions {
   fontFamilies: string[]
   searchMatchColor: string
   author?: string
-  stamps: StampSetting[]
+  stamps: (TextStampSetting | ImageStampSetting)[]
   modules?: CanvasModuleClass[]
   promptOnUnsavedChanges: boolean
 }

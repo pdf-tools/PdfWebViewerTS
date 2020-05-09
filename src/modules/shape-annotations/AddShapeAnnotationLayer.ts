@@ -143,7 +143,6 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
               }
 
               if (this.itemType === PdfItemType.CIRCLE) {
-                console.log('draw circle')
                 const cX = rect.x + rect.w / 2
                 const cY = rect.y + rect.h / 2
                 ctx.beginPath()
@@ -158,7 +157,6 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
               ctx.restore()
             }
           }
-          console.log('pointer down')
         } else if (this.pointerDown && this.startPoint) {
           const rect = getRectFromSelection(
             state.document,

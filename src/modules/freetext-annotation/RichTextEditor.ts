@@ -126,8 +126,6 @@ export class RichTextEditor {
         break
       }
       case 'setBorderWidth': {
-        console.log('setBorderWidth', cmd.args)
-
         this.content.borderWidth = cmd.args
         this.editorDocument.body.style.borderWidth = `${cmd.args}px`
         break

@@ -9,45 +9,46 @@ export class PdfWebViewerAPICallbackHandler {
   public saveResolve: null | ((buffer: Uint8Array) => void) = null
   public saveReject: null | ((error: Error) => void) = null
   public GetAnnotationsFromPagePromiseQueue: Array<{
-    resolve: (itemsOnPage: PdfItemsOnPage) => void,
-    reject: (error: Error) => void,
+    resolve: (itemsOnPage: PdfItemsOnPage) => void
+    reject: (error: Error) => void
   }>
   public GetTextFragmentsFromPagePromiseQueue: Array<{
-    resolve: (itemsOnPage: PdfItemsOnPage) => void,
-    reject: (error: Error) => void,
+    resolve: (itemsOnPage: PdfItemsOnPage) => void
+    reject: (error: Error) => void
   }>
   public GetContentElementsFromPagePromiseQueue: Array<{
-    resolve: (contentElementsOnPage: PdfItemsOnPage) => void,
-    reject: (error: Error) => void,
+    resolve: (contentElementsOnPage: PdfItemsOnPage) => void
+    reject: (error: Error) => void
   }>
   public CreateItemPromiseQueue: Array<{
-    resolve: (item: PdfItem) => void,
-    reject: (error: Error) => void,
+    resolve: (item: PdfItem) => void
+    reject: (error: Error) => void
   }>
   public UpdateItemPromiseQueue: Array<{
-    resolve: (item: PdfItem) => void,
-    reject: (error: Error) => void,
+    resolve: (item: PdfItem) => void
+    reject: (error: Error) => void
   }>
   public DeleteItemPromiseQueue: Array<{
-    resolve: () => void,
-    reject: (error: Error) => void,
+    resolve: () => void
+    reject: (error: Error) => void
   }>
   public RenderPagePromiseQueue: Array<{
-    resolve: (thumbnail: PageImage) => void,
-    reject: (error: Error) => void,
+    resolve: (thumbnail: PageImage) => void
+    reject: (error: Error) => void
   }>
   public GetStampInfoPromiseQueue: Array<{
-    resolve: (stampInfo: StampInfo) => void,
-    reject: (error: Error) => void,
+    resolve: (stampInfo: StampInfo) => void
+    reject: (error: Error) => void
   }>
-  public GetOutlinesPromiseQueue: { [id: number]: {
-      resolve: (outlines: OutlineItem[]) => void,
-      reject: (error: Error) => void,
-    },
+  public GetOutlinesPromiseQueue: {
+    [id: number]: {
+      resolve: (outlines: OutlineItem[]) => void
+      reject: (error: Error) => void
+    }
   }
   public RegisterStampImagePromiseQueue: Array<{
-    resolve: (id: number) => void,
-    reject: (error: Error) => void,
+    resolve: (id: number) => void
+    reject: (error: Error) => void
   }>
 
   public searchResolve: null | ((searchResult: SearchResult) => void) = null
@@ -220,7 +221,6 @@ export class PdfWebViewerAPICallbackHandler {
 
   public onStampImageRegistered(result: any) {
     const promiseCallback = this.RegisterStampImagePromiseQueue.shift()
-    console.log(result)
     if (!result.ok) {
       promiseCallback && promiseCallback.reject(new Error(result.message))
     } else {

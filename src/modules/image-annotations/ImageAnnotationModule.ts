@@ -104,7 +104,7 @@ export class ImageAnnotationModule extends CanvasModule {
             itemType: PdfItemType.STAMP,
             imageId,
             page,
-            color: this.options.defaultFillColor,
+            color: this.options.defaultHighlightColor,
             pdfRect: imagepPdfRect,
             originalAuthor: this.options.author,
           }
