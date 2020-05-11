@@ -165,6 +165,8 @@ export class RichTextEditor {
     text = text.replace(/border-color\:.*?\;/gi, '') // remove background-color:...;
     text = text.replace(/border-style\:.*?\;/gi, '') // remove background-color:...;
     text = text.replace(/border-width\:.*?\;/gi, '') // remove background-color:...;
+    text = text.replace(/height\:.*?\;/gi, '') // remove background-color:...;
+    text = text.replace(/box-sizing\:.*?\;/gi, '') // remove background-color:...;
     text = text.replace(/\:\s*/gi, ':') // remove spaces after :
     text = text.replace(/\;\s*/gi, ';') // remove spaces after ;
     text = text.replace(/font-size\:(\d*\.?\d+)px\;/gi, (_, size) => {
