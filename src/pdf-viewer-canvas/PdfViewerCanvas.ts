@@ -653,7 +653,10 @@ export class PdfViewerCanvas {
     modules.forEach((module) => {
       const m = new module()
       this.modules.push(m)
-      const reg = m.register(this.viewLayersElement, this.store, this.pdfViewerApi, this, this.options)
+
+      // tmp const for this, used for rollup
+      const viewerCanvas = this
+      const reg = m.register(this.viewLayersElement, this.store, this.pdfViewerApi, viewerCanvas, this.options)
       if (this.annotationbarElement && reg.annotationbar) {
         this.annotationbarElement.appendChild(reg.annotationbar)
       }
