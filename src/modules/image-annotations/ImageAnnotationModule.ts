@@ -78,8 +78,25 @@ export class ImageAnnotationModule extends CanvasModule {
         }
       }
 
+      const screenRect = {
+        x: 0,
+        y: 0,
+        w: canvasRect.width,
+        h: canvasRect.height,
+      }
       const pageScreenRect = this.pdfApi.getPageScreenRect(page)
-      const pageBoundingBox = this.pdfApi.transformScreenRectToPdfRect(pageScreenRect, page)
+
+      const x1 = Math.max(screenRect.x, pageScreenRect.x)
+      const y1 = Math.max(screenRect.y, pageScreenRect.y)
+      const x2 = Math.min(screenRect.w, pageScreenRect.x + pageScreenRect.w)
+      const y2 = Math.min(screenRect.h, pageScreenRect.y + pageScreenRect.h)
+      const boundingRect = {
+        x: x1,
+        y: y1,
+        w: x2 - x1,
+        h: y2 - y1,
+      }
+      const pageBoundingBox = this.pdfApi.transformScreenRectToPdfRect(boundingRect, page)
 
       const imagepPdfRect = {
         pdfX: 0,
@@ -90,19 +107,20 @@ export class ImageAnnotationModule extends CanvasModule {
       }
 
       if (imagepPdfRect.pdfW > pageBoundingBox.pdfW) {
-        const f = pageBoundingBox.pdfW / imagepPdfRect.pdfW
+        const f = (pageBoundingBox.pdfW / imagepPdfRect.pdfW) * 0.97
         imagepPdfRect.pdfW = imagepPdfRect.pdfW * f
         imagepPdfRect.pdfH = imagepPdfRect.pdfH * f
       }
 
       if (imagepPdfRect.pdfH > pageBoundingBox.pdfH) {
-        const f = pageBoundingBox.pdfH / imagepPdfRect.pdfH
+        const f = (pageBoundingBox.pdfH / imagepPdfRect.pdfH) * 0.97
         imagepPdfRect.pdfW = imagepPdfRect.pdfW * f
         imagepPdfRect.pdfH = imagepPdfRect.pdfH * f
       }
 
-      imagepPdfRect.pdfX = (pageBoundingBox.pdfW - imagepPdfRect.pdfW) / 2
-      imagepPdfRect.pdfY = (pageBoundingBox.pdfH - imagepPdfRect.pdfH) / 2
+      imagepPdfRect.pdfX = (pageBoundingBox.pdfW - imagepPdfRect.pdfW) / 2 + pageBoundingBox.pdfX
+      imagepPdfRect.pdfY = (pageBoundingBox.pdfH - imagepPdfRect.pdfH) / 2 + pageBoundingBox.pdfY
+
       this.pdfApi.registerStampImage(imageInfo.stampImage).then((imageId) => {
         if (this.pdfApi !== null && this.options !== null) {
           const annotation: ImageStampAnnotationArgs = {
