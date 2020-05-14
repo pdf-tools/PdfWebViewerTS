@@ -40,7 +40,7 @@ const options: Partial<PdfWebViewerOptions> = {
   language: 'en',
   highlightColors: ['#2ADB1A', '#FFEA02', '#FF7F1F', '#FF2882', '#008AD1'],
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
-  backgroundColors: ['#ffffff00', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
+  backgroundColors: ['transparent', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
   defaultHighlightColor: '#FFEA02',
   defaultBackgroundColor: '#FCF5E2',
   defaultForegroundColor: '#323232',
