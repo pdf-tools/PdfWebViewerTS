@@ -172,7 +172,7 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     const pdfRect = this.pdfApi.transformScreenRectToPdfRect(rect, this.page)
     const annotation: FreeTextAnnotationArgs = {
       itemType: PdfItemType.FREE_TEXT,
-      color: this.selectedColor,
+      color: this.selectedColor === 'transparent' ? '#00000000' : this.selectedColor,
       originalAuthor: this.options.author,
       page: pdfRect.page,
       pdfRect,
