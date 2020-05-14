@@ -30,7 +30,8 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
 
     // todo: get values from options
     this.borderWidths = [0, 1, 2, 3, 4]
-    this.selectedBorderWidth = this.options.defaultFreetextBorderSize ? this.options.defaultFreetextBorderSize : this.options.defaultBorderSize
+    this.selectedBorderWidth =
+      typeof this.options.defaultFreetextBorderSize === 'number' ? this.options.defaultFreetextBorderSize : this.options.defaultBorderSize
 
     /* tslint:disable-next-line:align */
     const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement

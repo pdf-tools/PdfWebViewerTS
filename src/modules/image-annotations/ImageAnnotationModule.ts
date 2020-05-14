@@ -10,6 +10,7 @@ export class ImageAnnotationModule extends CanvasModule {
 
   constructor() {
     super()
+    this.createImage = this.createImage.bind(this)
     this.onFileSelected = this.onFileSelected.bind(this)
     this.createImageStampAnnotation = this.createImageStampAnnotation.bind(this)
   }
@@ -31,7 +32,7 @@ export class ImageAnnotationModule extends CanvasModule {
     }
   }
 
-  private async onFileSelected(file: File) {
+  private createImage(dataUrl: string) {
     const image = new Image()
     image.onload = () => {
       const imageInfo = {
@@ -42,10 +43,14 @@ export class ImageAnnotationModule extends CanvasModule {
 
       this.createImageStampAnnotation(imageInfo)
     }
+    image.src = dataUrl
+  }
 
+  private async onFileSelected(file: File) {
     const reader = new FileReader()
+    const _this = this
     reader.onload = function (e: any) {
-      image.src = e.target.result
+      _this.createImage(e.target.result)
     }
     reader.readAsDataURL(file)
   }
