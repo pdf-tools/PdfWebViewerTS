@@ -188,6 +188,7 @@ export const actions: ActionsType<RootState, ActionDefinitions> = {
     return {
       ...$state,
       showUnsavedChangesDialog: false,
+      showLoadingIndicator: false,
       hasDocument: true,
     }
   },

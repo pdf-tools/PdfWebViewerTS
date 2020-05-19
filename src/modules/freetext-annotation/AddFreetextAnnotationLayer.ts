@@ -26,7 +26,6 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     this.context = this.createCanvas()
     this.colors = this.options.backgroundColors
     this.selectedColor = this.options.freetextBgColor
-    console.log(this.selectedColor)
 
     /* tslint:disable-next-line:align */
     ; const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement

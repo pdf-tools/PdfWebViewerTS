@@ -142,10 +142,15 @@ export class RichTextEditor {
     text = text.replace(/\;\s*/ig, '\;') // remove spaces after ;
     text = text.replace(/font-size\:(\d*\.?\d+)px\;/ig, (_, size) => { // calculate font size in pdf units
       size = roundToTwo(size / 96 * 72)
-      return 'font-size:' + size + 'pt'
+      return 'font-size:' + size + 'pt;'
     })
-    return text.replace(/rgb\((.+?)\)/ig, rgb => {
+    
+    text = text.replace(/rgb\((.+?)\)/ig, rgb => {
       return new Color(rgb).toHexRgb()
+    })
+    // remove spaces within the styles tag
+    return text.replace(/style="(.*?)>/ig, styles => { 
+      return styles.replace(/\s*/ig, '')
     })
   }
 
