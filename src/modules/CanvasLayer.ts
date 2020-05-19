@@ -1,13 +1,13 @@
 import { ViewerCanvasState, ViewerCanvasStore } from '../pdf-viewer-canvas/state/store'
 import { PdfViewerApi } from '../pdf-viewer-api'
 import { Annotation, PdfItem } from '../pdf-viewer-api/types'
-import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
+import { PdfViewerOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { CanvasModule } from './CanvasModule'
 import { addHistoryEntry } from '../custom/history'
 
 export interface CanvasLayerClass {
   new(module: CanvasModule, name: string, containerElement: HTMLElement, store: ViewerCanvasStore,
-      pdfApi: PdfViewerApi, options: PdfViewerCanvasOptions): CanvasLayer
+      pdfApi: PdfViewerApi, options: PdfViewerOptions): CanvasLayer
 }
 
 export abstract class CanvasLayer {
@@ -15,14 +15,14 @@ export abstract class CanvasLayer {
   protected containerElement: HTMLElement
   protected store: ViewerCanvasStore
   protected pdfApi: PdfViewerApi
-  protected options: PdfViewerCanvasOptions
+  protected options: PdfViewerOptions
   protected module: CanvasModule
   private canvasContexts: CanvasRenderingContext2D[] = []
   private htmlLayers: HTMLElement[] = []
   private name: string
 
   constructor(module: CanvasModule, name: string, containerElement: HTMLElement,
-              store: ViewerCanvasStore, pdfApi: PdfViewerApi, options: PdfViewerCanvasOptions) {
+              store: ViewerCanvasStore, pdfApi: PdfViewerApi, options: PdfViewerOptions) {
     this.containerElement = containerElement
     this.store = store
     this.pdfApi = pdfApi

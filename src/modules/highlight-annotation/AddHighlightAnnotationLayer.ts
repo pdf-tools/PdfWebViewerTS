@@ -28,9 +28,7 @@ export class AddHighlightAnnotationLayer extends CanvasLayer {
 
     this.context = this.createCanvas()
     this.colors = this.options.highlightColors
-    this.selectedColor = this.options.defaultHighlightAnnotationColor ?
-                         this.options.defaultHighlightAnnotationColor :
-                         this.options.defaultHighlightColor
+    this.selectedColor = this.options.highlightAnnotationColor
     /* tslint:disable-next-line:align */
     ; const toolbarElement = (this.module as HighlightAnnotationModule).toolbarElement as HTMLElement
     createAddHighlightAnnotationToolbar({
@@ -135,6 +133,7 @@ export class AddHighlightAnnotationLayer extends CanvasLayer {
 
   private setColor(color: string) {
     this.selectedColor = color
+    this.options.highlightAnnotationColor = color
   }
 
   private setItemType(itemType: PdfItemType) {

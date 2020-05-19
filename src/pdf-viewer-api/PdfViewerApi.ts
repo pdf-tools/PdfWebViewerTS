@@ -675,19 +675,6 @@ export class PdfViewerApi {
     })
   }
 
-  /**
-   * Verify that the viewer is able to read a given stamp image.
-   * @param name              The name of the stamp image.
-   * @param image             The stamp image to be verified.
-   * @returns                 A promise returning the name of the image if resolved or returning an error message if rejected.
-   */
-  public verifyStampImage(name: string, image: Uint8Array) {
-    checkType(image, 'object', 'addImageStampTemplate')
-    return new Promise<StampInfo>((resolve, reject) => {
-      this.apiCallbackHandler.GetStampInfoPromiseQueue.push({ resolve, reject })
-      this.instance.verifyStampImage(name, image)
-    })
-  }
 
   /**
    * Get information about a particular stamp.
@@ -699,6 +686,21 @@ export class PdfViewerApi {
     return new Promise<StampInfo>((resolve, reject) => {
       this.apiCallbackHandler.GetStampInfoPromiseQueue.push({ resolve, reject })
       this.instance.getStampInfo(args)
+    })
+  }
+
+/**
+ * Register an image stamp in the document. If the registration is successful the promise
+ * returns an ID > 0. This ID can then be used for the createItem method to create an image stamp
+ * with the given image ID
+ * @param image
+ * @returns                   A promise returning the ID 
+ */
+  public registerStampImage(image: Uint8Array) {
+    checkType(image, 'object', 'registerStampImage')
+    return new Promise<number>((resolve, reject) => {
+      this.apiCallbackHandler.RegisterStampImagePromiseQueue.push({resolve, reject})
+      this.instance.registerStampImage(image)
     })
   }
 

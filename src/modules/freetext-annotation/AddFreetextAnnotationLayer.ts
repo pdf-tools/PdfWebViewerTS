@@ -25,9 +25,8 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
 
     this.context = this.createCanvas()
     this.colors = this.options.backgroundColors
-    this.selectedColor = this.options.defaultFreetextBgColor ?
-                         this.options.defaultFreetextBgColor :
-                         this.options.defaultBackgroundColor
+    this.selectedColor = this.options.freetextBgColor
+    console.log(this.selectedColor)
 
     /* tslint:disable-next-line:align */
     ; const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
@@ -145,6 +144,7 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
 
   private setColor(color: string) {
     this.selectedColor = color
+    this.options.freetextBgColor = color
   }
 
   private close() {
@@ -160,20 +160,14 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
       page: pdfRect.page,
       pdfRect,
       border: {
-        width: this.options.defaultFreetextBorderSize ?
-               this.options.defaultFreetextBorderSize :
-               this.options.defaultBorderSize,
+        width: this.options.freetextBorderSize,
         style: AnnotationBorderStyle.SOLID,
       },
       /* tslint:disable-next-line: max-line-length */
-      richtext: `<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2" style="color:${this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor};"></body>`,
+      richtext: `<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2" style="color:${this.options.freetextFontColor};"></body>`,
       fontName: 'Arial',
-      fontColor: this.options.defaultFreetextFontColor ?
-                 this.options.defaultFreetextFontColor :
-                 this.options.defaultForegroundColor,
-      fontSize: this.options.defaultFreetextFontSize ?
-                this.options.defaultFreetextFontSize :
-                this.options.defaultFontSize,
+      fontColor: this.options.freetextFontColor,
+      fontSize: this.options.freetextFontSize
     }
     this.pdfApi.createItem(annotation).then(item => {
       const promise = this.onAnnotationCreated(item as Annotation)

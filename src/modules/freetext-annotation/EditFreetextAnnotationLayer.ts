@@ -16,10 +16,10 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
   private editorElement: HTMLElement | null = null
   private richTextEditor: RichTextEditor | null = null
   private toolbarView: EditFreetextAnnotationToolbarActions | null = null
-  private color: string = this.options.defaultForegroundColor
+  private color: string = this.options.freetextFontColor
   private fontSize: string = `${this.options.defaultFontSize}pt`
   private fontSizeCSS: string = convertPdfToCssPixel(`${this.options.defaultFontSize}`)
-  private fontName: string = this.options.defaultFontFamiliy
+  private fontName: string = this.options.freetextFontFamily
 
   public onCreate(annotationId: number): void {
     this.store.viewer.beginModule(moduleLayerName)
@@ -31,18 +31,12 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     this.editorElement.style.position = 'absolute'
     this.editorElement.style.zIndex = '4'
 
-    this.color = this.options.defaultFreetextFontColor ?
-                 this.options.defaultFreetextFontColor :
-                 this.options.defaultForegroundColor
+    this.color = this.options.freetextFontColor
 
-    this.fontName = this.options.defaultFreetextFontFamily ?
-                    this.options.defaultFreetextFontFamily :
-                    this.options.defaultFontFamiliy
+    this.fontName = this.options.freetextFontFamily
 
-    if (this.options.defaultFreetextFontSize) {
-      this.fontSize = `${this.options.defaultFreetextFontSize}`
-      this.fontSizeCSS = convertPdfToCssPixel(`${this.options.defaultFreetextFontSize}`)
-    }
+    this.fontSize = `${this.options.freetextFontSize}`
+    this.fontSizeCSS = convertPdfToCssPixel(`${this.options.freetextFontSize}`)
 
     if (this.freetextAnnotation.richText) {
       const colorRes = /.*color:(.*?);/.exec(this.freetextAnnotation.richText)

@@ -33,7 +33,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
     this.context = this.createCanvas()
     this.colors = this.options.highlightColors
     this.selectedColor = this.options.defaultHighlightColor
-    this.stampText = this.options.defaultStampText
+    this.stampText = this.options.stampText
 
     /* tslint:disable-next-line:align */
     ; const toolbarElement = (this.module as StampAnnotationModule).toolbarElement as HTMLElement
@@ -46,7 +46,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
       onClose: this.close,
     }, toolbarElement)
 
-    this.onStampTextSelected(this.options.defaultStampText)
+    this.onStampTextSelected(this.options.stampText)
 
     this.store.viewer.beginModule(moduleLayerName)
   }
@@ -172,6 +172,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
 
   private onStampTextSelected(stampText: string) {
     this.translatedStampText = translationManager.getText(stampText)
+    this.options.stampText = stampText
     this.stampText = stampText
     const args = {
       stampType: StampType.TEXT,

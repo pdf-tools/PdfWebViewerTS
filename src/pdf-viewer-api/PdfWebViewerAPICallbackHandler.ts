@@ -45,6 +45,10 @@ export class PdfWebViewerAPICallbackHandler {
       reject: (error: Error) => void,
     },
   }
+  public RegisterStampImagePromiseQueue: Array<{
+    resolve: (id: number) => void,
+    reject: (error: Error) => void,
+  }>
 
   public searchResolve: null | ((searchResult: SearchResult) => void) = null
   public searchReject: null | ((error: Error) => void) = null
@@ -92,6 +96,7 @@ export class PdfWebViewerAPICallbackHandler {
     this.onVisiblePageRangeChanged = this.onVisiblePageRangeChanged.bind(this)
     this.onPageChanged = this.onPageChanged.bind(this)
     this.onOutlinesLoaded = this.onOutlinesLoaded.bind(this)
+    this.onStampImageRegistered = this.onStampImageRegistered.bind(this)
 
     this.GetAnnotationsFromPagePromiseQueue = []
     this.GetTextFragmentsFromPagePromiseQueue = []
@@ -102,6 +107,7 @@ export class PdfWebViewerAPICallbackHandler {
     this.RenderPagePromiseQueue = []
     this.GetStampInfoPromiseQueue = []
     this.GetOutlinesPromiseQueue = []
+    this.RegisterStampImagePromiseQueue = []
   }
 
   public onOpenCompleted(message: string) {
@@ -205,6 +211,16 @@ export class PdfWebViewerAPICallbackHandler {
 
   public onGetStampInfoCompleted(result: any) {
     const promiseCallback = this.GetStampInfoPromiseQueue.shift()
+    if (!result.ok) {
+      promiseCallback && promiseCallback.reject(new Error(result.message))
+    } else {
+      promiseCallback && promiseCallback.resolve(result.value)
+    }
+  }
+
+  public onStampImageRegistered(result: any) {
+    const promiseCallback = this.RegisterStampImagePromiseQueue.shift()
+    console.log(result)
     if (!result.ok) {
       promiseCallback && promiseCallback.reject(new Error(result.message))
     } else {

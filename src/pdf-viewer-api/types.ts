@@ -109,6 +109,7 @@ export interface Annotation extends PdfPositionalItem {
   color: string | null
   originalAuthor: string
   popup: AnnotationPopup
+  identifier: string | null
   setLock(isLocked: boolean): void
   isLocked(): boolean
   isHidden(): boolean
@@ -120,6 +121,10 @@ export interface LinkAnnotation extends PdfPositionalItem {
   destination: PdfDestination | null
   uri: string | null
   quadPointRects: PdfRect[] | null
+}
+
+export interface InkAnnotation extends Annotation {
+  inkList: number[][]
 }
 
 export interface StampAnnotation extends PdfPositionalItem {
@@ -141,7 +146,6 @@ export interface StampInfoArgs {
   stampType: StampType
   stampText: string | null
   name: string | null
-  image: Uint8Array | null
 }
 
 export interface StampInfo {
@@ -165,8 +169,9 @@ export interface AnnotationArgs {
   page: number
   pdfRect: PdfRect
   color: string | null
-  originalAuthor: string | undefined
+  originalAuthor?: string
   content?: string
+  subject?: string
 }
 
 export interface InkAnnotationArgs extends AnnotationArgs {
@@ -189,11 +194,22 @@ export interface TextStampAnnotationArgs extends AnnotationArgs {
 }
 
 export interface ImageStampAnnotationArgs extends AnnotationArgs {
-  stampImage: Uint8Array
+  imageId: number
 }
 
 export interface HighlightAnnotationArgs extends AnnotationArgs {
   quadPointRects: PdfRect[]
+}
+
+export interface ShapeDrawingAnnotationArgs extends AnnotationArgs {
+  border?: AnnotationBorder
+  fillColor: string | null
+}
+
+export interface CircleAnnotationArgs extends ShapeDrawingAnnotationArgs {
+}
+
+export interface SquareAnnotationArgs extends ShapeDrawingAnnotationArgs {
 }
 
 export interface OutlineItem extends PdfItem {

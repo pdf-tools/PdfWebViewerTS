@@ -1,7 +1,7 @@
 import { ViewerCanvasStore, ViewerCanvasState } from '../pdf-viewer-canvas/state/store'
 import { PdfViewerApi, PdfItemType } from '../pdf-viewer-api'
 import { CanvasLayer, CanvasLayerClass } from './CanvasLayer'
-import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
+import { PdfViewerOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { IconDefinition } from '../common/Icon'
 
 export interface CanvasModuleRegistration {
@@ -27,7 +27,7 @@ export abstract class CanvasModule {
   protected canvasLayers: CanvasLayerList = {}
   protected store: ViewerCanvasStore | null = null
   protected pdfApi: PdfViewerApi | null = null
-  protected options: PdfViewerCanvasOptions | null = null
+  protected options: PdfViewerOptions | null = null
   private containerElement: HTMLElement | null = null
 
   constructor() {
@@ -36,7 +36,7 @@ export abstract class CanvasModule {
   }
 
   public register(containerElement: HTMLElement, store: ViewerCanvasStore, pdfApi: PdfViewerApi,
-                  options: PdfViewerCanvasOptions): CanvasModuleRegistration {
+                  options: PdfViewerOptions): CanvasModuleRegistration {
 
     this.containerElement = containerElement
     this.store = store

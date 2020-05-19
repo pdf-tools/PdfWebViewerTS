@@ -4,7 +4,7 @@ import {
   Rect, OutlineItem, PdfDestination, SearchResultType, PdfItemType, LinkAnnotation, PdfActionType, DeletedItem, PdfItemCategory, PdfItem, PdfItemsOnPage,
 } from '../pdf-viewer-api'
 import ResizeObserver from 'resize-observer-polyfill'
-import { PdfViewerCanvasOptions, PdfViewerCanvasDefaultOptions } from './PdfViewerCanvasOptions'
+import { PdfViewerCanvasOptions, PdfViewerOptions} from './PdfViewerCanvasOptions'
 import { translations } from './translations'
 import { translationManager } from '../common/TranslationManager'
 import { CanvasEvents, CanvasPointerEvent, CanvasPointerPinchEvent } from './CanvasEvents'
@@ -52,7 +52,7 @@ export class PdfViewerCanvas {
   private annotationbarElement: HTMLElement | undefined
   private toolbarElement: HTMLElement
 
-  private options: PdfViewerCanvasOptions
+  private options: PdfViewerOptions
   private viewLayers: ViewLayerBase[]
   private modules: CanvasModule[]
   private pdfViewerApi: PdfViewerApi
@@ -69,7 +69,7 @@ export class PdfViewerCanvas {
     if (!containerElement) {
       throw { error: 'PdfViewerCanvas container element is null' }
     }
-    this.options = { ...PdfViewerCanvasDefaultOptions, ...options }
+    this.options = new PdfViewerOptions(options)
 
     this.annotTimer = 0
 

@@ -17,9 +17,6 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   private page: number | null = null
   private penColors: string[] = []
   private penWidths: number[] = []
-  private penOpacity: number = 100
-  private selectedPenColor: string = ''
-  private selectedPenSize: number = 1
   private penRgbaColor: string = ''
   private boundingBox: PdfRect | null = null
   private toolbar: AddInkAnnotationToolbarActions | null = null
@@ -35,11 +32,9 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     this.context = this.createCanvas()
     this.penColors = this.options.foregroundColors
     this.penWidths = [1, 2, 3, 5, 8, 13, 21]
-    this.selectedPenColor = this.options.defaultInkColor ?
-                            this.options.defaultInkColor :
-                            this.options.defaultForegroundColor
-    this.selectedPenSize = this.options.defaultBorderSize
-    this.penRgbaColor = this.selectedPenColor
+    const color = new Color(this.options.inkColor)
+    color.setOpacity(this.options.inkOpacity / 100)
+    this.penRgbaColor = color.toRgba()
     this.store.viewer.beginModule(moduleLayerName)
 
     /* tslint:disable-next-line:align */
@@ -47,9 +42,9 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     this.toolbar = createAddInkAnnotationToolbar({
       penColors: this.penColors,
       penWidths: this.penWidths,
-      selectedPenColor: this.selectedPenColor,
-      selectedPenSize: this.selectedPenSize,
-      penOpacity: this.penOpacity,
+      selectedPenColor: this.options.inkColor,
+      selectedPenSize: this.options.inkWidth,
+      penOpacity: this.options.inkOpacity,
       onPenColorChanged: this.setPenColor,
       onPenSizeChanged: this.setPenSize,
       onPenOpacityChanged: this.setPenOpacity,
@@ -178,7 +173,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
           const oy = pageRect.y
           const s = this.pdfApi.transformPdfLengthToDeviceLength(1000) / 1000
           ctx.strokeStyle = this.penRgbaColor
-          ctx.lineWidth = this.selectedPenSize * devicePixelRatio * state.document.zoom
+          ctx.lineWidth = this.options.inkWidth * devicePixelRatio * state.document.zoom
           this.lines.forEach(pointList => {
             ctx.beginPath()
             const p1 = pointList[0]
@@ -199,7 +194,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
             ctx.strokeStyle = this.options.textSelectionColor
             ctx.lineWidth = 1 * devicePixelRatio
             ctx.setLineDash([2 * devicePixelRatio, 3 * devicePixelRatio])
-            const p = this.selectedPenSize * devicePixelRatio
+            const p = this.options.inkWidth * devicePixelRatio
             const p2 = p * 2
             ctx.strokeRect(
               rect.x - p,
@@ -215,22 +210,22 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   private setPenColor(color: string) {
-    this.selectedPenColor = color
+    this.options.inkColor = color
     const rgbaColor = new Color(color)
-    rgbaColor.setOpacity(this.penOpacity / 100)
+    rgbaColor.setOpacity(this.options.inkOpacity / 100)
     this.penRgbaColor = rgbaColor.toRgba()
     this.store.canvas.setCanvasInvalidated(true)
   }
 
   private setPenSize(size: number) {
-    this.selectedPenSize = size
+    this.options.inkWidth = size
     this.store.canvas.setCanvasInvalidated(true)
   }
 
   private setPenOpacity(opacity: number) {
-    this.penOpacity = opacity
-    const rgbaColor = new Color(this.selectedPenColor)
-    rgbaColor.setOpacity(this.penOpacity / 100)
+    this.options.inkOpacity = opacity
+    const rgbaColor = new Color(this.options.inkColor)
+    rgbaColor.setOpacity(this.options.inkOpacity / 100)
     this.penRgbaColor = rgbaColor.toRgba()
     this.store.canvas.setCanvasInvalidated(true)
   }
@@ -306,7 +301,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
           originalAuthor: this.options.author,
           border: {
             style: AnnotationBorderStyle.SOLID,
-            width: this.selectedPenSize,
+            width: this.options.inkWidth,
           },
           inkList,
         }
