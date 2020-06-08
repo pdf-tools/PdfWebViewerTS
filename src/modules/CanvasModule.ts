@@ -29,6 +29,7 @@ export abstract class CanvasModule {
   protected pdfApi: PdfViewerApi | null = null
   protected pdfViewerCanvas: PdfViewerCanvas | null = null
   protected options: PdfViewerCanvasOptions | null = null
+  protected name: string | null = null
   private containerElement: HTMLElement | null = null
 
   constructor() {

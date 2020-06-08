@@ -6,13 +6,13 @@ import { icons } from '../../common/Icon'
 import { EditFreetextAnnotationLayer } from './EditFreetextAnnotationLayer'
 
 export class FreetextAnnotationModule extends CanvasModule {
-
   public annotationbarElement: HTMLElement | null = null
   public toolbarElement: HTMLElement | null = null
   private annotationbar: AnnotationbarActions | null = null
 
   constructor() {
     super()
+    this.name = 'FreetextAnnotationModule'
     this.onEdit = this.onEdit.bind(this)
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
   }
@@ -20,9 +20,12 @@ export class FreetextAnnotationModule extends CanvasModule {
   public onRegister() {
     this.annotationbarElement = document.createElement('div')
     this.annotationbarElement.classList.add('pwv-commandbar-group')
-    this.annotationbar = createAnnotationbar({
-      onBtnAddClicked: this.onBtnAddClicked,
-    }, this.annotationbarElement)
+    this.annotationbar = createAnnotationbar(
+      {
+        onBtnAddClicked: this.onBtnAddClicked,
+      },
+      this.annotationbarElement,
+    )
     this.toolbarElement = document.createElement('div')
     return {
       annotationbar: this.annotationbarElement,
@@ -30,7 +33,9 @@ export class FreetextAnnotationModule extends CanvasModule {
       contextbar: {
         itemTypes: [PdfItemType.FREE_TEXT],
         icon: icons.edit,
-        onCmd: (annotationId: number) => { this.onEdit(annotationId) },
+        onCmd: (annotationId: number) => {
+          this.onEdit(annotationId)
+        },
       },
     }
   }

@@ -10,6 +10,7 @@ export class ImageAnnotationModule extends CanvasModule {
 
   constructor() {
     super()
+    this.name = 'ImageAnnotationModule'
     this.createImage = this.createImage.bind(this)
     this.onFileSelected = this.onFileSelected.bind(this)
     this.createImageStampAnnotation = this.createImageStampAnnotation.bind(this)

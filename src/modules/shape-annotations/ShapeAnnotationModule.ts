@@ -9,6 +9,7 @@ export class ShapeAnnotationModule extends CanvasModule {
 
   constructor() {
     super()
+    this.name = 'ShapeAnnotationModule'
     this.onBtnAddRectangleClicked = this.onBtnAddRectangleClicked.bind(this)
     this.onBtnAddCircleClicked = this.onBtnAddCircleClicked.bind(this)
   }

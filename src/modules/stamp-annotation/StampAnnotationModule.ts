@@ -9,6 +9,7 @@ export class StampAnnotationModule extends CanvasModule {
 
   constructor() {
     super()
+    this.name = 'StampAnnotationModule'
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
   }
 
