@@ -3,21 +3,24 @@ import { createAnnotationbar } from './Annotationbar'
 import { AddHighlightAnnotationLayer } from './AddHighlightAnnotationLayer'
 
 export class HighlightAnnotationModule extends CanvasModule {
-
   public annotationbarElement: HTMLElement | null = null
   public toolbarElement: HTMLElement | null = null
 
   constructor() {
     super()
+    this.name = 'HighlightAnnotationModule'
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
   }
 
   public onRegister() {
     this.annotationbarElement = document.createElement('div')
     this.annotationbarElement.classList.add('pwv-commandbar-group')
-    createAnnotationbar({
-      onBtnAddClicked: this.onBtnAddClicked,
-    }, this.annotationbarElement)
+    createAnnotationbar(
+      {
+        onBtnAddClicked: this.onBtnAddClicked,
+      },
+      this.annotationbarElement,
+    )
 
     this.toolbarElement = document.createElement('div')
 
@@ -35,5 +38,4 @@ export class HighlightAnnotationModule extends CanvasModule {
       this.removeCanvasLayer('add')
     }
   }
-  
 }

@@ -10,7 +10,6 @@ import { Color } from '../../common/Color'
 const moduleLayerName = 'AddInkAnnotation'
 
 export class AddInkAnnotationLayer extends CanvasLayer {
-
   private context: CanvasRenderingContext2D | null = null
   private drawing: boolean = false
   private lines: PdfPoint[][] | null = []
@@ -56,13 +55,15 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   public onSave() {
-    const promise = new Promise<void>( (resolve, reject) => {
-      this.createInkAnnotation().then( () => {
-        this.remove()
-        resolve()
-      }).catch( () => {
-        reject()
-      })
+    const promise = new Promise<void>((resolve, reject) => {
+      this.createInkAnnotation()
+        .then(() => {
+          this.remove()
+          resolve()
+        })
+        .catch(() => {
+          reject()
+        })
     })
     return promise
   }
@@ -84,19 +85,16 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   public render(timestamp: number, state: ViewerCanvasState): void {
-
     if (state.viewer.modeChanged && state.viewer.selectedModuleName !== moduleLayerName) {
       this.remove()
       return
     }
 
     if (this.context && this.lines) {
-
       let drawPath = state.canvas.canvasInvalidated
 
       if (state.pointer.stateChanged) {
         if (state.pointer.isDown) {
-
           const page = getPageOnPoint(state.document, {
             x: state.pointer.x.devicePixels,
             y: state.pointer.y.devicePixels,
@@ -128,7 +126,6 @@ export class AddInkAnnotationLayer extends CanvasLayer {
 
       // capture mouse move
       if (this.drawing && state.pointer.positionChanged && this.page) {
-
         const pos = {
           x: state.pointer.x.devicePixels,
           y: state.pointer.y.devicePixels,
@@ -168,19 +165,18 @@ export class AddInkAnnotationLayer extends CanvasLayer {
 
         const pageRect = state.document.pageRects[this.page as number]
         if (pageRect) {
-
           const ox = pageRect.x
           const oy = pageRect.y
           const s = this.pdfApi.transformPdfLengthToDeviceLength(1000) / 1000
           ctx.strokeStyle = this.penRgbaColor
           ctx.lineWidth = this.options.inkWidth * devicePixelRatio * state.document.zoom
-          this.lines.forEach(pointList => {
+          this.lines.forEach((pointList) => {
             ctx.beginPath()
             const p1 = pointList[0]
-            ctx.moveTo(ox + (p1.pdfX * s), oy + (p1.pdfY * s))
+            ctx.moveTo(ox + p1.pdfX * s, oy + p1.pdfY * s)
             for (let i = 0; i < pointList.length; i++) {
               const p = pointList[i]
-              ctx.lineTo(ox + (p.pdfX * s), oy + (p.pdfY * s))
+              ctx.lineTo(ox + p.pdfX * s, oy + p.pdfY * s)
             }
             ctx.stroke()
           })
@@ -196,12 +192,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
             ctx.setLineDash([2 * devicePixelRatio, 3 * devicePixelRatio])
             const p = this.options.inkWidth * devicePixelRatio
             const p2 = p * 2
-            ctx.strokeRect(
-              rect.x - p,
-              rect.y - p,
-              rect.w + p2,
-              rect.h + p2,
-            )
+            ctx.strokeRect(rect.x - p, rect.y - p, rect.w + p2, rect.h + p2)
             ctx.restore()
           }
         }
@@ -256,7 +247,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
   }
 
   private createInkAnnotation() {
-    const promise = new Promise<void>( (resolve, reject) => {
+    const promise = new Promise<void>((resolve, reject) => {
       if (this.pdfApi && this.page && this.lines && this.lines.length > 0) {
         const inkList: number[][] = []
 
@@ -265,7 +256,7 @@ export class AddInkAnnotationLayer extends CanvasLayer {
         let y1 = 1000000000
         let y2 = 0
 
-        this.lines.forEach(pointList => {
+        this.lines.forEach((pointList) => {
           const line: number[] = []
           for (let i = 0; i < pointList.length; i++) {
             const p = pointList[i]
@@ -336,13 +327,12 @@ export class AddInkAnnotationLayer extends CanvasLayer {
     }
 
     if (this.lines && this.lines.length > 0) {
-
       let x1 = 1000000000
       let x2 = 0
       let y1 = 1000000000
       let y2 = 0
 
-      this.lines.forEach(pointList => {
+      this.lines.forEach((pointList) => {
         const line: number[] = []
         for (let i = 0; i < pointList.length; i++) {
           const p = pointList[i]

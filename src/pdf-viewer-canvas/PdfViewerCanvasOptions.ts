@@ -1,26 +1,37 @@
 import { SupportedLanguages } from '../common/TranslationManager'
-import { StampAnnotationColor } from '../pdf-viewer-api/enums'
+import { StampAnnotationColor, AnnotationBorderStyle } from '../pdf-viewer-api/enums'
 import { CanvasModuleClass } from '../modules/CanvasModule'
 import { TextAnnotationModule } from '../modules/text-annotation/TextAnnotationModule'
 import { InkAnnotationModule } from '../modules/ink-annotation/InkAnnotationModule'
+import { EditInkAnnotationModule } from '../modules/edit-ink-annotation/EditInkAnnotationModule'
 import { FreetextAnnotationModule } from '../modules/freetext-annotation/FreetextAnnotationModule'
 import { HighlightAnnotationModule } from '../modules/highlight-annotation/HighlightAnnotationModule'
 import { StampAnnotationModule } from '../modules/stamp-annotation/StampAnnotationModule'
 import { PopupModule } from '../modules/popup/PopupModule'
 import { UserSettings } from './UserSettings'
+import { ShapeAnnotationModule } from '../modules/shape-annotations/ShapeAnnotationModule'
+import { ImageAnnotationModule } from '../modules/image-annotations/ImageAnnotationModule'
 
-export interface StampSetting {
-  name: string,
-  color: StampAnnotationColor,
-  pdfStampName?: string,
+export interface TextStampSetting {
+  name: string
+  thumbnail?: string
+  color: StampAnnotationColor
+  pdfStampName?: string
+}
+
+export interface ImageStampSetting {
+  name: string
+  color: string
+  thumbnail?: string
+  image: string
 }
 
 interface Fonts {
- Helvetica: string
- Times: string
- Courier: string
- Symbol: string
- ZapfDingbats: string
+  Helvetica: string
+  Times: string
+  Courier: string
+  Symbol: string
+  ZapfDingbats: string
 }
 
 export interface PdfViewerCanvasCoreOptions {
@@ -30,19 +41,20 @@ export interface PdfViewerCanvasCoreOptions {
   highlightColors: string[]
   foregroundColors: string[]
   backgroundColors: string[]
+  strokeWidths: number[]
   fontSizes: number[]
   highlightOpacity: number
   textSelectionColor: string
   fontFamilies: string[]
   searchMatchColor: string
   author?: string
-  stamps: StampSetting[]
+  stamps: (TextStampSetting | ImageStampSetting)[]
   modules?: CanvasModuleClass[]
   promptOnUnsavedChanges: boolean
 }
 
 export interface PdfViewerCanvasOptions extends PdfViewerCanvasCoreOptions {
-  [key: string]: any,
+  [key: string]: any
   defaultHighlightAnnotationColor?: string
   defaultFreetextBgColor?: string
   defaultFreetextFontColor?: string
@@ -118,7 +130,7 @@ export class PdfViewerOptions {
     return this.options.defaultFontFamily
   }
 
-  get stamps(): StampSetting[] {
+  get stamps(): (TextStampSetting | ImageStampSetting)[] {
     return this.options.stamps
   }
 
@@ -153,7 +165,6 @@ export class PdfViewerOptions {
   set stampText(text: string) {
     this.storage.setItem('stampText', text)
   }
-
 
   get freetextFontSize(): number {
     return this.storage.getItem<number>('freetextFontSize', this.options.defaultFontSize)
@@ -195,8 +206,12 @@ export class PdfViewerOptions {
     return this.options.defaultBorderSize
   }
 
-  get freetextBorderSize(): number {
-    return this.storage.getItem<number>('freetextBorderSize', this.options.defaultBorderSize)
+  set freetextBorderWidth(width: number) {
+    this.storage.setItem('freetextBorderWidth', width)
+  }
+
+  get freetextBorderWidth(): number {
+    return this.storage.getItem<number>('freetextBorderWidth', this.options.defaultBorderSize)
   }
 
   get freetextBgColor(): string {
@@ -231,6 +246,42 @@ export class PdfViewerOptions {
     this.storage.setItem('inkOpacity', opacity)
   }
 
+  set shapeColor(color: string) {
+    this.storage.setItem('shapeAnnotationColor', color)
+  }
+
+  get shapeColor(): string {
+    return this.storage.getItem<string>('shapeAnnotationColor', this.options.defaultForegroundColor)
+  }
+
+  set shapeStrokeWidth(width: number) {
+    this.storage.setItem('shapeStrokeWidth', width)
+  }
+
+  get shapeStrokeWidth(): number {
+    return this.storage.getItem<number>('shapeStrokeWidth', this.options.defaultBorderSize)
+  }
+
+  get strokeWidths(): number[] {
+    return this.options.strokeWidths
+  }
+
+  set shapeFillColor(color: string) {
+    this.storage.setItem('shapeFillColor', color)
+  }
+
+  get shapeFillColor(): string {
+    return this.storage.getItem<string>('shapeFillColor', this.defaultHighlightColor)
+  }
+
+  set shapeStrokeStyle(style: AnnotationBorderStyle) {
+    this.storage.setItem('shapeStrokeStyle', style)
+  }
+
+  get shapeStrokeStyle(): AnnotationBorderStyle {
+    return this.storage.getItem<AnnotationBorderStyle>('shapeStrokeStyle', AnnotationBorderStyle.SOLID)
+  }
+
   get ms_custom(): boolean {
     return this.options.ms_custom
   }
@@ -242,6 +293,7 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   highlightColors: ['#2ADB1A', '#FFEA02', '#FF7F1F', '#FF2882', '#008AD1'],
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
   backgroundColors: ['#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
+  strokeWidths: [0, 1, 2, 3, 5, 8, 13, 21],
   defaultHighlightColor: '#FFEA02',
   defaultBackgroundColor: '#FCF5E2',
   defaultForegroundColor: '#323232',
@@ -249,23 +301,23 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   fontSizes: [9, 10, 12, 14, 16, 18, 20, 24],
   defaultFontSize: 12,
   defaultBorderSize: 1,
-  highlightOpacity: .5,
+  highlightOpacity: 0.5,
   textSelectionColor: '#006395',
   fontFamilies: ['Helvetica', 'Times', 'Courier', 'Symbol', 'ZapfDingbats'],
   searchMatchColor: '#3ABCFF',
   stamps: [
-    { name: 'stamptext.approved', color : StampAnnotationColor.GREEN, pdfStampName: 'SBApproved' },
-    { name: 'stamptext.notApproved', color : StampAnnotationColor.RED, pdfStampName: 'SBNotApproved' },
-    { name: 'stamptext.draft', color : StampAnnotationColor.BLUE, pdfStampName: 'SBDraft' },
-    { name: 'stamptext.final', color : StampAnnotationColor.GREEN, pdfStampName: 'SBFinal' },
-    { name: 'stamptext.completed', color : StampAnnotationColor.GREEN, pdfStampName: 'SBCompleted' },
-    { name: 'stamptext.confidential', color : StampAnnotationColor.BLUE, pdfStampName: 'SBConfidential' },
-    { name: 'stamptext.forPublic', color : StampAnnotationColor.BLUE, pdfStampName: 'SBForPublicRelease' },
-    { name: 'stamptext.notForPublic', color : StampAnnotationColor.BLUE, pdfStampName: 'SBNotForPublicRelease' },
-    { name: 'stamptext.void', color : StampAnnotationColor.RED, pdfStampName: 'SBVoid' },
-    { name: 'stamptext.forComment', color : StampAnnotationColor.BLUE, pdfStampName: 'SBForComment' },
-    { name: 'stamptext.preliminaryResults', color : StampAnnotationColor.BLUE, pdfStampName: 'SBPreliminaryResults' },
-    { name: 'stamptext.informationOnly', color : StampAnnotationColor.BLUE, pdfStampName: 'SBInformationOnly' },
+    { name: 'stamptext.approved', color: StampAnnotationColor.GREEN, pdfStampName: 'SBApproved' },
+    { name: 'stamptext.notApproved', color: StampAnnotationColor.RED, pdfStampName: 'SBNotApproved' },
+    { name: 'stamptext.draft', color: StampAnnotationColor.BLUE, pdfStampName: 'SBDraft' },
+    { name: 'stamptext.final', color: StampAnnotationColor.GREEN, pdfStampName: 'SBFinal' },
+    { name: 'stamptext.completed', color: StampAnnotationColor.GREEN, pdfStampName: 'SBCompleted' },
+    { name: 'stamptext.confidential', color: StampAnnotationColor.BLUE, pdfStampName: 'SBConfidential' },
+    { name: 'stamptext.forPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForPublicRelease' },
+    { name: 'stamptext.notForPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBNotForPublicRelease' },
+    { name: 'stamptext.void', color: StampAnnotationColor.RED, pdfStampName: 'SBVoid' },
+    { name: 'stamptext.forComment', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForComment' },
+    { name: 'stamptext.preliminaryResults', color: StampAnnotationColor.BLUE, pdfStampName: 'SBPreliminaryResults' },
+    { name: 'stamptext.informationOnly', color: StampAnnotationColor.BLUE, pdfStampName: 'SBInformationOnly' },
   ],
   defaultStampWidth: 120,
   defaultStampText: 'stamptext.approved',
@@ -273,10 +325,13 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   modules: [
     PopupModule,
     TextAnnotationModule,
-    HighlightAnnotationModule,
-    FreetextAnnotationModule,
     InkAnnotationModule,
+    EditInkAnnotationModule,
+    FreetextAnnotationModule,
+    HighlightAnnotationModule,
     StampAnnotationModule,
+    ShapeAnnotationModule,
+    ImageAnnotationModule,
   ],
   ms_custom: false,
 }

@@ -30,13 +30,14 @@ export enum CursorStyle {
   EW_RESIZE = 'ew-resize',
   NESW_RESIZE = 'nesw-resize',
   NWSE_RESIZE = 'nwse-resize',
+  ERASE = 'erase'
 }
 
 /** @internal */
 export interface ContextBarItem {
-  itemTypes: PdfItemType[],
-  icon: IconDefinition,
-  onCmd(args?: any): void,
+  itemTypes: PdfItemType[]
+  icon: IconDefinition
+  onCmd(args?: any): void
 }
 
 /** @internal */
@@ -89,7 +90,7 @@ export interface ViewerActions {
 
 /** @internal */
 export const actions: ActionsType<ViewerState, ViewerActions> = {
-  setDefaultMode: () => $state => ({
+  setDefaultMode: () => ($state) => ({
     modeChanged: true,
     mode: ViewerMode.DEFAULT,
     selectedAnnotationId: null,
@@ -103,9 +104,9 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
     cursorStyle: CursorStyle.DEFAULT,
     cursorStyleChanged: true,
   }),
-  addContextBarItem: (contextBarItem: ContextBarItem) => $state => {
+  addContextBarItem: (contextBarItem: ContextBarItem) => ($state) => {
     const contextBarItems = $state.contextBarItems
-    contextBarItem.itemTypes.forEach(itemType => {
+    contextBarItem.itemTypes.forEach((itemType) => {
       if (!contextBarItems[itemType]) {
         contextBarItems[itemType] = []
       }
@@ -116,12 +117,12 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       contextBarItems,
     }
   },
-  setCursorStyle: (cursorStyle: CursorStyle) => $state => ({
+  setCursorStyle: (cursorStyle: CursorStyle) => ($state) => ({
     ...$state,
     cursorStyle,
     cursorStyleChanged: $state.cursorStyle !== cursorStyle,
   }),
-  selectAnnotation: (annotation: Annotation) => $state => ({
+  selectAnnotation: (annotation: Annotation) => ($state) => ({
     ...$state,
     selectedAnnotationId: annotation.id,
     selectedAnnotationBehaviors: getAnnotationBehaviors(annotation.itemType),
@@ -131,7 +132,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
     modeChanged: true,
     mode: ViewerMode.ANNOTATION_SELECTED,
   }),
-  deselectAnnotation: () => $state => {
+  deselectAnnotation: () => ($state) => {
     const modeChanged = $state.mode === ViewerMode.ANNOTATION_SELECTED
     return {
       ...$state,
@@ -143,7 +144,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       mode: modeChanged ? ViewerMode.DEFAULT : $state.mode,
     }
   },
-  beginModule: (moduleName: string) => $state => ({
+  beginModule: (moduleName: string) => ($state) => ({
     ...$state,
     modeChanged: true,
     mode: ViewerMode.MODULE_SELECTED,
@@ -156,7 +157,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
     selectedPopupId: null,
     selectedPopupChanged: true,
   }),
-  endModule: (moduleName: string) => $state => {
+  endModule: (moduleName: string) => ($state) => {
     const selectedModuleName = $state.selectedModuleName === moduleName ? null : $state.selectedModuleName
     const mode = selectedModuleName !== null ? ViewerMode.MODULE_SELECTED : ViewerMode.DEFAULT
     return {
@@ -166,7 +167,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       mode,
     }
   },
-  setTextSelection: (textSelection: PdfRect[] | null) => $state => {
+  setTextSelection: (textSelection: PdfRect[] | null) => ($state) => {
     const mode = textSelection ? ViewerMode.TEXT_SELECTED : ViewerMode.DEFAULT
     const modeChanged = $state.mode !== mode
     return {
@@ -177,7 +178,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       textSelection,
     }
   },
-  selectPopup: (id: number | null) => $state => {
+  selectPopup: (id: number | null) => ($state) => {
     const mode = id !== null ? ViewerMode.POPUP_SELECTED : ViewerMode.DEFAULT
     const modeChanged = $state.mode !== mode
     return {
@@ -188,7 +189,7 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       selectedPopupId: id,
     }
   },
-  deselectPopup: () => $state => {
+  deselectPopup: () => ($state) => {
     const mode = ViewerMode.DEFAULT
     const modeChanged = mode !== $state.mode
     return {

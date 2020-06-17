@@ -23,6 +23,25 @@
   }
 }
 
+.pwv-erase-cursor {
+  cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADwQAAA8EB0Z6ZfgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAM+SURBVEiJtZRbSBRRGMe/WTd3dmfmzOyZdcaVQlCsl3yK8lIqRAgFIbrubGa6D1IURQ8RhWgPQZC0RRQ99agPQXSDNCPEy67FCqZb6boma7Vq1w0zytvO7PTS0qZ7M+wPw8D3/+b/O+fMzEcEg0HV5/NBtPx+/2273W6D9ZDL5VIBIAwAi1HXkXUJBwDt7/sbAMhdr9BoaVJtbK6sPLwrP9/4XwBX7XbH6YqKG+erqjxHy8uFtQC0c3NzPQBwK17DzWPHzlsKCk5u0Gq1hXl5GwmCGJyX5aLW7u6ZVABEItNRV9dkLys7R5Hkhuj64OTkh3tOZ/G1rq5AMkBaPON6Q8OJ2pKSCzRJpq/0soxGRsC4xsRx9/vHxmbXDGiprT1uKy6+zOr1q8IjElmWZvX6GoamHw6Mj39NGXClvv7QwdLS60aK0iVaGQBAJsdRPEXZkF7f4Z6YCCYFNErSPntJSSumaTJZeBTEICJky+D5jn6v98tK/6/PVKeqwW/z80qq4RHlmM28YtrcZ7UeyV/p/bWDXq93RkSoLwOhap5hkh4RAMCyLMPVVx8VcaeN4hB7QKBRz+jY0PuYgN+QKTPLuniEqk1JIEuhEDhezISFAksaEAToWIE0Yl7KNtIuz8jQVExABCJynDMDIYuJYWK+j5CiQMvzd4pQZE0jNH9OOp0x6QwsL2VnsG7Py8G3cf8Dp9c7bca4Q0RIwgxjiPZkRYFLQ+8UoUhK02hWTxsdY0o3MNiSbebdcQEAAL2jo59Zmn6CaVoSWVYfCXcMTyl8YXXM8GgICcT+hAAAgKc+3ycBoUeYpiWeYQyXhwNhXJA4HABAXvyhwrSnPSkAAMDl832mSbL92XeN1bSzhtZoEj8mLy2oCyOPO5odjdUpAQAA3BMTQQpvahcwL5HGTCpenyovq6Hx7r6mljN7ARIMu1jy+0eCyIAeYA7ZSFZcBVEVWZ0dfDBw7tLZskgt4biOp117LDm7d1ucOHebOVILhxX4+aJzuPniqe0EQaiR+pp2EFFgcmxWWVq+I/LYasBZSFVV+OnpfLll0r1jqySFo3v/CQAAEAi8ngsvh+6KHFMZmvJMi7Pj2+1tbfLKvl/ycBilf3EZ0gAAAABJRU5ErkJggg=='), auto;
+}
+
+.pwv-ink-info-panel {
+  position: absolute;
+  display: table-cell;
+  height: 30px;
+  line-height: 30px;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  width: 100%;
+  background-color: #D82F3275;
+  z-index: 11;
+  color: white;
+  text-align: center;
+}
+
 .pwv-canvas-toolbar {
   flex-grow: 0;
   flex-shrink: 0;

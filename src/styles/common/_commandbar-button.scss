@@ -1,11 +1,10 @@
-
 .pwv-commandbar-btn {
   border: none;
   background-color: transparent;
   padding: 0;
   margin: 0;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   &:focus {
     outline: none;
@@ -15,18 +14,18 @@
       svg {
         fill: #006395;
       }
-      color: #008BD2;
+      color: #008bd2;
     }
     &:active {
-      color: #008BD2;
+      color: #008bd2;
       svg {
-        transform: scale(.9);
-        fill: #008BD2;
+        transform: scale(0.9);
+        fill: #008bd2;
       }
     }
     &:focus {
-      fill: #008BD2;
-      color: #008BD2;
+      fill: #008bd2;
+      color: #008bd2;
     }
   }
   &.pwv-active {
@@ -36,7 +35,7 @@
   }
   .pwv-btn-text {
     display: inline-block;
-    padding: 0 .5rem;
+    padding: 0 0.5rem;
   }
   .pwv-icon {
     display: block;

@@ -2,14 +2,18 @@ import { PdfWebViewer } from '../../'
 import { PdfWebViewerOptions } from '../../'
 import { PdfPageLayoutMode, StampAnnotationColor } from '../../pdf-viewer-api'
 import { DebugModule } from './modules/DebugModule'
-import { PdfViewerCanvasDefaultOptions } from '../../pdf-viewer-canvas/PdfViewerCanvasOptions'
 
 import { TextAnnotationModule } from '../../modules/text-annotation/TextAnnotationModule'
 import { InkAnnotationModule } from '../../modules/ink-annotation/InkAnnotationModule'
+import { EditInkAnnotationModule } from '../../modules/edit-ink-annotation/EditInkAnnotationModule'
 import { FreetextAnnotationModule } from '../../modules/freetext-annotation/FreetextAnnotationModule'
 import { HighlightAnnotationModule } from '../../modules/highlight-annotation/HighlightAnnotationModule'
 import { StampAnnotationModule } from '../../modules/stamp-annotation/StampAnnotationModule'
 import { PopupModule } from '../../modules/popup/PopupModule'
+import { ShapeAnnotationModule } from '../../modules/shape-annotations/ShapeAnnotationModule'
+import { ImageAnnotationModule } from '../../modules/image-annotations/ImageAnnotationModule'
+
+import { ApprovedImageStamp } from './sampleImageStamps'
 
 import '../styles/examples.scss'
 import '../../styles/themes/pdf-web-viewer.scss'
@@ -33,14 +37,13 @@ const options: Partial<PdfWebViewerOptions> = {
     PdfPageLayoutMode.TWO_PAGE_RIGHT,
   ],
   language: 'en',
-  annotationBarPosition: 'left',
   highlightColors: ['#2ADB1A', '#FFEA02', '#FF7F1F', '#FF2882', '#008AD1'],
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
-  backgroundColors: ['#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
+  backgroundColors: ['transparent', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
   defaultHighlightColor: '#FFEA02',
   defaultBackgroundColor: '#FCF5E2',
   defaultForegroundColor: '#323232',
-  highlightOpacity: .5,
+  highlightOpacity: 0.5,
   textSelectionColor: '#006395',
   searchMatchColor: '#3ABCFF',
   defaultStampWidth: 120,
@@ -50,9 +53,32 @@ const options: Partial<PdfWebViewerOptions> = {
     PopupModule,
     TextAnnotationModule,
     InkAnnotationModule,
+    EditInkAnnotationModule,
     FreetextAnnotationModule,
     HighlightAnnotationModule,
     StampAnnotationModule,
+    ShapeAnnotationModule,
+    ImageAnnotationModule,
+  ],
+  stamps: [
+    {
+      name: 'stamptext.approved',
+      color: '#009900',
+      thumbnail: ApprovedImageStamp.thumbnail,
+      image: ApprovedImageStamp.image,
+    },
+    { name: 'stamptext.approved', color: StampAnnotationColor.GREEN, pdfStampName: 'SBApproved' },
+    { name: 'stamptext.notApproved', color: StampAnnotationColor.RED, pdfStampName: 'SBNotApproved' },
+    { name: 'stamptext.draft', color: StampAnnotationColor.BLUE, pdfStampName: 'SBDraft' },
+    { name: 'stamptext.final', color: StampAnnotationColor.GREEN, pdfStampName: 'SBFinal' },
+    { name: 'stamptext.completed', color: StampAnnotationColor.GREEN, pdfStampName: 'SBCompleted' },
+    { name: 'stamptext.confidential', color: StampAnnotationColor.BLUE, pdfStampName: 'SBConfidential' },
+    { name: 'stamptext.forPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForPublicRelease' },
+    { name: 'stamptext.notForPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBNotForPublicRelease' },
+    { name: 'stamptext.void', color: StampAnnotationColor.RED, pdfStampName: 'SBVoid' },
+    { name: 'stamptext.forComment', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForComment' },
+    { name: 'stamptext.preliminaryResults', color: StampAnnotationColor.BLUE, pdfStampName: 'SBPreliminaryResults' },
+    { name: 'stamptext.informationOnly', color: StampAnnotationColor.BLUE, pdfStampName: 'SBInformationOnly' },
   ],
 
   /*****
@@ -96,7 +122,7 @@ viewer.addEventListener('appLoaded', () => {
   // viewer.openFile('http://url/to/cors/accessible/file.pdf')
 })
 
-viewer.addEventListener('documentLoaded', file => {
+viewer.addEventListener('documentLoaded', (file) => {
   if (file instanceof Blob) {
     console.log('*** document loaded ***')
     console.log('name          : ' + file.name)

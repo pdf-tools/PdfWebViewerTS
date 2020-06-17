@@ -1,7 +1,21 @@
 import { createStore, ViewerCanvasStore } from './state/store'
 import {
-  PdfViewerApi, PdfFitMode, PdfPageLayoutMode, Point, Annotation,
-  Rect, OutlineItem, PdfDestination, SearchResultType, PdfItemType, LinkAnnotation, PdfActionType, DeletedItem, PdfItemCategory, PdfItem, PdfItemsOnPage,
+  PdfViewerApi,
+  PdfFitMode,
+  PdfPageLayoutMode,
+  Point,
+  Annotation,
+  Rect,
+  OutlineItem,
+  PdfDestination,
+  SearchResultType,
+  PdfItemType,
+  LinkAnnotation,
+  PdfActionType,
+  DeletedItem,
+  PdfItemCategory,
+  PdfItem,
+  PdfItemsOnPage,
 } from '../pdf-viewer-api'
 import ResizeObserver from 'resize-observer-polyfill'
 import { PdfViewerCanvasOptions, PdfViewerOptions} from './PdfViewerCanvasOptions'
@@ -21,7 +35,7 @@ import { CanvasModuleClass, CanvasModule } from '../modules/CanvasModule'
 declare var __VERSION__: 'dev'
 
 interface ViewLayerBaseClass {
-  new(): ViewLayerBase
+  new (): ViewLayerBase
 }
 
 export interface PdfViewerCanvasEventMap {
@@ -46,7 +60,6 @@ export type PdfViewerCanvasEventListener = <K extends keyof PdfViewerCanvasEvent
 export type PdfViewerCanvasEventTypes = keyof PdfViewerCanvasEventMap
 
 export class PdfViewerCanvas {
-
   public viewLayersElement: HTMLElement
   private element: HTMLElement
   private annotationbarElement: HTMLElement | undefined
@@ -65,7 +78,6 @@ export class PdfViewerCanvas {
   private annotTimer: number
 
   constructor(containerElement: HTMLElement | null, license: string, options?: Partial<PdfViewerCanvasOptions>) {
-
     if (!containerElement) {
       throw { error: 'PdfViewerCanvas container element is null' }
     }
@@ -160,13 +172,7 @@ export class PdfViewerCanvas {
 
     // view layers
     this.viewLayers = []
-    const viewLayers = [
-      PdfDocumentLayer,
-      BusyStateLayer,
-      AnnotationSelectionLayer,
-      TextSelectionLayer,
-      ScrollLayer,
-    ]
+    const viewLayers = [PdfDocumentLayer, BusyStateLayer, AnnotationSelectionLayer, TextSelectionLayer, ScrollLayer]
     this.registerViewLayers(viewLayers)
 
     // register canvas modules
@@ -209,14 +215,15 @@ export class PdfViewerCanvas {
     this.canvasEvents.addEventListener('pointerenddrag', this.onCanvasPointerEndDrag)
     this.canvasEvents.addEventListener('pinch', this.onCanvasPointerPinch)
 
-    this.viewLayersElement.addEventListener('wheel', this.onMouseWheel, {passive: false})
-    document.addEventListener('keydown', this.onKeyboardShortcuts, {passive: false})
+    this.viewLayersElement.addEventListener('wheel', this.onMouseWheel, { passive: false })
+    document.addEventListener('keydown', this.onKeyboardShortcuts, { passive: false })
 
-    this.pdfViewerApi.setLicenseKey(license)
+    this.pdfViewerApi
+      .setLicenseKey(license)
       .then(() => {
         this.dispatchEvent('appLoaded', true)
       })
-      .catch(error => {
+      .catch((error) => {
         this.dispatchEvent('error', new Error('Invalid License'))
       })
   }
@@ -250,21 +257,29 @@ export class PdfViewerCanvas {
     for (let i = 0; i < this.modules.length; i++) {
       promises.push(this.modules[i].onSave())
     }
-    const savePromise = new Promise<Uint8Array>( (resolve, reject) => {
-      Promise.all(promises).then( () => {
-        return this.pdfViewerApi.saveFile(asFdf).then( buffer => {
-          resolve(buffer)
-        }).catch( reason => {
-          reject(reason)
+    const savePromise = new Promise<Uint8Array>((resolve, reject) => {
+      Promise.all(promises)
+        .then(() => {
+          return this.pdfViewerApi
+            .saveFile(asFdf)
+            .then((buffer) => {
+              resolve(buffer)
+            })
+            .catch((reason) => {
+              reject(reason)
+            })
         })
-      }).catch( () => {
-        console.warn('Some layers might have failed to save')
-        return this.pdfViewerApi.saveFile(asFdf).then( buffer => {
-          resolve(buffer)
-        }).catch( reason => {
-          reject(reason)
+        .catch(() => {
+          console.warn('Some layers might have failed to save')
+          return this.pdfViewerApi
+            .saveFile(asFdf)
+            .then((buffer) => {
+              resolve(buffer)
+            })
+            .catch((reason) => {
+              reject(reason)
+            })
         })
-      })
     })
     return savePromise
   }
@@ -437,18 +452,21 @@ export class PdfViewerCanvas {
   }
 
   public getAnnotationsFromPage(page: number): Promise<PdfItemsOnPage> {
-    return new Promise<PdfItemsOnPage>( (resolve, reject) => {
-      this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION).then( items => {
-        this.store.annotations.setPageAnnotations(items)
-        resolve(items)
-      }).catch(err => {
-        reject(err)
-      })
+    return new Promise<PdfItemsOnPage>((resolve, reject) => {
+      this.pdfViewerApi
+        .getItemsFromPage(page, PdfItemCategory.ANNOTATION)
+        .then((items) => {
+          this.store.annotations.setPageAnnotations(items)
+          resolve(items)
+        })
+        .catch((err) => {
+          reject(err)
+        })
     })
   }
 
   public goToAnnotation(annotation: Annotation, action?: 'select' | 'edit' | 'popup' | 'history') {
-    const dest: any = {destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null}
+    const dest: any = { destinationType: 0, page: 0, left: null, top: null, bottom: null, right: null, zoom: null }
     dest.destinationType = 8
     dest.top = annotation.pdfRect.pdfY
     dest.left = annotation.pdfRect.pdfX
@@ -462,7 +480,7 @@ export class PdfViewerCanvas {
 
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
-      (this.eventListeners.get(type) as PdfViewerCanvasEventListener[]).push(listener)
+      ;(this.eventListeners.get(type) as PdfViewerCanvasEventListener[]).push(listener)
     } else {
       this.eventListeners.set(type, [listener])
     }
@@ -471,7 +489,7 @@ export class PdfViewerCanvas {
   public removeEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
       let listeners = this.eventListeners.get(type) as PdfViewerCanvasEventListener[]
-      listeners = listeners.filter(listenerInArray => listenerInArray !== listener)
+      listeners = listeners.filter((listenerInArray) => listenerInArray !== listener)
       if (listeners.length !== 0) {
         this.eventListeners.set(type, listeners)
       } else {
@@ -483,7 +501,7 @@ export class PdfViewerCanvas {
   private dispatchEvent<K extends keyof PdfViewerCanvasEventMap>(type: K, args: PdfViewerCanvasEventMap[K]) {
     if (this.eventListeners.has(type)) {
       const listeners = this.eventListeners.get(type) as PdfViewerCanvasEventListener[]
-      listeners.forEach(listener => listener(args))
+      listeners.forEach((listener) => listener(args))
     }
   }
 
@@ -491,8 +509,8 @@ export class PdfViewerCanvas {
     const outlineItems = await this.pdfViewerApi.getOutlines(parent)
     for (const item of outlineItems) {
       if (item.hasDescendants) {
-        const children = await this.getOutlines(item);
-        (item as any).descendants = children
+        const children = await this.getOutlines(item)
+        ;(item as any).descendants = children
       }
     }
     return outlineItems
@@ -502,28 +520,32 @@ export class PdfViewerCanvas {
     return new Promise((resolve, reject) => {
       if (this.pdfViewerApi.isOpen()) {
         this.close().then(() => {
-          openFunction(...args).then(() => {
+          openFunction(...args)
+            .then(() => {
+              this.onDocumentOpened()
+              resolve()
+            })
+            .catch((error) => {
+              if (error.message === 'The authentication failed due to a wrong password.') {
+                reject(new Error('password required'))
+              } else {
+                reject(new Error('unsupported file'))
+              }
+            })
+        })
+      } else {
+        openFunction(...args)
+          .then(() => {
             this.onDocumentOpened()
             resolve()
-          }).catch(error => {
+          })
+          .catch((error) => {
             if (error.message === 'The authentication failed due to a wrong password.') {
               reject(new Error('password required'))
             } else {
               reject(new Error('unsupported file'))
             }
           })
-        })
-      } else {
-        openFunction(...args).then(() => {
-          this.onDocumentOpened()
-          resolve()
-        }).catch(error => {
-          if (error.message === 'The authentication failed due to a wrong password.') {
-            reject(new Error('password required'))
-          } else {
-            reject(new Error('unsupported file'))
-          }
-        })
       }
     })
   }
@@ -532,13 +554,12 @@ export class PdfViewerCanvas {
     const s = this.store.getState().search
     const index = reverse ? s.index - 1 : s.index
 
-    this.pdfViewerApi.search(s.searchString, s.page, index, reverse, s.caseSensitive, s.wrapSearch, s.useRegex)
-      .then(result => {
-
+    this.pdfViewerApi
+      .search(s.searchString, s.page, index, reverse, s.caseSensitive, s.wrapSearch, s.useRegex)
+      .then((result) => {
         if (result.type === SearchResultType.OK) {
-
           let page = 1
-          result.list.forEach(rect => {
+          result.list.forEach((rect) => {
             if (rect.page > page) {
               page = rect.page
             }
@@ -554,7 +575,7 @@ export class PdfViewerCanvas {
           this.endSearch()
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
@@ -593,10 +614,15 @@ export class PdfViewerCanvas {
     const loop = (timestamp: number) => {
       const state = this.store.getState()
       if (this.renderLoopRunning) {
-
         this.store.resetChangedState()
-        if (this.viewLayersElement.style.cursor !== state.viewer.cursorStyle) {
-          this.viewLayersElement.style.cursor = state.viewer.cursorStyle
+        if (state.viewer.cursorStyleChanged) {
+          if (state.viewer.cursorStyle === CursorStyle.ERASE) {
+            this.viewLayersElement.style.cursor = null
+            this.viewLayersElement.classList.add('pwv-erase-cursor')
+          } else {
+            this.viewLayersElement.classList.remove('pwv-erase-cursor')
+            this.viewLayersElement.style.cursor = state.viewer.cursorStyle
+          }
         }
 
         for (let i = 0; i < viewLayers.length; i++) {
@@ -622,7 +648,7 @@ export class PdfViewerCanvas {
   }
 
   private registerViewLayers(viewLayers: ViewLayerBaseClass[]) {
-    viewLayers.forEach(viewLayerBaseClass => {
+    viewLayers.forEach((viewLayerBaseClass) => {
       const viewLayer = new viewLayerBaseClass()
       viewLayer.register(this, this.dispatchEvent)
       this.viewLayers.push(viewLayer)
@@ -630,10 +656,13 @@ export class PdfViewerCanvas {
   }
 
   private registerModules(modules: CanvasModuleClass[]) {
-    modules.forEach(module => {
+    modules.forEach((module) => {
       const m = new module()
       this.modules.push(m)
-      const reg = m.register(this.viewLayersElement, this.store, this.pdfViewerApi, this.options)
+
+      // tmp const for this, used for rollup
+      const viewerCanvas = this
+      const reg = m.register(this.viewLayersElement, this.store, this.pdfViewerApi, viewerCanvas, this.options)
       if (this.annotationbarElement && reg.annotationbar) {
         this.annotationbarElement.appendChild(reg.annotationbar)
       }
@@ -655,8 +684,8 @@ export class PdfViewerCanvas {
     const maxScroll = this.pdfViewerApi.getScrollMaxPosition()
     const scrollPosition = this.pdfViewerApi.getScrollPosition()
 
-    const devicePixelsWidth = (rect.width * pixelRatio) + ((maxScroll.x_max > 0) ? maxScroll.x_max : scrollPosition.x * 2)
-    const devicePixelsHeight = (rect.height * pixelRatio) + ((maxScroll.y_max > 0) ? maxScroll.y_max : scrollPosition.y * 2)
+    const devicePixelsWidth = rect.width * pixelRatio + (maxScroll.x_max > 0 ? maxScroll.x_max : scrollPosition.x * 2)
+    const devicePixelsHeight = rect.height * pixelRatio + (maxScroll.y_max > 0 ? maxScroll.y_max : scrollPosition.y * 2)
 
     const zoom = this.pdfViewerApi.getZoom()
     this.store.document.resize({ zoom, devicePixelsHeight, devicePixelsWidth })
@@ -706,10 +735,12 @@ export class PdfViewerCanvas {
   }
 
   private twoPageLayoutMode(layoutMode: PdfPageLayoutMode) {
-    return layoutMode === PdfPageLayoutMode.TWO_COLUMN_LEFT ||
-           layoutMode === PdfPageLayoutMode.TWO_COLUMN_RIGHT ||
-           layoutMode === PdfPageLayoutMode.TWO_PAGE_LEFT ||
-           layoutMode === PdfPageLayoutMode.TWO_PAGE_RIGHT
+    return (
+      layoutMode === PdfPageLayoutMode.TWO_COLUMN_LEFT ||
+      layoutMode === PdfPageLayoutMode.TWO_COLUMN_RIGHT ||
+      layoutMode === PdfPageLayoutMode.TWO_PAGE_LEFT ||
+      layoutMode === PdfPageLayoutMode.TWO_PAGE_RIGHT
+    )
   }
 
   private transformPointer(e: CanvasPointerEvent) {
@@ -758,7 +789,7 @@ export class PdfViewerCanvas {
     const y = (e.clientY - containerRect.top) * devicePixelRatio
 
     const zoom = this.pdfViewerApi.getZoom()
-    const zoomDistance = (e.movementDistance / 200 * zoom)
+    const zoomDistance = (e.movementDistance / 200) * zoom
     const newZoom = zoom + zoomDistance
     this.setZoom(newZoom, { x, y })
   }
@@ -872,11 +903,11 @@ export class PdfViewerCanvas {
     const containerRect = this.viewLayersElement.getBoundingClientRect()
     const pixelRatio = window.devicePixelRatio
 
-    this.viewLayers.forEach(viewLayer => {
+    this.viewLayers.forEach((viewLayer) => {
       viewLayer.resize(containerRect.width, containerRect.height, pixelRatio)
     })
 
-    this.modules.forEach(module => {
+    this.modules.forEach((module) => {
       module.resize(containerRect.width, containerRect.height)
     })
 
@@ -910,16 +941,17 @@ export class PdfViewerCanvas {
     if (this.annotTimer) {
       window.clearTimeout(this.annotTimer)
     }
-    this.annotTimer = window.setTimeout( () => { this.getAnnotations(begin, end) }, 100)
+    this.annotTimer = window.setTimeout(() => {
+      this.getAnnotations(begin, end)
+    }, 100)
   }
 
   private getAnnotations(begin: number, end: number) {
     for (let page = begin; page <= end; page++) {
       if (this.store.getState().annotations.byPage[page] === undefined) {
-        this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION)
-          .then( itemsOnPage => {
-            this.store.annotations.setPageAnnotations(itemsOnPage)
-          })
+        this.pdfViewerApi.getItemsFromPage(page, PdfItemCategory.ANNOTATION).then((itemsOnPage) => {
+          this.store.annotations.setPageAnnotations(itemsOnPage)
+        })
       }
     }
   }
@@ -990,5 +1022,4 @@ export class PdfViewerCanvas {
       return
     }
   }
-
 }

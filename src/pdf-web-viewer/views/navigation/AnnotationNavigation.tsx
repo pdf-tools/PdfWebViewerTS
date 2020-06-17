@@ -5,19 +5,13 @@ import { AnnotationList } from './AnnotationList'
 import { translationManager } from '../../../common/TranslationManager'
 
 /** @internal */
-export const AnnotationNavigation: Component<
-  {},
-  PdfWebViewerState,
-  PdfWebViewerActions
-> = ({}) => (state, actions) => {
+export const AnnotationNavigation: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({}) => (state, actions) => {
   if (!state.navigationPanel) {
     return <div>loading</div>
   }
 
   const { annotations } = state.navigationPanel
-  const pageNumbers = Object.keys(annotations).filter(
-    pageNumber => Object.keys(annotations[pageNumber as any]).length > 0,
-  )
+  const pageNumbers = Object.keys(annotations).filter((pageNumber) => Object.keys(annotations[pageNumber as any]).length > 0)
 
   return (
     <ScrollContainer>
@@ -27,11 +21,10 @@ export const AnnotationNavigation: Component<
           createAnnotationNavigation(element)
         }}
       >
-        {pageNumbers.map(pageNumber => (
+        {pageNumbers.map((pageNumber) => (
           <div>
             <h4>
-              {translationManager.getText('sideNavigation.annotation.page')}{' '}
-              {pageNumber}
+              {translationManager.getText('sideNavigation.annotation.page')} {pageNumber}
             </h4>
             <AnnotationList pageNumber={pageNumber as any} />
           </div>
@@ -57,8 +50,8 @@ const createAnnotationNavigation = (element: HTMLElement) => {
   }
   const scrollContainer = findScrollContainer(element) as HTMLElement
 
-  const mutationObserver = new MutationObserver(function(mutations) {
-    mutations.forEach(mutation => {
+  const mutationObserver = new MutationObserver(function (mutations) {
+    mutations.forEach((mutation) => {
       if (mutation.type === 'attributes') {
         if (mutation.target.nodeType === 1) {
           const elm = mutation.target as HTMLElement
@@ -69,10 +62,7 @@ const createAnnotationNavigation = (element: HTMLElement) => {
             })
           }
         }
-      } else if (
-        mutation.type === 'childList' &&
-        mutation.addedNodes.length > 0
-      ) {
+      } else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
         // todo: scroll to new created annotation
         // console.log('scroll to new item')
         // const newElm = mutation.addedNodes[0] as HTMLElement

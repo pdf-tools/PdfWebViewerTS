@@ -1,11 +1,10 @@
 .pwv-freetexteditor {
-  border: solid 1px #999999;
+  /* border: solid 1px #999999; */
 }
 .pwv-freetexteditor-toolbar {
   position: absolute;
   top: -105px;
   left: 0;
-
 }
 
 .pwv-freetext-subject {
@@ -15,10 +14,9 @@
     width: 220px;
     height: 30px;
     border: none;
-    padding: .3rem;
+    padding: 0.3rem;
     box-sizing: border-box;
     resize: none;
-    font-size: .9rem !important;
+    font-size: 0.9rem !important;
   }
-
 }

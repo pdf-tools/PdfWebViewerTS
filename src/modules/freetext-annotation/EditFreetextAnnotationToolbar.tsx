@@ -8,11 +8,14 @@ import { Commandbar } from '../../common/Commandbar'
 import { CommandbarSeparator } from '../../common/CommandbarSeparator'
 import { Annotation } from '../../pdf-viewer-api'
 import { translationManager } from '../../common/TranslationManager'
+import { StrokeWidthPicker } from '../../common/StrokeWidthPicker'
 
 /** @internal */
 export interface EditFreetextAnnotationToolbarProps {
   annotation: Annotation
   backgroundColors: string[]
+  borderWidths: number[]
+  selectedBorderWidth: number
   fontColors: string[]
   fontFamilies: string[]
   fontSizes: number[]
@@ -29,6 +32,8 @@ export interface EditFreetextAnnotationToolbarState {
   annotation: Annotation
   newSubject: string | null
   backgroundColors: string[]
+  borderWidths: number[]
+  selectedBorderWidth: number
   fontColors: string[]
   fontFamilies: string[]
   fontSizes: number[]
@@ -42,6 +47,7 @@ export interface EditFreetextAnnotationToolbarState {
 export interface EditFreetextAnnotationToolbarActions {
   getState(): EditFreetextAnnotationToolbarState
   executeCommand(cmd: ExecCommandArgs): EditFreetextAnnotationToolbarState
+  setBorderWith(borderWidth: number): EditFreetextAnnotationToolbarState
   setFontFamily(fontName: string): EditFreetextAnnotationToolbarState
   setFontSize(fontSize: number): EditFreetextAnnotationToolbarState
   setFontColor(color: string): EditFreetextAnnotationToolbarState
@@ -53,11 +59,12 @@ export interface EditFreetextAnnotationToolbarActions {
 
 /** @internal */
 export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotationToolbarProps, element: HTMLElement) => {
-
   const state: EditFreetextAnnotationToolbarState = {
     annotation: props.annotation,
     newSubject: null,
     backgroundColors: props.backgroundColors,
+    borderWidths: props.borderWidths,
+    selectedBorderWidth: props.selectedBorderWidth,
     fontColors: props.fontColors,
     fontFamilies: props.fontFamilies,
     fontSizes: props.fontSizes,
@@ -69,69 +76,77 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
   }
 
   const actions: ActionsType<EditFreetextAnnotationToolbarState, EditFreetextAnnotationToolbarActions> = {
-    getState: () => $state => $state,
-    executeCommand: (cmd: ExecCommandArgs) => $state => {
+    getState: () => ($state) => $state,
+
+    setBorderWith: (borderWidth: number) => ($state) => {
+      // props.onBorderWidthChanged(borderWidth)
+      props.onCmd({ cmd: 'setBorderWidth', args: borderWidth })
+      return {
+        ...$state,
+        selectedBorderWidth: borderWidth,
+      }
+    },
+
+    executeCommand: (cmd: ExecCommandArgs) => ($state) => {
       props.onCmd(cmd)
       return $state
     },
-    setFontFamily: (fontName: string) => $state => {
+    setFontFamily: (fontName: string) => ($state) => {
       props.onCmd({ cmd: 'setFont', args: fontName as string })
       return {
         ...$state,
         selectedFont: fontName,
       }
     },
-    setFontSize: (fontSize: string) => $state => {
+    setFontSize: (fontSize: string) => ($state) => {
       props.onCmd({ cmd: 'setFontSize', args: fontSize as string })
       return {
         ...$state,
         selectedFontSize: `${fontSize}pt`,
       }
     },
-    setFontColor: (color: string) => $state => {
+    setFontColor: (color: string) => ($state) => {
       props.onCmd({ cmd: 'setFontColor', args: color as string })
       return {
         ...$state,
         selectedFontColor: color,
       }
     },
-    setBackgroundColor: (color: string) => $state => {
+    setBackgroundColor: (color: string) => ($state) => {
       props.onCmd({ cmd: 'setFillColor', args: color as string })
       return {
         ...$state,
         selectedBackgroundColor: color,
       }
     },
-    setSubject: (subject: string | null) => $state => {
+    setSubject: (subject: string | null) => ($state) => {
       return {
         ...$state,
         annotation: $state.annotation,
         newSubject: subject,
       }
     },
-    hasRangeSelectionChanged: (hasRangeSelection: boolean) => $state => ({
+    hasRangeSelectionChanged: (hasRangeSelection: boolean) => ($state) => ({
       ...$state,
       hasRangeSelection,
     }),
-    close: () => $state => {
+    close: () => ($state) => {
       props.onClose()
       return $state
     },
   }
 
-  const App = () => (
-    <EditFreetextAnnotationToolbar />
-  )
+  const App = () => <EditFreetextAnnotationToolbar />
 
   /* tslint:disable-next-line:max-line-length */
-  const EditFreetextAnnotationToolbar: Component<{}, EditFreetextAnnotationToolbarState, EditFreetextAnnotationToolbarActions> = ({ }) => ($state, $actions) => (
+  const EditFreetextAnnotationToolbar: Component<{}, EditFreetextAnnotationToolbarState, EditFreetextAnnotationToolbarActions> = ({}) => ($state, $actions) => (
     <div class="pwv-toolbar">
       <Commandbar>
         <Dropdown
           text={$state.selectedFont}
           value={$state.selectedFont}
           width={130}
-          items={state.fontFamilies.map(font => ({ text: font, value: font }))}
+          items={state.fontFamilies.map((font) => ({ text: font, value: font }))}
           onChange={$actions.setFontFamily}
         />
         <Dropdown
@@ -143,45 +158,55 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
           onChange={$actions.setFontSize}
         />
         <CommandbarSeparator />
-        <ColorPicker
-          colors={$state.fontColors}
-          icon={icons.fontColor}
-          color={$state.selectedFontColor}
-          onChange={$actions.setFontColor}
+        <ColorPicker colors={$state.fontColors} icon={icons.fontColor} color={$state.selectedFontColor} onChange={$actions.setFontColor} />
+        <ColorPicker colors={$state.backgroundColors} icon={icons.fillColor} color={$state.selectedBackgroundColor} onChange={$actions.setBackgroundColor} />
+
+        <StrokeWidthPicker
+          noneStrokeText={translationManager.getText('borderNone')}
+          strokeWidths={$state.borderWidths}
+          value={$state.selectedBorderWidth}
+          onChange={$actions.setBorderWith}
         />
-        <ColorPicker
-          colors={$state.backgroundColors}
-          icon={icons.fillColor}
-          color={$state.selectedBackgroundColor}
-          onChange={$actions.setBackgroundColor}
-        />
+
         <CommandbarSeparator />
       </Commandbar>
       <Commandbar>
         <CommandbarButton
           icon={icons.alignLeft}
-          onClick={() => { $actions.executeCommand({ cmd: 'justifyLeft' }) }}
+          onClick={() => {
+            $actions.executeCommand({ cmd: 'justifyLeft' })
+          }}
         />
         <CommandbarButton
           icon={icons.alignCenter}
-          onClick={() => { $actions.executeCommand({ cmd: 'justifyCenter' }) }}
+          onClick={() => {
+            $actions.executeCommand({ cmd: 'justifyCenter' })
+          }}
         />
         <CommandbarButton
           icon={icons.alignRight}
-          onClick={() => { $actions.executeCommand({ cmd: 'justifyRight' }) }}
+          onClick={() => {
+            $actions.executeCommand({ cmd: 'justifyRight' })
+          }}
         />
         <CommandbarSeparator />
         <CommandbarButton
           icon={icons.bold}
-          onClick={() => { $actions.executeCommand({ cmd: 'bold' }) }}
+          onClick={() => {
+            $actions.executeCommand({ cmd: 'bold' })
+          }}
         />
         <CommandbarButton
           icon={icons.italic}
-          onClick={() => { $actions.executeCommand({ cmd: 'italic' }) }}
+          onClick={() => {
+            $actions.executeCommand({ cmd: 'italic' })
+          }}
         />
         <CommandbarButton
           icon={icons.underline}
-          onClick={() => { $actions.executeCommand({ cmd: 'underline' }) }}
+          onClick={() => {
+            $actions.executeCommand({ cmd: 'underline' })
+          }}
         />
         <CommandbarSeparator />
       </Commandbar>
@@ -201,14 +226,12 @@ export const createEditFreetextAnnotationToolbar = (props: EditFreetextAnnotatio
             onchange={(e: UIEvent) => {
               $actions.setSubject((e.currentTarget as HTMLTextAreaElement).value)
             }}
-            value={$state.annotation.subject} />
+            value={$state.annotation.subject}
+          />
         </div>
       </Commandbar>
       <Commandbar>
-        <CommandbarButton
-          icon={icons.ok}
-          onClick={$actions.close}
-        />
+        <CommandbarButton icon={icons.ok} onClick={$actions.close} />
       </Commandbar>
     </div>
   )

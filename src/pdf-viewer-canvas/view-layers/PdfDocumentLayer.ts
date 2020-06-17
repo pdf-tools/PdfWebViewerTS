@@ -7,7 +7,6 @@ import { renderTextSelection } from './canvasShapes'
 
 /** @internal */
 export class PdfDocumentLayer extends ViewLayerBase {
-
   public context: CanvasRenderingContext2D | null | undefined
   private canvas: HTMLCanvasElement | undefined
 
@@ -21,20 +20,18 @@ export class PdfDocumentLayer extends ViewLayerBase {
   }
 
   public render(timestamp: number, state: ViewerCanvasState) {
-
     if (this.pdfViewerApi) {
-
-      const draw = state.canvas.canvasInvalidated ||
-                   state.canvas.widthChanged ||
-                   state.canvas.heightChanged ||
-                   state.viewer.modeChanged ||
-                   state.viewer.textSelectionChanged
+      const draw =
+        state.canvas.canvasInvalidated ||
+        state.canvas.widthChanged ||
+        state.canvas.heightChanged ||
+        state.viewer.modeChanged ||
+        state.viewer.textSelectionChanged
 
       const defaultState = state.viewer.mode === ViewerMode.DEFAULT
 
       // set cursor style and handle link click
       if (defaultState && (state.pointer.positionChanged || state.pointer.stateChanged)) {
-
         const pointerPos = {
           x: state.pointer.x.devicePixels,
           y: state.pointer.y.devicePixels,
@@ -50,10 +47,10 @@ export class PdfDocumentLayer extends ViewLayerBase {
           const annotationOnPoint = annotationsOnPoint ? annotationsOnPoint[0] : null
           if (annotationOnPoint) {
             const itemType = annotationOnPoint.itemType
-            if ((itemType === PdfItemType.HIGHLIGHT ||
-              itemType === PdfItemType.SQUIGGLY ||
-              itemType === PdfItemType.STRIKE_OUT) &&
-              this.pdfViewerApi.getTextFragmentOnPoint(pdfPoint) !== null) {
+            if (
+              (itemType === PdfItemType.HIGHLIGHT || itemType === PdfItemType.SQUIGGLY || itemType === PdfItemType.STRIKE_OUT) &&
+              this.pdfViewerApi.getTextFragmentOnPoint(pdfPoint) !== null
+            ) {
               this.store.viewer.setCursorStyle(CursorStyle.TEXT)
             } else if (itemType === PdfItemType.LINK) {
               const link = (annotationOnPoint as any) as LinkAnnotation
@@ -76,10 +73,17 @@ export class PdfDocumentLayer extends ViewLayerBase {
       if (draw) {
         const ctx = this.context as CanvasRenderingContext2D
 
+        ctx.save()
+        if (this.options.pageShadow) {
+          ctx.shadowColor = this.options.pageShadow.color
+          ctx.shadowBlur = this.options.pageShadow.blur
+          ctx.shadowOffsetX = this.options.pageShadow.offsetX
+          ctx.shadowOffsetY = this.options.pageShadow.offsetY
+        }
+
         // draw pdf
         if (state.viewer.mode === ViewerMode.MODULE_SELECTED) {
-          ctx.save()
-          ctx.globalAlpha = .75
+          ctx.globalAlpha = 0.75
           this.pdfViewerApi.renderCanvas(ctx)
           ctx.globalAlpha = 1
           ctx.fillStyle = 'rgb(255,255,255)'
@@ -90,18 +94,18 @@ export class PdfDocumentLayer extends ViewLayerBase {
               ctx.fillRect(pageRect.x, pageRect.y, pageRect.w, pageRect.h)
             }
           }
-          ctx.restore()
         } else {
           this.pdfViewerApi.renderCanvas(ctx)
         }
+        ctx.restore()
 
         // draw search
         if (state.search.match) {
           ctx.save()
           ctx.globalCompositeOperation = 'multiply'
           ctx.fillStyle = this.options.searchMatchColor
-          ctx.globalAlpha = .9
-          state.search.match.forEach(match => {
+          ctx.globalAlpha = 0.9
+          state.search.match.forEach((match) => {
             if (match.page >= state.document.firstVisiblePage && match.page <= state.document.lastVisiblePage) {
               const rect = this.pdfViewerApi.transformPdfPageRectToScreenRect(match)
               ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
@@ -121,7 +125,6 @@ export class PdfDocumentLayer extends ViewLayerBase {
           renderTextSelection(ctx, devicePixelRatio * state.document.zoom, this.options.textSelectionColor, screenRectSelection)
           ctx.restore()
         }
-
       }
     }
   }

@@ -101,7 +101,7 @@ export interface AnnotationPopup extends Annotation {
 export interface Annotation extends PdfPositionalItem {
   itemType: PdfItemType
   lastModified: string
-  borderWidth: number
+  border: AnnotationBorder
   custom: object[]
   page: number
   content: string | null
@@ -140,6 +140,7 @@ export interface FreetextAnnotation extends Annotation {
   fontName: string
   fontColor: string
   richText: string | null
+  border: AnnotationBorder
 }
 
 export interface StampInfoArgs {

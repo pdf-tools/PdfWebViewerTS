@@ -1,4 +1,3 @@
-
 /** @internal */
 export const translations = {
   'errors.invalidLicense': {
@@ -25,8 +24,7 @@ export const translations = {
     fr: 'Sujet',
     it: 'Oggetto',
   },
-  'stamptext.approved' :
-  {
+  'stamptext.approved': {
     en: 'APPROVED',
     de: 'GENEHMIGT',
     fr: 'APPROUVÉ',
@@ -109,5 +107,17 @@ export const translations = {
     de: 'Geschützte Annotation',
     fr: 'Annotation Protégée',
     it: 'Annotazione protetta',
+  },
+  'eraseInkLine': {
+    en: 'Click to Delete Ink Lines',
+    de: 'Klicken um Inkannotationen zu löschen',
+    fr: 'Cliquez pour effacer les lignes d\'encre',
+    it: 'Cliccare per cancellare le linee di inchiostro',
+  },
+  'borderNone': {
+    en: 'No Border',
+    de: 'Kein Rahmen',
+    fr: 'No Border',
+    it: 'No Border',
   },
 }

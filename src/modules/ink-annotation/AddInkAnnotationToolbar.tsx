@@ -4,9 +4,10 @@ import { icons } from '../../common/icons'
 import { Commandbar } from '../../common/Commandbar'
 import { CommandbarSeparator } from '../../common/CommandbarSeparator'
 import { DropdownItem, Dropdown } from '../../common/Dropdown'
+import { StrokeWidthPicker } from '../../common/StrokeWidthPicker'
 import { RangeSlider } from '../../common/RangeSlider'
 import { ColorPicker } from '../../common/ColorPicker'
-import { TooltipPosition } from '../../common/Tooltip';
+import { TooltipPosition } from '../../common/Tooltip'
 
 export interface AddInkAnnotationToolbarProps {
   penColors: string[]
@@ -25,7 +26,7 @@ export interface AddInkAnnotationToolbarProps {
 
 interface AddInkAnnotationToolbarState {
   penColors: string[]
-  penWidths: DropdownItem[]
+  penWidths: number[]
   selectedPenColor: string
   selectedPenSize: number
   penOpacity: number
@@ -40,17 +41,9 @@ export interface AddInkAnnotationToolbarActions {
 }
 
 export const createAddInkAnnotationToolbar = (props: AddInkAnnotationToolbarProps, element: HTMLElement) => {
-
   const state: AddInkAnnotationToolbarState = {
     penColors: props.penColors,
-    penWidths: props.penWidths.map(item => ({
-      value: item,
-      renderItem: (i: DropdownItem) => (
-        <div class="pwv-line-width">
-          <div style={{ height: `${i.value}px` }}></div>
-        </div>
-      ),
-    })),
+    penWidths: props.penWidths,
     selectedPenColor: props.selectedPenColor,
     selectedPenSize: props.selectedPenSize,
     penOpacity: props.penOpacity,
@@ -58,39 +51,36 @@ export const createAddInkAnnotationToolbar = (props: AddInkAnnotationToolbarProp
   }
 
   const actions: ActionsType<AddInkAnnotationToolbarState, AddInkAnnotationToolbarActions> = {
-
-    setPenColor: (color: string) => $state => {
+    setPenColor: (color: string) => ($state) => {
       props.onPenColorChanged(color)
       return {
         ...$state,
         selectedPenColor: color,
       }
     },
-    setPenSize: (width: number) => $state => {
+    setPenSize: (width: number) => ($state) => {
       props.onPenSizeChanged(width)
       return {
         ...$state,
         selectedPenSize: width,
       }
     },
-    setPenOpacity: (opacity: number) => $state => {
+    setPenOpacity: (opacity: number) => ($state) => {
       props.onPenOpacityChanged(opacity)
       return {
         ...$state,
         penOpacity: opacity,
       }
     },
-    setLineCount: (lineCount: number) => $state => ({
+    setLineCount: (lineCount: number) => ($state) => ({
       ...$state,
       lineCount,
     }),
   }
 
-  const App = () => (
-    <AddInkAnnotationToolbar />
-  )
+  const App = () => <AddInkAnnotationToolbar />
 
-  const AddInkAnnotationToolbar: Component<{}, AddInkAnnotationToolbarState, AddInkAnnotationToolbarActions> = ({ }) => ($state, $actions) => (
+  const AddInkAnnotationToolbar: Component<{}, AddInkAnnotationToolbarState, AddInkAnnotationToolbarActions> = ({}) => ($state, $actions) => (
     <div class="pwv-toolbar">
       <Commandbar>
         <ColorPicker
@@ -99,30 +89,19 @@ export const createAddInkAnnotationToolbar = (props: AddInkAnnotationToolbarProp
           icon={icons.fillColor}
           mode="buttons"
           onChange={$actions.setPenColor}
-        >
-        </ColorPicker>
+        ></ColorPicker>
         <RangeSlider
-            min={10}
-            max={100}
-            step={1}
-            value={$state.penOpacity}
-            text={`${$state.penOpacity} %`}
-            icon={icons.drop}
-            onChange={$actions.setPenOpacity}
-            className="pwv-opacityslider"
-        >
-        </RangeSlider>
-        <Dropdown
-          value={$state.selectedPenSize}
-          className="pwv-dropdown-line-width"
-          items={$state.penWidths}
-          renderButton={(value, text) => (
-            <div class="pwv-line-width">
-              <div style={{ height: `${value}px` }}></div>
-            </div>
-          )}
-          onChange={$actions.setPenSize}
-        />
+          min={10}
+          max={100}
+          step={1}
+          value={$state.penOpacity}
+          text={`${$state.penOpacity} %`}
+          icon={icons.drop}
+          onChange={$actions.setPenOpacity}
+          className="pwv-opacityslider"
+        ></RangeSlider>
+
+        <StrokeWidthPicker noneStrokeText={''} strokeWidths={$state.penWidths} value={$state.selectedPenSize} onChange={$actions.setPenSize} />
       </Commandbar>
       <Commandbar>
         <CommandbarSeparator />
@@ -133,23 +112,14 @@ export const createAddInkAnnotationToolbar = (props: AddInkAnnotationToolbarProp
           tooltip="Remove last line"
           tooltipPos={TooltipPosition.bottom}
         />
-        <CommandbarButton
-          icon={icons.addLayer}
-          onClick={props.onAdd}
-          disabled={$state.lineCount < 1}
-        />
+        <CommandbarButton icon={icons.addLayer} onClick={props.onAdd} disabled={$state.lineCount < 1} />
       </Commandbar>
       <Commandbar>
         <CommandbarSeparator />
-        <CommandbarButton
-          icon={icons.ok}
-          onClick={props.onSave}
-        >
-        </CommandbarButton>
+        <CommandbarButton icon={icons.ok} onClick={props.onSave}></CommandbarButton>
       </Commandbar>
     </div>
   )
 
   return app(state, actions, App, element)
-
 }

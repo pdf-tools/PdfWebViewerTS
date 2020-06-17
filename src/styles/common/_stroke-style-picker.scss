@@ -1,0 +1,47 @@
+.pwv-stroke-style-picker {
+  width: 50px;
+}
+
+.pwv-stroke-style-picker-button {
+  > span {
+    display: block;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+    border-color: $icon-color;
+    border-width: 1px;
+    border-style: solid;
+  }
+  &.pwv-stroke-style-dashed {
+    > span {
+      border-style: dashed;
+    }
+  }
+}
+
+.pwv-stroke-style-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 21px;
+  &:hover {
+    > span {
+      border-top-color: $blue;
+    }
+  }
+
+  > span {
+    display: block;
+    width: 40px;
+    height: 2px;
+    box-sizing: border-box;
+    border-top-color: $icon-color;
+    border-top-width: 2px;
+    border-top-style: solid;
+  }
+  &.pwv-stroke-style-dashed {
+    > span {
+      border-top-style: dashed;
+    }
+  }
+}
