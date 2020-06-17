@@ -14,7 +14,6 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
   private colors: string[] = []
   private selectedColor: string = ''
   private borderWidths: number[] = []
-  private selectedBorderWidth = 1
   private pointerDown: boolean = false
   private startPoint: Point | null = null
   private page: number = 0
@@ -26,12 +25,9 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
 
     this.context = this.createCanvas()
     this.colors = this.options.backgroundColors
-    this.selectedColor = this.options.defaultFreetextBgColor ? this.options.defaultFreetextBgColor : this.options.defaultBackgroundColor
 
     // todo: get values from options
     this.borderWidths = [0, 1, 2, 3, 4]
-    this.selectedBorderWidth =
-      typeof this.options.defaultFreetextBorderSize === 'number' ? this.options.defaultFreetextBorderSize : this.options.defaultBorderSize
 
     /* tslint:disable-next-line:align */
     const toolbarElement = (this.module as FreetextAnnotationModule).toolbarElement as HTMLElement
@@ -39,9 +35,9 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
     createAddFreetextAnnotationToolbar(
       {
         colors: this.colors,
-        selectedColor: this.selectedColor,
+        selectedColor: this.options.freetextBgColor,
         borderWidths: this.borderWidths,
-        selectedBorderWidth: this.selectedBorderWidth,
+        selectedBorderWidth: this.options.freetextBorderWidth,
         onColorChanged: this.setColor,
         onBorderWidthChanged: this.setBorderWidth,
         onClose: this.close,
@@ -158,10 +154,11 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
 
   private setColor(color: string) {
     this.selectedColor = color
+    this.options.freetextBgColor = color
   }
 
   private setBorderWidth(borderWidth: number) {
-    this.selectedBorderWidth = borderWidth
+    this.options.freetextBorderWidth = borderWidth
   }
 
   private close() {
@@ -177,16 +174,14 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
       page: pdfRect.page,
       pdfRect,
       border: {
-        width: this.selectedBorderWidth,
+        width: this.options.freetextBorderWidth,
         style: AnnotationBorderStyle.SOLID,
       },
       /* tslint:disable-next-line: max-line-length */
-      richtext: `<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2" style="color:${
-        this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor
-      };"></body>`,
+      richtext: `<?xml version="1.0"?><body xmlns="http://www.w3.org/1999/xhtml" xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" xfa:APIVersion="Acrobat:19.12.0" xfa:spec="2.0.2" style="color:${this.options.freetextFontColor};"></body>`,
       fontName: 'Arial',
-      fontColor: this.options.defaultFreetextFontColor ? this.options.defaultFreetextFontColor : this.options.defaultForegroundColor,
-      fontSize: this.options.defaultFreetextFontSize ? this.options.defaultFreetextFontSize : this.options.defaultFontSize,
+      fontColor: this.options.freetextFontColor,
+      fontSize: this.options.freetextFontSize
     }
 
     this.pdfApi.createItem(annotation).then((item) => {

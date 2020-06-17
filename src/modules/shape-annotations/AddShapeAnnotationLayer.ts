@@ -18,12 +18,7 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
   private itemType: PdfItemType | null = null
 
   private strokeColors: string[] = []
-  private strokeWidths: number[] = []
   private fillColors: string[] = []
-  private selectedStrokeColor: string = ''
-  private selectedStrokeWidth: number = 1
-  private selectedStrokeStyle: AnnotationBorderStyle = AnnotationBorderStyle.SOLID
-  private selectedFillColor: string = ''
 
   public onCreate(itemType: PdfItemType): void {
     this.setStrokeColor = this.setStrokeColor.bind(this)
@@ -33,12 +28,8 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
     this.cancel = this.cancel.bind(this)
     this.context = this.createCanvas()
     this.itemType = itemType
-    this.strokeColors = this.options.strokeColors
-    this.strokeWidths = this.options.strokeWidths
-    this.fillColors = this.options.fillColors
-    this.selectedStrokeColor = this.options.defaultStrokeColor ? this.options.defaultStrokeColor : this.options.defaultForegroundColor
-    this.selectedStrokeWidth = this.options.defaultStrokeWidth
-    this.selectedFillColor = this.options.defaultFillColor ? this.options.defaultFillColor : this.options.fillColors[0]
+    this.strokeColors = this.options.foregroundColors
+    this.fillColors = this.options.backgroundColors
 
     this.store.viewer.beginModule(moduleLayerName)
 
@@ -47,12 +38,12 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
     this.toolbar = createShapeAnnotationToolbar(
       {
         strokeColors: this.strokeColors,
-        strokeWidths: this.strokeWidths,
+        strokeWidths: this.options.strokeWidths,
         fillColors: this.fillColors,
-        selectedStrokeColor: this.selectedStrokeColor,
-        selectedStrokeWidth: this.selectedStrokeWidth,
-        selectedStrokeStyle: this.selectedStrokeStyle,
-        selectedFillColor: this.selectedFillColor,
+        selectedStrokeColor: this.options.shapeColor,
+        selectedStrokeWidth: this.options.shapeStrokeWidth,
+        selectedStrokeStyle: this.options.shapeStrokeStyle,
+        selectedFillColor: this.options.shapeFillColor,
         onStrokeColorChanged: this.setStrokeColor,
         onStrokeWidthChanged: this.setStrokeWidth,
         onStrokeStyleChanged: this.setStrokeStyle,
@@ -134,14 +125,13 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
 
             if (rect) {
               ctx.save()
-              ctx.strokeStyle = this.selectedStrokeColor
-              ctx.fillStyle = this.selectedFillColor
-              ctx.lineWidth = this.pdfApi.transformPdfLengthToDeviceLength(this.selectedStrokeWidth) * 2
+              ctx.strokeStyle = this.options.shapeColor
+              ctx.fillStyle = this.options.shapeFillColor
+              ctx.lineWidth = this.options.shapeStrokeWidth * devicePixelRatio * state.document.zoom
 
-              if (this.selectedStrokeStyle === AnnotationBorderStyle.DASHED) {
+              if (this.options.shapeStrokeStyle === AnnotationBorderStyle.DASHED) {
                 ctx.setLineDash([ctx.lineWidth])
               }
-
               if (this.itemType === PdfItemType.CIRCLE) {
                 const cX = rect.x + rect.w / 2
                 const cY = rect.y + rect.h / 2
@@ -150,8 +140,8 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
                 ctx.fill()
                 ctx.stroke()
               } else {
-                ctx.strokeRect(rect.x, rect.y, rect.w, rect.h)
                 ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+                ctx.strokeRect(rect.x + ctx.lineWidth / 2, rect.y + ctx.lineWidth / 2, rect.w - ctx.lineWidth, rect.h - ctx.lineWidth)
               }
 
               ctx.restore()
@@ -181,19 +171,19 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
   }
 
   private setStrokeColor(color: string) {
-    this.selectedStrokeColor = color
+    this.options.shapeColor = color
   }
 
   private setStrokeWidth(width: number) {
-    this.selectedStrokeWidth = width
+    this.options.shapeStrokeWidth = width
   }
 
   private setStrokeStyle(style: AnnotationBorderStyle) {
-    this.selectedStrokeStyle = style
+    this.options.shapeStrokeStyle = style
   }
 
   private setFillColor(color: string) {
-    this.selectedFillColor = color
+    this.options.shapeFillColor = color
   }
 
   private createRectangleAnnotation(rect: Rect) {
@@ -201,20 +191,20 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
 
     const annotation: ShapeDrawingAnnotationArgs = {
       itemType: this.itemType as PdfItemType,
-      color: this.selectedStrokeColor,
+      color: this.options.shapeColor,
       pdfRect,
       page: this.page,
       originalAuthor: this.options.author,
-      fillColor: this.selectedFillColor === 'transparent' ? null : this.selectedFillColor,
+      fillColor: this.options.shapeFillColor === 'transparent' ? null : this.options.shapeFillColor,
       border: {
-        width: this.selectedStrokeWidth,
-        style: this.selectedStrokeStyle,
+        width: this.options.shapeStrokeWidth,
+        style: this.options.shapeStrokeStyle,
       },
     }
 
     this.pdfApi
       .createItem(annotation)
-      .then((annot) => {
+      .then(() => {
         this.remove()
         // select new annotation
         // const pdfViewerCanvasApi = this.pdfViewerCanvas as any

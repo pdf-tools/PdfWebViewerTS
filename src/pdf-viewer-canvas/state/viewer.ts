@@ -30,6 +30,7 @@ export enum CursorStyle {
   EW_RESIZE = 'ew-resize',
   NESW_RESIZE = 'nesw-resize',
   NWSE_RESIZE = 'nwse-resize',
+  ERASE = 'erase'
 }
 
 /** @internal */

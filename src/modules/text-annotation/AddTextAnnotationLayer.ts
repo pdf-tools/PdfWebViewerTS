@@ -21,8 +21,7 @@ export class AddTextAnnotationLayer extends CanvasLayer {
 
     this.context = this.createCanvas()
     this.colors = this.options.highlightColors
-    this.selectedColor = this.options.defaultStickyNoteColor ? this.options.defaultStickyNoteColor :
-                         this.options.defaultHighlightColor
+    this.selectedColor = this.options.stickyNoteColor
 
     /* tslint:disable-next-line:align */
     ; const toolbarElement = (this.module as TextAnnotationModule).toolbarElement as HTMLElement
@@ -111,6 +110,7 @@ export class AddTextAnnotationLayer extends CanvasLayer {
 
   private setColor(color: string) {
     this.selectedColor = color
+    this.options.stickyNoteColor = color
   }
 
   private close() {

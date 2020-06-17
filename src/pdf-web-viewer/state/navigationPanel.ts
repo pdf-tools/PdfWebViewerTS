@@ -173,6 +173,9 @@ export const actions: ActionsType<
     const id = deletedItem.id
     const itemsOnPage = $state.annotations[page]
 
+    if (!itemsOnPage) {
+      return { ...$state }
+    }
     delete itemsOnPage[id]
 
     return {

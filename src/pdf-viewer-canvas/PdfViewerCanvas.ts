@@ -18,7 +18,7 @@ import {
   PdfItemsOnPage,
 } from '../pdf-viewer-api'
 import ResizeObserver from 'resize-observer-polyfill'
-import { PdfViewerCanvasOptions, PdfViewerCanvasDefaultOptions } from './PdfViewerCanvasOptions'
+import { PdfViewerCanvasOptions, PdfViewerOptions} from './PdfViewerCanvasOptions'
 import { translations } from './translations'
 import { translationManager } from '../common/TranslationManager'
 import { CanvasEvents, CanvasPointerEvent, CanvasPointerPinchEvent } from './CanvasEvents'
@@ -65,7 +65,7 @@ export class PdfViewerCanvas {
   private annotationbarElement: HTMLElement | undefined
   private toolbarElement: HTMLElement
 
-  private options: PdfViewerCanvasOptions
+  private options: PdfViewerOptions
   private viewLayers: ViewLayerBase[]
   private modules: CanvasModule[]
   private pdfViewerApi: PdfViewerApi
@@ -81,7 +81,7 @@ export class PdfViewerCanvas {
     if (!containerElement) {
       throw { error: 'PdfViewerCanvas container element is null' }
     }
-    this.options = { ...PdfViewerCanvasDefaultOptions, ...options }
+    this.options = new PdfViewerOptions(options)
 
     this.annotTimer = 0
 
@@ -615,8 +615,14 @@ export class PdfViewerCanvas {
       const state = this.store.getState()
       if (this.renderLoopRunning) {
         this.store.resetChangedState()
-        if (this.viewLayersElement.style.cursor !== state.viewer.cursorStyle) {
-          this.viewLayersElement.style.cursor = state.viewer.cursorStyle
+        if (state.viewer.cursorStyleChanged) {
+          if (state.viewer.cursorStyle === CursorStyle.ERASE) {
+            this.viewLayersElement.style.cursor = null
+            this.viewLayersElement.classList.add('pwv-erase-cursor')
+          } else {
+            this.viewLayersElement.classList.remove('pwv-erase-cursor')
+            this.viewLayersElement.style.cursor = state.viewer.cursorStyle
+          }
         }
 
         for (let i = 0; i < viewLayers.length; i++) {

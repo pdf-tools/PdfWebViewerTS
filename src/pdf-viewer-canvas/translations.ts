@@ -96,19 +96,25 @@ export const translations = {
     fr: 'POUR INFORMATION',
     it: 'SOLO INFORMAZIONI',
   },
-  chooseStamp: {
+  'chooseStamp': {
     en: 'CHOOSE STAMP',
     de: 'STEMPEL WÄHLEN',
     fr: 'SÉLECTIONNEZ LE TIMBRE',
     it: 'SCEGLIERE TIMBRO',
   },
-  lockedAnnotation: {
+  'lockedAnnotation': {
     en: 'Locked Annotation',
     de: 'Geschützte Annotation',
     fr: 'Annotation Protégée',
     it: 'Annotazione protetta',
   },
-  borderNone: {
+  'eraseInkLine': {
+    en: 'Click to Delete Ink Lines',
+    de: 'Klicken um Inkannotationen zu löschen',
+    fr: 'Cliquez pour effacer les lignes d\'encre',
+    it: 'Cliccare per cancellare le linee di inchiostro',
+  },
+  'borderNone': {
     en: 'No Border',
     de: 'Kein Rahmen',
     fr: 'No Border',

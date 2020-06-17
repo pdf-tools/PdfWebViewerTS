@@ -20,7 +20,7 @@ export class FreetextAnnotationModule extends CanvasModule {
   public onRegister() {
     this.annotationbarElement = document.createElement('div')
     this.annotationbarElement.classList.add('pwv-commandbar-group')
-    this.annotationbar = createAnnotationbar(
+    createAnnotationbar(
       {
         onBtnAddClicked: this.onBtnAddClicked,
       },

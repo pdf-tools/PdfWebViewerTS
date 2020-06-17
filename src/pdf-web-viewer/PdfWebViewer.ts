@@ -142,6 +142,7 @@ export class PdfWebViewer {
     this.handleAnnotationDeleted = this.handleAnnotationDeleted.bind(this)
     this.handleAnnotationSelected = this.handleAnnotationSelected.bind(this)
     this.handleAnnotationDeselected = this.handleAnnotationDeselected.bind(this)
+    this.showUnconfirmedChangesDialog = this.showUnconfirmedChangesDialog.bind(this)
 
     const deviceType = Math.min(window.screen.availHeight, window.screen.availWidth) < 570 ? 'mobile' : 'desktop'
     this.options = { ...pdfWebViewerDefaultOptions, ...options }
@@ -331,19 +332,30 @@ export class PdfWebViewer {
       }
       a.api = {
         openFile: (x: { file: File; password?: string }) => {
+          this.view.loadDocumentBegin()
+          const reader = new FileReader()
+          reader.onload = (e: any) => {
           if (this.viewerCanvas) {
-            if (!this.beforeOpen(x.file)) {
+            if (!this.beforeOpen(new Blob([e.target.result]) as File)) {
               return
             }
-            this.viewerCanvas
-              .openBlob(x.file, x.password)
-              .then(() => {
-                this.openResolve(x.file)
-              })
-              .catch((error: Error) => {
-                this.openReject(x.file, null, error)
-              })
+              if (this.viewerCanvas) {
+                this.viewerCanvas
+                  .openBlob(new Blob([e.target.result]), x.password)
+                  .then(() => {
+                    this.openResolve(x.file)
+                  })
+                  .catch((error: Error) => {
+                    this.openReject(x.file, null, error)
+                  })
+              }
+            }
+
           }
+          reader.onerror = (e: any) => {
+            console.log(e)
+          }
+          reader.readAsArrayBuffer(x.file)
         },
         openUri: (x: { pdfUri: string; password?: string; pdfAuthorization?: string }) => {
           if (this.viewerCanvas) {
@@ -395,9 +407,7 @@ export class PdfWebViewer {
         close: () => {
           return new Promise((resolve, reject) => {
             if (this.viewerCanvas) {
-              const currentState = this.view.getState()
-              const hasChanges = this.viewerCanvas.hasChanges()
-              if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
+              if (this.showUnconfirmedChangesDialog()) {
                 this.view.showConfirmUnsavedChangesDialog({ pdfFile: null })
                 return
               }
@@ -587,11 +597,17 @@ export class PdfWebViewer {
     }
   }
 
-  private beforeOpen(pdfFile: File | string, fdfFile?: File | string) {
+  private showUnconfirmedChangesDialog() {
     if (this.viewerCanvas) {
       const currentState = this.view.getState()
       const hasChanges = this.viewerCanvas.hasChanges()
-      if (!currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges) {
+      return !currentState.unsavedChangesDialogDontSave && currentState.hasDocument && hasChanges && this.options.promptOnUnsavedChanges && this.options.allowSaveFile
+    }
+  }
+
+  private beforeOpen(pdfFile: File | string, fdfFile?: File | string) {
+    if (this.viewerCanvas) {
+      if (this.showUnconfirmedChangesDialog()) {
         this.view.showConfirmUnsavedChangesDialog({ pdfFile, fdfFile })
         return false
       }

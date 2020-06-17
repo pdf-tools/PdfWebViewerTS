@@ -1,13 +1,16 @@
 import { SupportedLanguages } from '../common/TranslationManager'
-import { StampAnnotationColor } from '../pdf-viewer-api/enums'
+import { StampAnnotationColor, AnnotationBorderStyle } from '../pdf-viewer-api/enums'
 import { CanvasModuleClass } from '../modules/CanvasModule'
 import { TextAnnotationModule } from '../modules/text-annotation/TextAnnotationModule'
 import { InkAnnotationModule } from '../modules/ink-annotation/InkAnnotationModule'
+import { EditInkAnnotationModule } from '../modules/edit-ink-annotation/EditInkAnnotationModule'
 import { FreetextAnnotationModule } from '../modules/freetext-annotation/FreetextAnnotationModule'
 import { HighlightAnnotationModule } from '../modules/highlight-annotation/HighlightAnnotationModule'
 import { StampAnnotationModule } from '../modules/stamp-annotation/StampAnnotationModule'
 import { PopupModule } from '../modules/popup/PopupModule'
+import { UserSettings } from './UserSettings'
 import { ShapeAnnotationModule } from '../modules/shape-annotations/ShapeAnnotationModule'
+import { ImageAnnotationModule } from '../modules/image-annotations/ImageAnnotationModule'
 
 export interface TextStampSetting {
   name: string
@@ -32,15 +35,13 @@ interface Fonts {
 }
 
 export interface PdfViewerCanvasCoreOptions {
-  [key: string]: any
-  language?: keyof SupportedLanguages
-  annotationBarPosition?: 'top' | 'left' | 'right' | 'bottom'
+  [key: string]: any,
+  language: keyof SupportedLanguages,
+  annotationBarPosition: 'top' | 'left' | 'right' | 'bottom'
   highlightColors: string[]
   foregroundColors: string[]
   backgroundColors: string[]
-  strokeColors: string[]
   strokeWidths: number[]
-  fillColors: string[]
   fontSizes: number[]
   highlightOpacity: number
   textSelectionColor: string
@@ -65,15 +66,225 @@ export interface PdfViewerCanvasOptions extends PdfViewerCanvasCoreOptions {
   defaultBackgroundColor: string
   defaultForegroundColor: string
   defaultHighlightColor: string
-  defaultFontFamiliy: keyof Fonts
+  defaultFontFamily: keyof Fonts
   defaultFontSize: number
   defaultBorderSize: number
   defaultStampWidth: number
   defaultStampText: string
-  defaultStrokeColor: string
-  defaultStrokeWidth: number
-  defaultFillColor: string
   ms_custom: boolean
+}
+
+export class PdfViewerOptions {
+  private options: PdfViewerCanvasOptions
+  private storage: UserSettings
+  constructor(_options?: Partial<PdfViewerCanvasOptions>) {
+    this.options = {...PdfViewerCanvasDefaultOptions, ..._options}
+    this.storage = new UserSettings()
+  }
+
+  get language(): keyof SupportedLanguages {
+    return this.options.language
+  }
+
+  get annotationBarPosition(): 'top' | 'left' | 'right' | 'bottom' {
+    return this.options.annotationBarPosition
+  }
+
+  get highlightColors(): string[] {
+    return this.options.highlightColors
+  }
+  
+  get foregroundColors(): string[] {
+    return this.options.foregroundColors
+  }
+
+  get backgroundColors(): string[] {
+    return this.options.backgroundColors
+  }
+
+  get fontSizes(): number[] {
+    return this.options.fontSizes
+  }
+
+  get highlightOpacity(): number {
+    return this.options.highlightOpacity
+  }
+
+  get textSelectionColor(): string {
+    return this.options.textSelectionColor
+  }
+  
+  get fontFamilies(): string[] {
+    return this.options.fontFamilies
+  }
+  
+  get searchMatchColor(): string {
+    return this.options.searchMatchColor
+  }
+
+  get author(): string | undefined {
+    return this.options.author
+  }
+
+  get defaultFontFamily(): keyof Fonts {
+    return this.options.defaultFontFamily
+  }
+
+  get stamps(): (TextStampSetting | ImageStampSetting)[] {
+    return this.options.stamps
+  }
+
+  get modules(): CanvasModuleClass[] | undefined {
+    return this.options.modules
+  }
+  
+  get promptOnUnsavedChanges(): boolean {
+    return this.options.promptOnUnsavedChanges
+  }
+
+  get defaultHighlightColor(): string {
+    return this.options.defaultHighlightColor
+  }
+
+  get highlightAnnotationColor(): string {
+    return this.storage.getItem<string>('highlightAnnotationColor', this.defaultHighlightColor)
+  }
+
+  set highlightAnnotationColor(color: string) {
+    this.storage.setItem('highlightAnnotationColor', color)
+  }
+
+  get defaultStampWidth(): number {
+    return this.defaultStampWidth
+  }
+
+  get stampText(): string {
+    return this.storage.getItem('stampText', this.options.defaultStampText)
+  }
+
+  set stampText(text: string) {
+    this.storage.setItem('stampText', text)
+  }
+
+  get freetextFontSize(): number {
+    return this.storage.getItem<number>('freetextFontSize', this.options.defaultFontSize)
+  }
+
+  set freetextFontSize(size: number) {
+    this.storage.setItem('freetextFontSize', size)
+  }
+
+  get defaultFontSize(): number {
+    return this.options.defaultFontSize
+  }
+
+  get freetextFontColor(): string {
+    return this.storage.getItem<string>('freetextFontColor', this.options.defaultForegroundColor)
+  }
+
+  set freetextFontColor(color: string) {
+    this.storage.setItem('freetextFontColor', color)
+  }
+
+  get stickyNoteColor(): string {
+    return this.storage.getItem<string>('stickyNoteColor', this.options.defaultHighlightColor)
+  }
+
+  set stickyNoteColor(color: string) {
+    this.storage.setItem('stickyNoteColor', color)
+  }
+
+  get freetextFontFamily(): string {
+    return this.storage.getItem<keyof Fonts>('freetextFontFamily', this.options.defaultFontFamily)
+  }
+
+  set freetextFontFamily(font: string) {
+    this.storage.setItem('freetextFontFamily', font)
+  }
+
+  get defaultBorderSize(): number {
+    return this.options.defaultBorderSize
+  }
+
+  set freetextBorderWidth(width: number) {
+    this.storage.setItem('freetextBorderWidth', width)
+  }
+
+  get freetextBorderWidth(): number {
+    return this.storage.getItem<number>('freetextBorderWidth', this.options.defaultBorderSize)
+  }
+
+  get freetextBgColor(): string {
+    return this.storage.getItem<string>('freetextBgColor', this.options.defaultBackgroundColor)
+  }
+
+  set freetextBgColor(color: string) {
+    this.storage.setItem('freetextBgColor', color)
+  }
+
+  get inkColor(): string {
+    return this.storage.getItem<string>('inkColor', this.options.defaultForegroundColor)
+  }
+
+  set inkColor(color: string) {
+    this.storage.setItem('inkColor', color)
+  }
+
+  get inkWidth(): number {
+    return this.storage.getItem<number>('inkWidth', this.options.defaultBorderSize)
+  }
+
+  set inkWidth(width: number) {
+    this.storage.setItem('inkWidth', width)
+  }
+
+  get inkOpacity(): number {
+    return this.storage.getItem<number>('inkOpacity', 100)
+  }
+
+  set inkOpacity(opacity: number) {
+    this.storage.setItem('inkOpacity', opacity)
+  }
+
+  set shapeColor(color: string) {
+    this.storage.setItem('shapeAnnotationColor', color)
+  }
+
+  get shapeColor(): string {
+    return this.storage.getItem<string>('shapeAnnotationColor', this.options.defaultForegroundColor)
+  }
+
+  set shapeStrokeWidth(width: number) {
+    this.storage.setItem('shapeStrokeWidth', width)
+  }
+
+  get shapeStrokeWidth(): number {
+    return this.storage.getItem<number>('shapeStrokeWidth', this.options.defaultBorderSize)
+  }
+
+  get strokeWidths(): number[] {
+    return this.options.strokeWidths
+  }
+
+  set shapeFillColor(color: string) {
+    this.storage.setItem('shapeFillColor', color)
+  }
+
+  get shapeFillColor(): string {
+    return this.storage.getItem<string>('shapeFillColor', this.defaultHighlightColor)
+  }
+
+  set shapeStrokeStyle(style: AnnotationBorderStyle) {
+    this.storage.setItem('shapeStrokeStyle', style)
+  }
+
+  get shapeStrokeStyle(): AnnotationBorderStyle {
+    return this.storage.getItem<AnnotationBorderStyle>('shapeStrokeStyle', AnnotationBorderStyle.SOLID)
+  }
+
+  get ms_custom(): boolean {
+    return this.options.ms_custom
+  }
 }
 
 export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
@@ -82,16 +293,11 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   highlightColors: ['#2ADB1A', '#FFEA02', '#FF7F1F', '#FF2882', '#008AD1'],
   foregroundColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
   backgroundColors: ['#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
-  strokeColors: ['#323232', '#FFFFFF', '#FFEA02', '#2ADB1A', '#0066CC', '#D82F32'],
-  fillColors: ['transparent', '#FFFFFF', '#FCF5E2', '#323232', '#FFEA02', '#D82F32', '#0066CC'],
-  defaultStrokeColor: '#323232',
   strokeWidths: [0, 1, 2, 3, 5, 8, 13, 21],
-  defaultStrokeWidth: 1,
-  defaultFillColor: '#FFFFFF',
   defaultHighlightColor: '#FFEA02',
   defaultBackgroundColor: '#FCF5E2',
   defaultForegroundColor: '#323232',
-  defaultFontFamiliy: 'Helvetica',
+  defaultFontFamily: 'Helvetica',
   fontSizes: [9, 10, 12, 14, 16, 18, 20, 24],
   defaultFontSize: 12,
   defaultBorderSize: 1,
@@ -119,11 +325,13 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   modules: [
     PopupModule,
     TextAnnotationModule,
-    HighlightAnnotationModule,
-    FreetextAnnotationModule,
     InkAnnotationModule,
+    EditInkAnnotationModule,
+    FreetextAnnotationModule,
+    HighlightAnnotationModule,
     StampAnnotationModule,
     ShapeAnnotationModule,
+    ImageAnnotationModule,
   ],
   ms_custom: false,
 }

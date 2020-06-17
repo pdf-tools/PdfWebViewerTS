@@ -47,8 +47,8 @@ export class PdfWebViewerAPICallbackHandler {
     }
   }
   public RegisterStampImagePromiseQueue: Array<{
-    resolve: (id: number) => void
-    reject: (error: Error) => void
+    resolve: (id: number) => void,
+    reject: (error: Error) => void,
   }>
 
   public searchResolve: null | ((searchResult: SearchResult) => void) = null

@@ -101,7 +101,7 @@ export interface AnnotationPopup extends Annotation {
 export interface Annotation extends PdfPositionalItem {
   itemType: PdfItemType
   lastModified: string
-  borderWidth: number
+  border: AnnotationBorder
   custom: object[]
   page: number
   content: string | null
@@ -147,7 +147,6 @@ export interface StampInfoArgs {
   stampType: StampType
   stampText: string | null
   name: string | null
-  image: Uint8Array | null
 }
 
 export interface StampInfo {
@@ -171,8 +170,9 @@ export interface AnnotationArgs {
   page: number
   pdfRect: PdfRect
   color: string | null
-  originalAuthor: string | undefined
+  originalAuthor?: string
   content?: string
+  subject?: string
 }
 
 export interface InkAnnotationArgs extends AnnotationArgs {
@@ -203,13 +203,15 @@ export interface HighlightAnnotationArgs extends AnnotationArgs {
 }
 
 export interface ShapeDrawingAnnotationArgs extends AnnotationArgs {
-  border: AnnotationBorder
+  border?: AnnotationBorder
   fillColor: string | null
 }
 
-export interface CircleAnnotationArgs extends ShapeDrawingAnnotationArgs {}
+export interface CircleAnnotationArgs extends ShapeDrawingAnnotationArgs {
+}
 
-export interface SquareAnnotationArgs extends ShapeDrawingAnnotationArgs {}
+export interface SquareAnnotationArgs extends ShapeDrawingAnnotationArgs {
+}
 
 export interface OutlineItem extends PdfItem {
   destination: PdfDestination

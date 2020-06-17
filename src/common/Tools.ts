@@ -1,4 +1,4 @@
-import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
+import { PdfViewerOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { PdfItemType } from '../pdf-viewer-api/enums'
 
 export function convertPdfToCssPixel(pdfPixel: string): string {
@@ -17,7 +17,10 @@ export function roundToTwo(num: number) {
   return Math.round(num * 100) / 100
 }
 
-export function getColorPalette(type: PdfItemType, options: PdfViewerCanvasOptions): string[] {
+export function getColorPalette(
+  type: PdfItemType,
+  options: PdfViewerOptions,
+): string[] {
   if (type === PdfItemType.INK) {
     return options.foregroundColors
   } else {

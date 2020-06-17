@@ -1,7 +1,7 @@
 import { ViewerCanvasState, ViewerCanvasStore } from '../pdf-viewer-canvas/state/store'
 import { PdfViewerApi } from '../pdf-viewer-api'
 import { Annotation, PdfItem } from '../pdf-viewer-api/types'
-import { PdfViewerCanvasOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
+import { PdfViewerOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { PdfViewerCanvas } from '../pdf-viewer-canvas/PdfViewerCanvas'
 import { CanvasModule } from './CanvasModule'
 import { addHistoryEntry } from '../custom/history'
@@ -14,7 +14,7 @@ export interface CanvasLayerClass {
     store: ViewerCanvasStore,
     pdfApi: PdfViewerApi,
     pdfViewerCanvas: PdfViewerCanvas,
-    options: PdfViewerCanvasOptions,
+    options: PdfViewerOptions,
   ): CanvasLayer
 }
 
@@ -23,7 +23,7 @@ export abstract class CanvasLayer {
   protected store: ViewerCanvasStore
   protected pdfApi: PdfViewerApi
   protected pdfViewerCanvas: PdfViewerCanvas
-  protected options: PdfViewerCanvasOptions
+  protected options: PdfViewerOptions
   protected module: CanvasModule
   private canvasContexts: CanvasRenderingContext2D[] = []
   private htmlLayers: HTMLElement[] = []
@@ -36,7 +36,7 @@ export abstract class CanvasLayer {
     store: ViewerCanvasStore,
     pdfApi: PdfViewerApi,
     pdfViewerCanvas: PdfViewerCanvas,
-    options: PdfViewerCanvasOptions,
+    options: PdfViewerOptions,
   ) {
     this.containerElement = containerElement
     this.store = store

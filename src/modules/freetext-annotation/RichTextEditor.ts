@@ -104,10 +104,10 @@ export class RichTextEditor {
     return {
       ...this.content,
       content: pureContent ? pureContent : '',
-      // backgroundColor: this.editorDocument.body.style.backgroundColor,
-      // fontColor: this.editorDocument.body.style.color,
-      // fontName: this.editorDocument.body.style.fontFamily,
-      // fontSizeCSS: this.editorDocument.body.style.fontSize,
+       backgroundColor: this.editorDocument.body.style.backgroundColor,
+       fontColor: this.editorDocument.body.style.color,
+       fontName: this.editorDocument.body.style.fontFamily,
+       fontSizeCSS: this.editorDocument.body.style.fontSize,
       richText,
     }
   }
@@ -174,8 +174,12 @@ export class RichTextEditor {
       size = roundToTwo((size / 96) * 72)
       return 'font-size:' + size + 'pt'
     })
-    return text.replace(/rgb\((.+?)\)/gi, (rgb) => {
+    text = text.replace(/rgb\((.+?)\)/gi, (rgb) => {
       return new Color(rgb).toHexRgb()
+    })
+    // remove spaces within the styles tag
+    return text.replace(/style="(.*?)"/gi, styles => {
+      return styles.replace(/\s*/gi, '')
     })
   }
 

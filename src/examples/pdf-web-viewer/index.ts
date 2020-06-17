@@ -2,10 +2,10 @@ import { PdfWebViewer } from '../../'
 import { PdfWebViewerOptions } from '../../'
 import { PdfPageLayoutMode, StampAnnotationColor } from '../../pdf-viewer-api'
 import { DebugModule } from './modules/DebugModule'
-import { PdfViewerCanvasDefaultOptions } from '../../pdf-viewer-canvas/PdfViewerCanvasOptions'
 
 import { TextAnnotationModule } from '../../modules/text-annotation/TextAnnotationModule'
 import { InkAnnotationModule } from '../../modules/ink-annotation/InkAnnotationModule'
+import { EditInkAnnotationModule } from '../../modules/edit-ink-annotation/EditInkAnnotationModule'
 import { FreetextAnnotationModule } from '../../modules/freetext-annotation/FreetextAnnotationModule'
 import { HighlightAnnotationModule } from '../../modules/highlight-annotation/HighlightAnnotationModule'
 import { StampAnnotationModule } from '../../modules/stamp-annotation/StampAnnotationModule'
@@ -20,7 +20,6 @@ import '../../styles/themes/pdf-web-viewer.scss'
 
 const viewerContainer = document.getElementById('viewer') as HTMLElement
 const license = '1-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
-
 const options: Partial<PdfWebViewerOptions> = {
   author: 'Hans Muster',
   allowFileDrop: true,
@@ -54,6 +53,7 @@ const options: Partial<PdfWebViewerOptions> = {
     PopupModule,
     TextAnnotationModule,
     InkAnnotationModule,
+    EditInkAnnotationModule,
     FreetextAnnotationModule,
     HighlightAnnotationModule,
     StampAnnotationModule,
