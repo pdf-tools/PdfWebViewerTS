@@ -3,6 +3,7 @@ import { PdfViewerApi } from '../pdf-viewer-api'
 import { Annotation, PdfItem } from '../pdf-viewer-api/types'
 import { PdfViewerOptions } from '../pdf-viewer-canvas/PdfViewerCanvasOptions'
 import { PdfViewerCanvas } from '../pdf-viewer-canvas/PdfViewerCanvas'
+
 import { CanvasModule } from './CanvasModule'
 import { addHistoryEntry } from '../custom/history'
 

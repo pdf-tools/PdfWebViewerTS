@@ -40,6 +40,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
       toolbarElement,
     )
 
+
     this.store.viewer.beginModule(moduleLayerName)
   }
 

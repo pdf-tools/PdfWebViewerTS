@@ -159,7 +159,6 @@ export class EditFreetextAnnotationLayer extends CanvasLayer {
     const promise = new Promise<void>((resolve, reject) => {
       if (this.richTextEditor && this.freetextAnnotation) {
         const richTextObj = this.richTextEditor.getEditorValues()
-
         const subject = this.toolbarView ? this.toolbarView.getState().newSubject : this.freetextAnnotation.subject
         if (this.options.ms_custom) {
           addHistoryEntry(this.freetextAnnotation, 'edit', this.options.author, richTextObj.content, subject)
