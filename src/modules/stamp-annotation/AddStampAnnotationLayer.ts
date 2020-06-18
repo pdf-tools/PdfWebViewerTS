@@ -18,7 +18,6 @@ export class AddStampAnnotationLayer extends CanvasLayer {
   private stampRect: Rect | null = null
   private page: number = 0
   private screenPageRect: Rect | null = null
-  private selectedStamp: number = -1
   private aspectRatio: number | null = null
   private stamps: any[] = []
 
@@ -32,14 +31,14 @@ export class AddStampAnnotationLayer extends CanvasLayer {
     const toolbarElement = (this.module as StampAnnotationModule).toolbarElement as HTMLElement
     createAddStampAnnotationToolbar(
       {
-        selectedStamp: this.selectedStamp,
+        selectedStamp: this.options.selectedStamp,
         stamps: this.stamps,
         onStampChanged: this.setStamp,
         onClose: this.close,
       },
       toolbarElement,
     )
-
+    this.setStamp(this.options.selectedStamp)
     this.store.viewer.beginModule(moduleLayerName)
   }
 
@@ -141,7 +140,6 @@ export class AddStampAnnotationLayer extends CanvasLayer {
             this.stampRect = null
             this.page = 0
             this.aspectRatio = null
-            this.selectedStamp = -1
             this.screenPageRect = null
             this.remove()
             return
@@ -156,7 +154,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
   }
 
   private setStamp(stampIndex: number) {
-    this.selectedStamp = stampIndex
+    this.options.selectedStamp = stampIndex
 
     const stamp = this.stamps[stampIndex]
 
@@ -188,7 +186,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
       pdfRect.pdfH = pdfRect.pdfW / this.aspectRatio
     }
 
-    const stampSetting = this.stamps[this.selectedStamp]
+    const stampSetting = this.stamps[this.options.selectedStamp]
 
     if (stampSetting.image) {
       const imgData = imageDataUrlToUint8Array(stampSetting.image)

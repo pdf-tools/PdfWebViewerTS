@@ -282,6 +282,14 @@ export class PdfViewerOptions {
     return this.storage.getItem<AnnotationBorderStyle>('shapeStrokeStyle', AnnotationBorderStyle.SOLID)
   }
 
+  set selectedStamp(id: number) {
+    this.storage.setItem('selectedStamp', id)
+  }
+
+  get selectedStamp(): number {
+    return this.storage.getItem<number>('selectedStamp', -1)
+  }
+
   get ms_custom(): boolean {
     return this.options.ms_custom
   }
