@@ -136,7 +136,7 @@ export class AddShapeAnnotationLayer extends CanvasLayer {
                 const cX = rect.x + rect.w / 2
                 const cY = rect.y + rect.h / 2
                 ctx.beginPath()
-                ctx.ellipse(cX, cY, rect.w / 2, rect.h / 2, 0, 0, Math.PI * 2)
+                ctx.ellipse(cX, cY, Math.max(rect.w / 2 - ctx.lineWidth / 2, 0), Math.max(rect.h / 2 - ctx.lineWidth / 2, 0), 0, 0, Math.PI * 2)
                 ctx.fill()
                 ctx.stroke()
               } else {
