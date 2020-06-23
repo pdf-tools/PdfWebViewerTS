@@ -1,5 +1,10 @@
 # PdfWebViewer
 
+In this repository is the complete GUI code for the PDF Tools PDF Web Viewer.
+This is the place to start if you need to change more than the options allow.
+
+If you have any questions regarding code structure do not hesitate to contact us at pdfsupport@pdf-tools.com
+
 [Online Demo](https://www.pdf-tools.com/pdf20/en/products/pdf-rendering/pdf-web-viewer/online-demo/)
 
 ## Development
