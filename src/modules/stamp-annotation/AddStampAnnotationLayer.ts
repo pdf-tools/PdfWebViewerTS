@@ -18,7 +18,6 @@ export class AddStampAnnotationLayer extends CanvasLayer {
   private stampRect: Rect | null = null
   private page: number = 0
   private screenPageRect: Rect | null = null
-  private selectedStamp: number = -1
   private aspectRatio: number | null = null
   private stamps: any[] = []
 
@@ -30,16 +29,16 @@ export class AddStampAnnotationLayer extends CanvasLayer {
 
     /* tslint:disable-next-line:align */
     const toolbarElement = (this.module as StampAnnotationModule).toolbarElement as HTMLElement
+    this.setStamp(this.options.selectedStamp)
     createAddStampAnnotationToolbar(
       {
-        selectedStamp: this.selectedStamp,
+        selectedStamp: this.options.selectedStamp,
         stamps: this.stamps,
         onStampChanged: this.setStamp,
         onClose: this.close,
       },
       toolbarElement,
     )
-
     this.store.viewer.beginModule(moduleLayerName)
   }
 
@@ -141,7 +140,6 @@ export class AddStampAnnotationLayer extends CanvasLayer {
             this.stampRect = null
             this.page = 0
             this.aspectRatio = null
-            this.selectedStamp = -1
             this.screenPageRect = null
             this.remove()
             return
@@ -156,7 +154,15 @@ export class AddStampAnnotationLayer extends CanvasLayer {
   }
 
   private setStamp(stampIndex: number) {
-    this.selectedStamp = stampIndex
+    if (this.stamps.length == 0) {
+      return
+    }
+
+    if (stampIndex > this.stamps.length) {
+      stampIndex = 0
+    }
+
+    this.options.selectedStamp = stampIndex
 
     const stamp = this.stamps[stampIndex]
 
@@ -171,7 +177,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
 
     const getStampInfoArgs = {
       stampType: StampType.TEXT,
-      stampText: translationManager.getText(stamp.name),
+      stampText: stamp.text ? stamp.text : translationManager.getText(stamp.translation_key),
       name: null,
       image: null,
     }
@@ -188,7 +194,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
       pdfRect.pdfH = pdfRect.pdfW / this.aspectRatio
     }
 
-    const stampSetting = this.stamps[this.selectedStamp]
+    const stampSetting = this.stamps[this.options.selectedStamp]
 
     if (stampSetting.image) {
       const imgData = imageDataUrlToUint8Array(stampSetting.image)
@@ -220,7 +226,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
         page: pdfRect.page,
         pdfRect,
         stampName,
-        stampText: translationManager.getText(stampSetting.name),
+        stampText: stampSetting.text ? stampSetting.text : translationManager.getText(stampSetting.translation_key),
         stampColor: stampColor != null ? stampColor : StampAnnotationColor.GREEN,
       }
       this.pdfApi.createItem(annotation).then((annot) => {

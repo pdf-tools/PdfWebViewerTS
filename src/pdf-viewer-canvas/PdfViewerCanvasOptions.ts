@@ -13,17 +13,16 @@ import { ShapeAnnotationModule } from '../modules/shape-annotations/ShapeAnnotat
 import { ImageAnnotationModule } from '../modules/image-annotations/ImageAnnotationModule'
 
 export interface TextStampSetting {
-  name: string
+  translation_key?: string
+  text?: string
   thumbnail?: string
   color: StampAnnotationColor
-  pdfStampName?: string
 }
 
 export interface ImageStampSetting {
-  name: string
-  color: string
-  thumbnail?: string
   image: string
+  thumbnail?: string
+  name?: string
 }
 
 interface Fonts {
@@ -70,7 +69,6 @@ export interface PdfViewerCanvasOptions extends PdfViewerCanvasCoreOptions {
   defaultFontSize: number
   defaultBorderSize: number
   defaultStampWidth: number
-  defaultStampText: string
   ms_custom: boolean
 }
 
@@ -155,15 +153,7 @@ export class PdfViewerOptions {
   }
 
   get defaultStampWidth(): number {
-    return this.defaultStampWidth
-  }
-
-  get stampText(): string {
-    return this.storage.getItem('stampText', this.options.defaultStampText)
-  }
-
-  set stampText(text: string) {
-    this.storage.setItem('stampText', text)
+    return this.options.defaultStampWidth
   }
 
   get freetextFontSize(): number {
@@ -282,6 +272,14 @@ export class PdfViewerOptions {
     return this.storage.getItem<AnnotationBorderStyle>('shapeStrokeStyle', AnnotationBorderStyle.SOLID)
   }
 
+  set selectedStamp(id: number) {
+    this.storage.setItem('selectedStamp', id)
+  }
+
+  get selectedStamp(): number {
+    return this.storage.getItem<number>('selectedStamp', 0)
+  }
+
   get ms_custom(): boolean {
     return this.options.ms_custom
   }
@@ -306,21 +304,20 @@ export const PdfViewerCanvasDefaultOptions: PdfViewerCanvasOptions = {
   fontFamilies: ['Helvetica', 'Times', 'Courier', 'Symbol', 'ZapfDingbats'],
   searchMatchColor: '#3ABCFF',
   stamps: [
-    { name: 'stamptext.approved', color: StampAnnotationColor.GREEN, pdfStampName: 'SBApproved' },
-    { name: 'stamptext.notApproved', color: StampAnnotationColor.RED, pdfStampName: 'SBNotApproved' },
-    { name: 'stamptext.draft', color: StampAnnotationColor.BLUE, pdfStampName: 'SBDraft' },
-    { name: 'stamptext.final', color: StampAnnotationColor.GREEN, pdfStampName: 'SBFinal' },
-    { name: 'stamptext.completed', color: StampAnnotationColor.GREEN, pdfStampName: 'SBCompleted' },
-    { name: 'stamptext.confidential', color: StampAnnotationColor.BLUE, pdfStampName: 'SBConfidential' },
-    { name: 'stamptext.forPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForPublicRelease' },
-    { name: 'stamptext.notForPublic', color: StampAnnotationColor.BLUE, pdfStampName: 'SBNotForPublicRelease' },
-    { name: 'stamptext.void', color: StampAnnotationColor.RED, pdfStampName: 'SBVoid' },
-    { name: 'stamptext.forComment', color: StampAnnotationColor.BLUE, pdfStampName: 'SBForComment' },
-    { name: 'stamptext.preliminaryResults', color: StampAnnotationColor.BLUE, pdfStampName: 'SBPreliminaryResults' },
-    { name: 'stamptext.informationOnly', color: StampAnnotationColor.BLUE, pdfStampName: 'SBInformationOnly' },
+    { translation_key: 'stamptext.approved', color: StampAnnotationColor.GREEN },
+    { translation_key: 'stamptext.notApproved', color: StampAnnotationColor.RED },
+    { translation_key: 'stamptext.draft', color: StampAnnotationColor.BLUE },
+    { translation_key: 'stamptext.final', color: StampAnnotationColor.GREEN },
+    { translation_key: 'stamptext.completed', color: StampAnnotationColor.GREEN },
+    { translation_key: 'stamptext.confidential', color: StampAnnotationColor.BLUE },
+    { translation_key: 'stamptext.forPublic', color: StampAnnotationColor.BLUE },
+    { translation_key: 'stamptext.notForPublic', color: StampAnnotationColor.BLUE },
+    { translation_key: 'stamptext.void', color: StampAnnotationColor.RED },
+    { translation_key: 'stamptext.forComment', color: StampAnnotationColor.BLUE },
+    { translation_key: 'stamptext.preliminaryResults', color: StampAnnotationColor.BLUE },
+    { translation_key: 'stamptext.informationOnly', color: StampAnnotationColor.BLUE },
   ],
   defaultStampWidth: 120,
-  defaultStampText: 'stamptext.approved',
   promptOnUnsavedChanges: false,
   modules: [
     PopupModule,

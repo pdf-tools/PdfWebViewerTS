@@ -50,7 +50,7 @@ export const createAddStampAnnotationToolbar = (props: AddStampAnnotationToolbar
         </div>
       )
     }
-    return <div>{translationManager.getText(stamp.name)}</div>
+    return <div>{stamp.image ? stamp.name : stamp.text ? stamp.text : translationManager.getText(stamp.translation_key)}</div>
   }
 
   const DropdownButton = (value: number) => {
@@ -63,7 +63,7 @@ export const createAddStampAnnotationToolbar = (props: AddStampAnnotationToolbar
     if (stamp.thumbnail) {
       return <img src={stamp.thumbnail} />
     }
-    return <div>{translationManager.getText(stamp.name)}</div>
+    return <div>{stamp.image ? stamp.name : stamp.text ? stamp.text : translationManager.getText(stamp.translation_key)}</div>
   }
 
   const App = () => <AddStampAnnotationToolbar />
