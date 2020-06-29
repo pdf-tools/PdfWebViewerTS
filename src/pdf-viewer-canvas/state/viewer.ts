@@ -51,6 +51,7 @@ export interface ViewerState {
   textSelection: PdfRect[] | null
   selectedPopupId: number | null
   selectedPopupChanged: boolean | null
+  popupFocus: number | null
   selectedModuleName: string | null
   cursorStyle: CursorStyle
   cursorStyleChanged: boolean
@@ -68,6 +69,7 @@ export const state: ViewerState = {
   textSelection: null,
   selectedPopupId: null,
   selectedPopupChanged: true,
+  popupFocus: null,
   selectedModuleName: null,
   cursorStyle: CursorStyle.DEFAULT,
   cursorStyleChanged: true,
@@ -84,7 +86,8 @@ export interface ViewerActions {
   selectAnnotation(annotation: Annotation): ViewerState
   deselectAnnotation(): ViewerState
   setTextSelection(selection: PdfRect[] | null): ViewerState
-  selectPopup(id: number | null): ViewerState
+  selectPopup( args: {id: number | null, focus: boolean} ): ViewerState
+  clearPopupFocus(): ViewerState
   deselectPopup(): ViewerState
 }
 
@@ -178,15 +181,22 @@ export const actions: ActionsType<ViewerState, ViewerActions> = {
       textSelection,
     }
   },
-  selectPopup: (id: number | null) => ($state) => {
-    const mode = id !== null ? ViewerMode.POPUP_SELECTED : ViewerMode.DEFAULT
+  selectPopup: (args: {id: number | null, focus: boolean}) => ($state) => {
+    const mode = args.id !== null ? ViewerMode.POPUP_SELECTED : ViewerMode.DEFAULT
     const modeChanged = $state.mode !== mode
     return {
       ...$state,
       mode,
       modeChanged,
-      selectedPopupChanged: id !== $state.selectedPopupId,
-      selectedPopupId: id,
+      selectedPopupChanged: args.id !== $state.selectedPopupId,
+      selectedPopupId: args.id,
+      popupFocus: args.focus ? args.id : null
+    }
+  },
+  clearPopupFocus: () => ($state) => {
+    return {
+      ...$state,
+      popupFocus: null,
     }
   },
   deselectPopup: () => ($state) => {

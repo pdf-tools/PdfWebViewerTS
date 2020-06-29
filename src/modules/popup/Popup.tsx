@@ -53,6 +53,7 @@ interface PopupViewState {
   currentUser: string
   activeContent: string | null
   activeSubject: string | null
+  clearFocus: boolean
   stateChanged: boolean
 }
 
@@ -61,6 +62,7 @@ export interface PopupViewActions {
   updateOpenPopups(openPopups: Popup[]): PopupViewState
   setPositionCalculated(id: number): PopupViewState
   selectPopup(id: number): PopupViewState
+  setFocus(id: number): PopupViewState
   deselectPopup(): PopupViewState
   updateSubjectAndContent(id: number): PopupViewState
   stateChanged(hasChanged: boolean): PopupViewState
@@ -79,6 +81,7 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
     activeContent: null,
     activeSubject: null,
     stateChanged: false,
+    clearFocus: false,
   }
 
   const actions: ActionsType<PopupViewState, PopupViewActions> = {
@@ -129,6 +132,16 @@ export const createPopupView = (props: PopupViewProps, element: HTMLElement) => 
         activeContent: content,
         activeSubject: subject,
       }    
+    },
+    setFocus: (id: number) => $state => {
+      const textArea = (document.getElementById('pwv-popup-content-' + id) as HTMLTextAreaElement)
+      if (textArea) {
+        textArea.focus()
+      }
+      return {
+        ...$state,
+        clearFocus: document.activeElement === textArea
+      }
     },
     deselectPopup: () => $state => {
       return {

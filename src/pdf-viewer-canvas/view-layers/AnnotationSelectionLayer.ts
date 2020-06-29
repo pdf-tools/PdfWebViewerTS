@@ -399,7 +399,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
 
       this.pdfViewerApi.updateItem(item)
         .then(() => {
-          this.store.viewer.selectPopup(item.id)
+          this.store.viewer.selectPopup({ id: item.id, focus: true})
         })
       this.deselectAnnotation()
     }
@@ -418,7 +418,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
 
       this.pdfViewerApi.updateItem(item)
         .then(() => {
-          this.store.viewer.selectPopup(item.id)
+          this.store.viewer.selectPopup({id: item.id, focus: true}  )
         })
       this.deselectAnnotation()
     }
