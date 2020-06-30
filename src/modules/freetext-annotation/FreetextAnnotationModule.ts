@@ -40,6 +40,10 @@ export class FreetextAnnotationModule extends CanvasModule {
     }
   }
 
+  public activate(annotationId: number) {
+    this.onEdit(annotationId)
+  }
+
   public onEdit(annotationId: number) {
     this.createCanvasLayer('edit', EditFreetextAnnotationLayer, annotationId)
   }

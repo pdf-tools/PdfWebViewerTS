@@ -19,4 +19,8 @@ export class DebugModule extends CanvasModule {
     return {
     }
   }
+
+  public activate() {
+    return
+  }
 }

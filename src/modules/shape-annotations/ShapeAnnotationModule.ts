@@ -32,6 +32,10 @@ export class ShapeAnnotationModule extends CanvasModule {
     }
   }
 
+  public activate() {
+    return
+  }
+
   private onBtnAddRectangleClicked() {
     /* tslint:disable-next-line:no-string-literal */
     if (!this.canvasLayers['add']) {

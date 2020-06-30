@@ -11,6 +11,7 @@ export class TextAnnotationModule extends CanvasModule {
     super()
     this.name = 'TextAnnotationModule'
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
+    this.activate = this.activate.bind(this)
   }
 
   public onRegister() {
@@ -28,6 +29,10 @@ export class TextAnnotationModule extends CanvasModule {
       annotationbar: this.annotationbarElement,
       toolbar: this.toolbarElement,
     }
+  }
+
+  public activate() {
+    this.onBtnAddClicked()
   }
 
   private onBtnAddClicked() {
