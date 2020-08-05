@@ -33,7 +33,7 @@ export class ShapeAnnotationModule extends CanvasModule {
   }
 
   public activate() {
-
+    return
   }
 
   private onBtnAddRectangleClicked() {

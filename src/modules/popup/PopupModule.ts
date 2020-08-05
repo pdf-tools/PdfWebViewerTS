@@ -14,6 +14,6 @@ export class PopupModule extends CanvasModule {
   }
 
   public activate() {
-
+    return
   }
 }
