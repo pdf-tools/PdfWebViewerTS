@@ -316,6 +316,14 @@ export class PdfWebViewer {
           this.viewerCanvas.addEventListener('itemDeleted', this.handleAnnotationDeleted)
           this.viewerCanvas.addEventListener('itemSelected', this.handleAnnotationSelected)
           this.viewerCanvas.addEventListener('itemDeselected', this.handleAnnotationDeselected)
+
+          const params = new URLSearchParams(location.search)
+          if (params) {
+            const file = params.get('url')
+            if (file) {
+              this.openFile(file)
+            }
+          }
         })
       }
       a.removeCanvasView = (elm: HTMLElement) => {

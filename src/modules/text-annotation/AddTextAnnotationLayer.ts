@@ -137,8 +137,10 @@ export class AddTextAnnotationLayer extends CanvasLayer {
         page: pdfPoint.page,
       },
     }
-    this.pdfApi.createItem(annotation).then( annot => {
+    this.pdfApi.createItem(annotation).then( item => {
+      const annot = item as Annotation
       this.onAnnotationCreated(annot as Annotation)
+      this.store.viewer.selectPopup({id: annot.id, focus: true})
     })
   }
 }

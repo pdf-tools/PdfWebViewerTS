@@ -10,6 +10,7 @@ export class HighlightAnnotationModule extends CanvasModule {
     super()
     this.name = 'HighlightAnnotationModule'
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
+    this.activate = this.activate.bind(this)
   }
 
   public onRegister() {
@@ -28,6 +29,10 @@ export class HighlightAnnotationModule extends CanvasModule {
       annotationbar: this.annotationbarElement,
       toolbar: this.toolbarElement,
     }
+  }
+
+  public activate() {
+    this.onBtnAddClicked()
   }
 
   private onBtnAddClicked() {

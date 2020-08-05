@@ -478,6 +478,13 @@ export class PdfViewerCanvas {
     }
   }
 
+  public startModule(moduleName: string, args?: any) {
+    const module = this.modules.find( m => { return m.name == moduleName})
+    if (module) {
+      module.activate(args)
+    }
+  }
+
   public addEventListener<K extends keyof PdfViewerCanvasEventMap>(type: K, listener: (e: PdfViewerCanvasEventMap[K]) => void) {
     if (this.eventListeners.has(type)) {
       ;(this.eventListeners.get(type) as PdfViewerCanvasEventListener[]).push(listener)

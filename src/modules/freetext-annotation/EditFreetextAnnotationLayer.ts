@@ -8,7 +8,7 @@ import { convertPdfToCssPixel, convertCssToPdfPixel } from '../../common/Tools'
 import { addHistoryEntry } from '../../custom/history'
 import { Annotation } from '../../pdf-viewer-api'
 
-const moduleLayerName = 'AddFreetextAnnotation'
+const moduleLayerName = 'EditFreetextAnnotation'
 
 export class EditFreetextAnnotationLayer extends CanvasLayer {
   private freetextAnnotation: any | null = null

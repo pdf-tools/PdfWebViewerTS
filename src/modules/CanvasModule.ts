@@ -29,7 +29,7 @@ export abstract class CanvasModule {
   protected pdfApi: PdfViewerApi | null = null
   protected pdfViewerCanvas: PdfViewerCanvas | null = null
   protected options: PdfViewerOptions | null = null
-  protected name: string | null = null
+  public name: string | null = null
   private containerElement: HTMLElement | null = null
 
   constructor() {
@@ -54,6 +54,7 @@ export abstract class CanvasModule {
   }
 
   public abstract onRegister(): CanvasModuleRegistration
+  public abstract activate(args?: any): void
 
   public render(timestamp: number, state: ViewerCanvasState) {
     const keys = Object.keys(this.canvasLayers)

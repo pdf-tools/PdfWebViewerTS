@@ -10,6 +10,7 @@ export class InkAnnotationModule extends CanvasModule {
     super()
     this.name = 'InkAnnotationModule'
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
+    this.activate = this.activate.bind(this)
   }
 
   public onRegister() {
@@ -27,6 +28,10 @@ export class InkAnnotationModule extends CanvasModule {
       annotationbar: this.annotationbarElement,
       toolbar: this.toolbarElement,
     }
+  }
+
+  public activate() {
+    this.onBtnAddClicked()
   }
 
   private onBtnAddClicked() {

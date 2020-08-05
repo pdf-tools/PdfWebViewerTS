@@ -11,6 +11,7 @@ export class EditInkAnnotationModule extends CanvasModule {
     super()
     this.name = 'EditInkAnnotationModule'
     this.onBtnAddClicked = this.onBtnAddClicked.bind(this)
+    this.activate = this.activate.bind(this)
   }
 
   public onRegister() {
@@ -25,6 +26,10 @@ export class EditInkAnnotationModule extends CanvasModule {
       annotationbar: this.annotationbarElement,
       toolbar: this.toolbarElement,
     }
+  }
+
+  public activate() {
+    this.onBtnAddClicked()
   }
 
   private onBtnAddClicked() {

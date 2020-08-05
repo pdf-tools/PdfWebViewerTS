@@ -29,6 +29,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
 
     /* tslint:disable-next-line:align */
     const toolbarElement = (this.module as StampAnnotationModule).toolbarElement as HTMLElement
+    this.setStamp(this.options.selectedStamp)
     createAddStampAnnotationToolbar(
       {
         selectedStamp: this.options.selectedStamp,
@@ -38,7 +39,6 @@ export class AddStampAnnotationLayer extends CanvasLayer {
       },
       toolbarElement,
     )
-    this.setStamp(this.options.selectedStamp)
     this.store.viewer.beginModule(moduleLayerName)
   }
 
@@ -154,6 +154,14 @@ export class AddStampAnnotationLayer extends CanvasLayer {
   }
 
   private setStamp(stampIndex: number) {
+    if (this.stamps.length == 0) {
+      return
+    }
+
+    if (stampIndex > this.stamps.length) {
+      stampIndex = 0
+    }
+
     this.options.selectedStamp = stampIndex
 
     const stamp = this.stamps[stampIndex]
@@ -169,7 +177,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
 
     const getStampInfoArgs = {
       stampType: StampType.TEXT,
-      stampText: translationManager.getText(stamp.name),
+      stampText: stamp.text ? stamp.text : translationManager.getText(stamp.translation_key),
       name: null,
       image: null,
     }
@@ -218,7 +226,7 @@ export class AddStampAnnotationLayer extends CanvasLayer {
         page: pdfRect.page,
         pdfRect,
         stampName,
-        stampText: translationManager.getText(stampSetting.name),
+        stampText: stampSetting.text ? stampSetting.text : translationManager.getText(stampSetting.translation_key),
         stampColor: stampColor != null ? stampColor : StampAnnotationColor.GREEN,
       }
       this.pdfApi.createItem(annotation).then((annot) => {

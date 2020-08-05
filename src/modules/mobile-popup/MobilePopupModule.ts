@@ -12,4 +12,8 @@ export class MobilePopupModule extends CanvasModule {
 
     return {}
   }
+
+  public activate() {
+    return
+  }
 }

@@ -100,7 +100,7 @@ export class MobilePopupLayer extends CanvasLayer {
       if (item) {
         item.popup.isOpen = false
         this.updateSelectedPopupContent(true, item)
-        this.store.viewer.selectPopup(null)
+        this.store.viewer.selectPopup({ id: null, focus: false })
       }
     }
   }

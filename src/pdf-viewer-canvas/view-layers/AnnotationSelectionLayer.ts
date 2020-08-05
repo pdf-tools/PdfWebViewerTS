@@ -108,9 +108,15 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
                 breakRenderLoop = true
               }
             }
-          } else if (state.pointer.action === 'dblclick' && behaviors.canHavePopup && !annotationOnPoint.isHidden()) {
-            this.openPopup(annotationOnPoint.id)
-            breakRenderLoop = true
+          } else if (state.pointer.action === 'dblclick') { 
+            if (behaviors.canHavePopup && !annotationOnPoint.isHidden()) {
+              this.openPopup(annotationOnPoint.id)
+              breakRenderLoop = true
+            } else if (annotationOnPoint.itemType === PdfItemType.FREE_TEXT) {
+              if (this.viewerCanvas) {
+                this.viewerCanvas.startModule('FreetextAnnotationModule', annotationOnPoint.id)
+              }
+            }
           }
         }
       } else if (state.viewer.selectedAnnotationId) {
@@ -399,7 +405,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
 
       this.pdfViewerApi.updateItem(item)
         .then(() => {
-          this.store.viewer.selectPopup(item.id)
+          this.store.viewer.selectPopup({ id: item.id, focus: true})
         })
       this.deselectAnnotation()
     }
@@ -418,7 +424,7 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
 
       this.pdfViewerApi.updateItem(item)
         .then(() => {
-          this.store.viewer.selectPopup(item.id)
+          this.store.viewer.selectPopup({id: item.id, focus: true}  )
         })
       this.deselectAnnotation()
     }

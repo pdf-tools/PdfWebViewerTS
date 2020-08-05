@@ -33,6 +33,10 @@ export class ImageAnnotationModule extends CanvasModule {
     }
   }
 
+  public activate() {
+    return
+  }
+
   private createImage(dataUrl: string) {
     const image = new Image()
     image.onload = () => {

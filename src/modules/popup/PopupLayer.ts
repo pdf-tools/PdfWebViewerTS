@@ -76,6 +76,13 @@ export class PopupLayer extends CanvasLayer {
         this.updateOpenPopupList(state)
       }
 
+      if (state.viewer.popupFocus) {
+        this.popupView.setFocus(state.viewer.popupFocus)
+      }
+      if (this.popupView.getState().clearFocus) {
+        this.store.viewer.clearPopupFocus()
+      }
+
       if (state.viewer.selectedPopupChanged) {
         const selectedPopup = this.popupView.getState().selectedPopup
         if (state.viewer.selectedPopupId) {
@@ -374,7 +381,7 @@ export class PopupLayer extends CanvasLayer {
         this.updateSelectedPopupContent(true)
       }
       this.popupView.selectPopup(id)
-      this.store.viewer.selectPopup(id)
+      this.store.viewer.selectPopup( {id, focus: false})
     }
   }
 
@@ -382,7 +389,7 @@ export class PopupLayer extends CanvasLayer {
     if (this.popupView) {
       this.updateSelectedPopupContent(true)
       this.popupView.deselectPopup()
-      this.store.viewer.selectPopup(null)
+      this.store.viewer.selectPopup( {id: null, focus: false})
     }
   }
 
@@ -419,7 +426,7 @@ export class PopupLayer extends CanvasLayer {
       if (this.popupView) {
         this.popupView.deselectPopup()
       }
-      this.store.viewer.selectPopup(null)
+      this.store.viewer.selectPopup({id: null, focus: false})
       const annotation = this.pdfApi.getItem(id) as Annotation
       if (annotation) {
         annotation.content = ''
