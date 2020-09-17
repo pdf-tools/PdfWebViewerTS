@@ -65,6 +65,8 @@ export const actions: ActionsType<ViewerCanvasState, ViewerCanvasStore> = {
   loadDefaultState: () => $state => {
     const newState = deepClone(defaultState)
     newState.viewer.contextBarItems = $state.viewer.contextBarItems
+    newState.search = $state.search
+    newState.search.index = 0
     return newState
   },
   resetChangedState: () => $state => ({

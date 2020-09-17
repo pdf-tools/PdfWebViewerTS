@@ -60,7 +60,7 @@ export interface PdfWebViewerActions extends ActionDefinitions {
     openFDFUri(openFDFUri: { pdfUri: string; fdfUri: string; password?: string; pdfAuthorization?: string; fdfAuthorization?: string }): void
     downloadFile(): Promise<void>
     close(): Promise<void>
-    hasChanges(): void
+    hasChanges(): boolean
     setZoom(zoom: number): void
     zoomIn(): void
     zoomOut(): void
@@ -203,23 +203,49 @@ export class PdfWebViewer {
   }
 
   public saveFile(asFdf: boolean) {
-    return this.viewerCanvas ? this.viewerCanvas.saveFile(asFdf) : null
+    return new Promise<Uint8Array>( (resolve, reject) => {
+      if (this.viewerCanvas) {
+        this.viewerCanvas.saveFile(asFdf).then( array => {
+          resolve(array)
+        }).catch( error => {
+          reject(error)
+        })
+      } else {
+        reject(null)
+      }
+    })
   }
 
   public downloadFile() {
-    if (this.view) {
-      return this.view.api.downloadFile()
-    }
+    return new Promise( (resolve, reject) => {
+      if (this.view) {
+        return this.view.api.downloadFile().then( () => {
+          resolve()
+        }).catch( () => {
+          reject()
+        })
+      } else {
+        reject()
+      }
+    })
   }
 
   public close() {
-    if (this.view) {
-      return this.view.api.close()
-    }
+    return new Promise( (resolve, reject) => {
+      if (this.view) {
+        return this.view.api.close().then( () => {
+          resolve()
+        }).catch( error => {
+          reject(error)
+        })
+      } else {
+        reject()
+      }
+    })
   }
 
   public getPageCount() {
-    return this.viewerCanvas ? this.viewerCanvas.getPageCount() : null
+    return this.viewerCanvas ? this.viewerCanvas.getPageCount() : 0
   }
 
   public setPageNumber(page: number) {
@@ -422,6 +448,8 @@ export class PdfWebViewer {
               this.view.closeDocument()
               this.viewerCanvas.close().then(() => {
                 resolve()
+              }).catch( error => {
+                reject(error)
               })
             }
           })
@@ -461,7 +489,7 @@ export class PdfWebViewer {
         },
         hasChanges: () => {
           if (this.viewerCanvas) {
-            this.viewerCanvas.hasChanges()
+            return this.viewerCanvas.hasChanges()
           }
         },
         setZoom: (zoom: number) => {

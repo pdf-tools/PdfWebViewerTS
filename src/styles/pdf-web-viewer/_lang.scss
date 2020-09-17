@@ -1,0 +1,29 @@
+.pwv-show-navigation-panel {
+  .pwv-navigation-panel {
+    .pwv-lang-de & {
+      width: 380px;
+    }
+
+    .pwv-lang-fr & {
+      width: 360px;
+    }
+  }
+  .pwv-navigation-panel > div {
+    .pwv-lang-de & {
+      width: 380px;
+    }
+    .pwv-lang-fr & {
+      width: 360px;
+    }
+  }
+}
+
+.pwv-scroll-container-sc > div {
+  .pwv-lang-de & {
+    width: 366px;
+  }
+  .pwv-lang-fr & {
+    width: 346px;
+  }
+}
+

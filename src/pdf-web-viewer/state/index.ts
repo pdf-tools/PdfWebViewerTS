@@ -26,7 +26,6 @@ export interface RootState {
   showSaveIndicator: boolean
   hasError: boolean
   errorMessage: string
-  language: string
   layout: Layout.LayoutState
   passwordForm: PasswordForm.PasswordFormState
   navigationPanel: NavigationPanel.NavigationPanelState
@@ -52,7 +51,6 @@ const defaultState: RootState = {
   showSaveIndicator: false,
   hasError: false,
   errorMessage: '',
-  language: 'en',
   layout: Layout.state,
   passwordForm: PasswordForm.state,
   navigationPanel: NavigationPanel.state,

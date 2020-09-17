@@ -25,7 +25,7 @@ export interface ImageStampSetting {
   name?: string
 }
 
-interface Fonts {
+export interface Fonts {
   Helvetica: string
   Times: string
   Courier: string

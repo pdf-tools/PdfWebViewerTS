@@ -949,7 +949,9 @@ export class PdfViewerCanvas {
       window.clearTimeout(this.annotTimer)
     }
     this.annotTimer = window.setTimeout(() => {
-      this.getAnnotations(begin, end)
+      if (this.documentLoaded) {
+        this.getAnnotations(begin, end)
+      }
     }, 100)
   }
 

@@ -10,7 +10,9 @@ import { Modal } from './modal/Modal'
 export const Layout: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({ }) => (state, actions) => (
   <div
     class={classNames(
-      'pt-pwv', 'pwv-devicetype-desktop',
+      'pwv-lang-' + state.options.language,
+      'pt-pwv',
+      'pwv-devicetype-desktop',
       state.layout.breakPoint,
     )}
     >
