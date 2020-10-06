@@ -12,6 +12,12 @@ export const translations = {
     fr: 'Glisser le document ici',
     it: 'Trascina qui il documento',
   },
+  'openFile.openFileDisabled': {
+    en: 'No document',
+    de: 'Kein Dokument',
+    fr: 'Pas de document',
+    it: 'Nessun documento',
+  },
   'openFile.openDocument': {
     en: 'Open document',
     de: 'Dokument öffnen',

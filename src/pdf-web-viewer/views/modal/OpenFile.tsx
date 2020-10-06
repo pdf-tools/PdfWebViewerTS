@@ -24,16 +24,20 @@ export const OpenFile: Component<{}, PdfWebViewerState, PdfWebViewerActions> = (
         </div>
         <div class="pwv-modal-body">
           <div class="pwv-modal-message">
-            {state.layout.deviceType === 'desktop' ?
-              <h2>{translationManager.getText('openFile.dropFileHere')}</h2> :
-              <h2>{translationManager.getText('openFile.openDocument')}</h2>
+            {state.layout.deviceType === 'desktop' && state.options.allowFileDrop && state.options.allowOpenFile ?
+              <h2>{translationManager.getText('openFile.dropFileHere')}</h2> : state.options.allowOpenFile ?
+              <h2>{translationManager.getText('openFile.openDocument')}</h2> :
+              <h2>{translationManager.getText('openFile.openFileDisabled')}</h2>
             }
           </div>
           <div class="pwv-btn-row">
-            <label class="pwv-btn">
-              {translationManager.getText('openFile.btnSelectFile')}
-              <input type="file" onchange={handleFileSelected} style={{ display: 'none' }} />
-            </label>
+            { (state.options.allowOpenFile) ?
+              <label class="pwv-btn">
+                {translationManager.getText('openFile.btnSelectFile')}
+                <input type="file" onchange={handleFileSelected} style={{ display: 'none' }} />
+              </label> :
+              <div/>
+            }
           </div>
         </div>
       </div>

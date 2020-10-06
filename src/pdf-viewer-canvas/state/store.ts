@@ -52,6 +52,14 @@ const deepClone = <T>(state: T) => {
 }
 
 /** @internal */
+const resetSearchResults = (searchState: Search.SearchState) => {
+  searchState.page = 1
+  searchState.match = null
+  searchState.index = 0
+  return searchState
+}
+
+/** @internal */
 export const actions: ActionsType<ViewerCanvasState, ViewerCanvasStore> = {
   document: Document.actions,
   annotations: Annotations.actions,
@@ -65,8 +73,7 @@ export const actions: ActionsType<ViewerCanvasState, ViewerCanvasStore> = {
   loadDefaultState: () => $state => {
     const newState = deepClone(defaultState)
     newState.viewer.contextBarItems = $state.viewer.contextBarItems
-    newState.search = $state.search
-    newState.search.index = 0
+    newState.search = resetSearchResults($state.search)
     return newState
   },
   resetChangedState: () => $state => ({

@@ -27,7 +27,7 @@ export const Modal: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({ }
     return <LoadFile />
   } else if (state.showSaveIndicator) {
     return <SaveFile />
-  } else if (!state.hasDocument && state.options.allowFileDrop) {
+  } else if (!state.hasDocument) {
     return <OpenFile />
   } else {
     return <div></div>

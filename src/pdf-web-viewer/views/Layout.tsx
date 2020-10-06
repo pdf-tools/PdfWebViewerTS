@@ -17,7 +17,7 @@ export const Layout: Component<{}, PdfWebViewerState, PdfWebViewerActions> = ({ 
     )}
     >
     <DropZone
-      enabled={state.options.allowFileDrop && state.fileDropEnabled}
+      enabled={state.options.allowFileDrop && state.fileDropEnabled && state.options.allowOpenFile}
       onFileSelected={file => actions.api.openFile({file})}
     >
       <Toolbar />
