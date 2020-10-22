@@ -25,6 +25,7 @@ export class AddFreetextAnnotationLayer extends CanvasLayer {
 
     this.context = this.createCanvas()
     this.colors = this.options.backgroundColors
+    this.selectedColor = this.options.freetextBgColor
 
     // todo: get values from options
     this.borderWidths = [0, 1, 2, 3, 4]

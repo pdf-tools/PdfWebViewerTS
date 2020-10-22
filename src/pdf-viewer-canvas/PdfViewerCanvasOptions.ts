@@ -91,7 +91,7 @@ export class PdfViewerOptions {
   get highlightColors(): string[] {
     return this.options.highlightColors
   }
-  
+
   get foregroundColors(): string[] {
     return this.options.foregroundColors
   }
@@ -135,7 +135,7 @@ export class PdfViewerOptions {
   get modules(): CanvasModuleClass[] | undefined {
     return this.options.modules
   }
-  
+
   get promptOnUnsavedChanges(): boolean {
     return this.options.promptOnUnsavedChanges
   }
@@ -205,11 +205,16 @@ export class PdfViewerOptions {
   }
 
   get freetextBgColor(): string {
-    return this.storage.getItem<string>('freetextBgColor', this.options.defaultBackgroundColor)
+    return this.storage.getItem<string>('freetextBgColor', this.defaultFreetextBgColor)
   }
 
   set freetextBgColor(color: string) {
     this.storage.setItem('freetextBgColor', color)
+  }
+
+  get defaultFreetextBgColor(): string {
+    console.log('returning default freetext bg color', this.options.defaultFreetextBgColor)
+    return this.options.defaultFreetextBgColor ? this.options.defaultFreetextBgColor : this.options.defaultBackgroundColor
   }
 
   get inkColor(): string {
