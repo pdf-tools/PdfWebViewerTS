@@ -132,21 +132,23 @@ export class AnnotationSelectionLayer extends ViewLayerBase {
     if (mode === ViewerMode.ANNOTATION_SELECTED && state.viewer.selectedAnnotationId) {
 
       const annotation = state.annotations.all[state.viewer.selectedAnnotationId]
-
-      if (this.selectedAnnotation === null) {
-        this.selectAnnotation(annotation)
-      }
-
-      if (this.annotationBorder && state.canvas.canvasInvalidated) {
-        const pageRect = state.document.pageRects[annotation.pdfRect.page]
-        if (pageRect) {
-          this.annotationBorder.updatePageRect(pageRect)
+      if (!annotation) {
+        this.deselectAnnotation()
+      } else {
+        if (this.selectedAnnotation === null) {
+          this.selectAnnotation(annotation)
+        }
+        if (this.annotationBorder && state.canvas.canvasInvalidated) {
+          const pageRect = state.document.pageRects[annotation.pdfRect.page]
+          if (pageRect) {
+            this.annotationBorder.updatePageRect(pageRect)
+          }
+        }
+        if (state.viewer.selectedAnnotationChanged || state.canvas.canvasInvalidated) {
+          this.updateSelectionElementPosition(annotation)
         }
       }
 
-      if (state.viewer.selectedAnnotationChanged || state.canvas.canvasInvalidated) {
-        this.updateSelectionElementPosition(annotation)
-      }
     }
 
   }
