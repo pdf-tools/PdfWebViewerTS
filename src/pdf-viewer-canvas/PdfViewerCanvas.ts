@@ -481,7 +481,8 @@ export class PdfViewerCanvas {
   public startModule(moduleName: string, args?: any) {
     const module = this.modules.find( m => { return m.name == moduleName})
     if (module) {
-      module.activate(args)
+      module.activate(args);
+      return module;
     }
   }
 
